@@ -12,6 +12,7 @@ int main()
 
     if(n==1)
         registrarEspecie(arquivo);
-
+    if(n==2)
+        relatorioEspecies(arquivo);
     return 0;
 }

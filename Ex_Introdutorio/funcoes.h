@@ -11,5 +11,7 @@ typedef struct Especie
 
 int registrarEspecie(char  *nomeArq);
 int relatorioEspecies(char *nomeArq);
-int buscaEspecie(char *nomeArq);
+int buscarEspecie(char *nomeArq);
 int registrarInformacao(char *nomeArq);
+Especie criarEspecie(void);
+void mostrarRelatorio(Especie especie);

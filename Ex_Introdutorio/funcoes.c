@@ -8,7 +8,7 @@ int registrarEspecie(char *nomeArq)
 {
     FILE *arquivo;
     Especie especie;
-    int i, j, num;
+    int i, num;
 
     printf("%s", nomeArq);
 
@@ -19,37 +19,16 @@ int registrarEspecie(char *nomeArq)
 
     for(i=0; i<num; i++)
     {
-        scanf("%d", &especie.id);
-        getchar();
-        fgets(especie.nome, 41, stdin);
-        for(j=strlen(especie.nome)-1; j<40;j++)
-        {
-            especie.nome[j] = '$';
-        }
-        fgets(especie.nomeCient, 61, stdin);
-        for(j=strlen(especie.nomeCient)-1; j<60;j++)
-        {
-            especie.nomeCient[j] = '$';
-        }
-        scanf("%d", &especie.populacao);
-        getchar();
-        fgets(especie.status, 9, stdin);
-        for(j=strlen(especie.status)-1; j<8;j++)
-        {
-            especie.status[j] = '$';
-        }
-        scanf("%f %f", &especie.locX, &especie.locY);
-        getchar();
-        scanf("%d", &especie.impacto);
-        getchar();
+        especie = criarEspecie();
 
-        fprintf(arquivo, "%d", especie.id);
-        fprintf(arquivo, "%s", especie.nome);
-        fprintf(arquivo, "%s", especie.nomeCient);
-        fprintf(arquivo, "%d", especie.populacao);
-        fprintf(arquivo, "%s", especie.status);
-        fprintf(arquivo, "%.2f%.2f", especie.locX, especie.locY);
-        fprintf(arquivo, "%d", especie.impacto);
+        fwrite(&especie.id, sizeof(int),1,arquivo);
+        fwrite(especie.nome, sizeof(char),41,arquivo);
+        fwrite(especie.nomeCient, sizeof(char),61,arquivo);
+        fwrite(&especie.populacao, sizeof(int),1,arquivo);
+        fwrite(especie.status, sizeof(char),9,arquivo);
+        fwrite(&especie.locX, sizeof(float),1,arquivo);
+        fwrite(&especie.locY, sizeof(float),1,arquivo);
+        fwrite(&especie.impacto, sizeof(int),1,arquivo);
     }
     fclose(arquivo);
 
@@ -58,8 +37,89 @@ int registrarEspecie(char *nomeArq)
     return 0;
 
 }
-int relatorioEspecies(char *nomeArq);
-int buscaEspecie(char *nomeArq);
+int relatorioEspecies(char *nomeArq)
+{
+    FILE *arquivo;
+    Especie especie;
+    char c;
+
+    arquivo = fopen(nomeArq, "rb");
+
+    while(1)
+    {
+        if(fread(&especie.id, sizeof(int),1,arquivo) == 0)
+            break;
+        fread(especie.nome, sizeof(char), 41, arquivo);
+        fread(especie.nomeCient, sizeof(char), 61, arquivo);
+        fread(&especie.populacao, sizeof(int), 1, arquivo);
+        fread(especie.status, sizeof(char), 9, arquivo);
+        fread(&especie.locX, sizeof(float), 1, arquivo);
+        fread(&especie.locY, sizeof(float), 1, arquivo);
+        if(fread(&especie.impacto, sizeof(int),1,arquivo) == 0)
+            break;
+
+        mostrarRelatorio(especie);
+
+    }
+    return 0;
+}
+int buscarEspecie(char *nomeArq);
 int registrarInformacao(char *nomeArq);
 
+Especie criarEspecie(void)
+{
+    Especie especie;
+    int j;
 
+    for(j=0; j<41;j++)
+    {
+        especie.nome[j] = '$';
+    }
+    for(j=0; j<61;j++)
+    {
+        especie.nomeCient[j] = '$';
+    }
+    for(j=0; j<9;j++)
+    {
+        especie.status[j] = '$';
+    }
+    scanf("%d", &especie.id);
+    getchar();
+    readline(especie.nome);
+    readline(especie.nomeCient);
+    scanf("%d", &especie.populacao);
+    getchar();
+    readline(especie.status);
+    scanf("%f %f", &especie.locX, &especie.locY);
+    getchar();
+    scanf("%d", &especie.impacto);
+    getchar();
+
+    return especie;
+}
+
+void mostrarRelatorio(Especie especie)
+{
+    printf("ID: %d\n", especie.id);
+        printf("Nome: %s\n", especie.nome);
+        printf("Nome Científico: %s\n", especie.nomeCient);
+        if(especie.populacao == 0)
+        {
+            printf("População: NULO\n");
+        }
+        else
+        {
+            printf("População: %d\n", especie.populacao);
+        }
+        printf("Status: %s\n", especie.status);
+        printf("Localização: (%.2f, %.2f)\n", especie.locX, especie.locY);
+        if(especie.impacto == 0)
+        {
+            printf("Impacto Humano: NULO\n");
+        }
+        else
+        {
+            printf("Impacto Humano: %d\n", especie.impacto);
+        }
+        printf("\n");
+}
