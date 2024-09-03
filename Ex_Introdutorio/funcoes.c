@@ -8,43 +8,53 @@ int registrarEspecie(char *nomeArq)
 {
     FILE *arquivo;
     Especie especie;
-    int i, num;
-    size_t tam;
+    int i, j, num;
 
-    arquivo = fopen("saida.txt","w");
+    printf("%s", nomeArq);
+
+    arquivo = fopen(nomeArq,"wb");
 
     scanf("%d", &num);
+    getchar();
+
     for(i=0; i<num; i++)
     {
         scanf("%d", &especie.id);
-        printf("%d", especie.id);
-        fprintf(arquivo, "%d", especie.id);
-        fgets(especie.nome, sizeof(especie.nome), stdin);
-        printf("%s", especie.nome);
-        fprintf(arquivo, "%s", especie.nome);
-        fgets(especie.nomeCient, sizeof(especie.nomeCient), stdin);
-        printf("%s", especie.nomeCient);
-        fprintf(arquivo, "%s", especie.nomeCient);
+        getchar();
+        fgets(especie.nome, 41, stdin);
+        for(j=strlen(especie.nome)-1; j<40;j++)
+        {
+            especie.nome[j] = '$';
+        }
+        fgets(especie.nomeCient, 61, stdin);
+        for(j=strlen(especie.nomeCient)-1; j<60;j++)
+        {
+            especie.nomeCient[j] = '$';
+        }
         scanf("%d", &especie.populacao);
-        printf("%d", especie.populacao);
+        getchar();
+        fgets(especie.status, 9, stdin);
+        for(j=strlen(especie.status)-1; j<8;j++)
+        {
+            especie.status[j] = '$';
+        }
+        scanf("%f %f", &especie.locX, &especie.locY);
+        getchar();
+        scanf("%d", &especie.impacto);
+        getchar();
+
+        fprintf(arquivo, "%d", especie.id);
+        fprintf(arquivo, "%s", especie.nome);
+        fprintf(arquivo, "%s", especie.nomeCient);
         fprintf(arquivo, "%d", especie.populacao);
-        fgets(especie.status, sizeof(especie.status), stdin);
-        printf("%s", especie.status);
         fprintf(arquivo, "%s", especie.status);
-        scanf("%f", &especie.locX);
-        printf("%f", especie.locX);
-        fprintf(arquivo, "%f", especie.locX);
-        scanf("%f", &especie.locY);
-        printf("%f", especie.locY);
-        fprintf(arquivo, "%f", especie.locY);
-        scanf("%d", &especie.impacto); 
-        printf("%d", especie.impacto);
-        fprintf(arquivo, "%d", especie.impacto);       
+        fprintf(arquivo, "%.2f%.2f", especie.locX, especie.locY);
+        fprintf(arquivo, "%d", especie.impacto);
     }
     fclose(arquivo);
-    
-    
-    
+
+    binarioNaTela(nomeArq);
+
     return 0;
 
 }

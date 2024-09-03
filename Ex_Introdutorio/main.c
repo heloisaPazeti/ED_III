@@ -7,7 +7,8 @@ int main()
     int n;
     char arquivo[15];
 
-    scanf("%d %s", &n, arquivo);
+    scanf("%d ", &n);
+    scanf("%s", arquivo);
 
     if(n==1)
         registrarEspecie(arquivo);
