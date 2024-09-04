@@ -10,7 +10,6 @@ int main()
     scanf("%d ", &n);
     scanf("%s", arquivo);
 
-
     switch (n)
     {
         case 1:
@@ -22,11 +21,11 @@ int main()
             break;
 
         case 3:
-            procurarRegistro(arquivo);
+            buscarEspecie(arquivo);
             break;
     
         case 4:
-            alterarRegistro(arquivo);
+            registrarInformacao(arquivo);
             break;
 
         default:

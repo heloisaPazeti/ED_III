@@ -1,3 +1,10 @@
+//////////////////////////////////////////// TAMANHO REGISTROS
+
+#define idSize 4
+#define tamanhoRegistro 131
+
+//////////////////////////////////////////// STRUCT
+
 typedef struct Especie
 {
     int id;
@@ -13,12 +20,12 @@ typedef struct Especie
 
 int registrarEspecie(char  *nomeArq);
 int relatorioEspecies(char *nomeArq);
-int procurarRegistro(char *nomeArq);
-int alterarRegistro(char *nomeArq);
+int buscarEspecie(char *nomeArq);
+int registrarInformacao(char *nomeArq);
 
 //////////////////////////////////////////// FUNÇÕES AUXILIARES
 
-int buscarEspecie(char *nomeArq);
-int registrarInformacao(char *nomeArq);
+FILE* abrirArquivo(char *nomeArq, char *mode);
 Especie criarEspecie(void);
 void mostrarRelatorio(Especie especie);
+int montarEspecie(Especie *especie, FILE *arquivo);
