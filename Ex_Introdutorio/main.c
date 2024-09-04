@@ -10,9 +10,29 @@ int main()
     scanf("%d ", &n);
     scanf("%s", arquivo);
 
-    if(n==1)
-        registrarEspecie(arquivo);
-    if(n==2)
-        relatorioEspecies(arquivo);
+
+    switch (n)
+    {
+        case 1:
+            registrarEspecie(arquivo);
+            break;
+
+        case 2:
+            relatorioEspecies(arquivo);
+            break;
+
+        case 3:
+            procurarRegistro(arquivo);
+            break;
+    
+        case 4:
+            alterarRegistro(arquivo);
+            break;
+
+        default:
+            printf(">> Comando não encontrado...\n");
+            break;
+    }
+
     return 0;
 }

@@ -4,6 +4,10 @@
 #include "funcoes.h"
 #include "funcoesFornecidas.h"
 
+#define tamanhoRegistro 131
+
+//////////////////////////////////////////// OPÇÕES DE REGISTROS
+
 int registrarEspecie(char *nomeArq)
 {
     FILE *arquivo;
@@ -37,6 +41,7 @@ int registrarEspecie(char *nomeArq)
     return 0;
 
 }
+
 int relatorioEspecies(char *nomeArq)
 {
     FILE *arquivo;
@@ -61,8 +66,172 @@ int relatorioEspecies(char *nomeArq)
         mostrarRelatorio(especie);
 
     }
+
+    fclose(arquivo);
     return 0;
 }
+
+int procurarRegistro(char *nomeArq)
+{
+    int rrn, byteOffset;
+    FILE *arquivo;
+    Especie especie;
+
+    scanf("%d", &rrn);
+    byteOffset = rrn * tamanhoRegistro;
+
+    arquivo = fopen(nomeArq, "rb");
+    if(arquivo == NULL)
+    {
+        printf(">> Arquivo nao encontrado...\n");
+        return -1;
+    }
+
+    int result = fseek(arquivo, byteOffset, SEEK_SET);
+
+    if(result != 0)
+    {
+        printf(">> Erro ao posicionar byte offset\n");
+        return -1;
+    }
+
+    if(fread(&especie.id, sizeof(int),1,arquivo) == 0)
+    {
+        printf("Espécie não encontrada\n");
+        return -1;
+    }
+    fread(especie.nome, sizeof(char), 41, arquivo);
+    fread(especie.nomeCient, sizeof(char), 61, arquivo);
+    fread(&especie.populacao, sizeof(int), 1, arquivo);
+    fread(especie.status, sizeof(char), 9, arquivo);
+    fread(&especie.locX, sizeof(float), 1, arquivo);
+    fread(&especie.locY, sizeof(float), 1, arquivo);
+    if(fread(&especie.impacto, sizeof(int),1,arquivo) == 0)
+        return -1;                                                  //Hã?
+            
+
+    mostrarRelatorio(especie);
+    fclose(arquivo);
+    return 0;
+    
+}
+
+int alterarRegistro(char *nomeArq)
+{
+    int id, quantCampo;
+    int result, i, k = 0;
+    FILE *arquivo;
+    Especie especie;
+
+    scanf("%d", &id);
+    
+    arquivo = fopen(nomeArq, "rb+");
+    if(arquivo == NULL)
+    {
+        printf(">> Arquivo nao encontrado...\n");
+        return -1;
+    }
+
+    while(1)
+    {
+        k++;
+        if(fread(&especie.id, sizeof(int),1,arquivo) == 0)
+        {
+            printf(">> Espécie não encontrada...\n");
+            break;
+        }
+
+        if(especie.id != id)
+            fseek(arquivo, tamanhoRegistro-4, SEEK_CUR);
+        else
+        {
+            scanf("%d", &quantCampo);
+            getchar();
+
+            fread(especie.nome, sizeof(char), 41, arquivo);
+            fread(especie.nomeCient, sizeof(char), 61, arquivo);
+            fread(&especie.populacao, sizeof(int), 1, arquivo);
+            fread(especie.status, sizeof(char), 9, arquivo);
+            fread(&especie.locX, sizeof(float), 1, arquivo);
+            fread(&especie.locY, sizeof(float), 1, arquivo);
+            fread(&especie.impacto, sizeof(int),1,arquivo);
+                                               
+            for(i = 0; i < quantCampo; i++)
+            {
+                char campo[15];
+
+                fflush(stdin);
+                fgets(campo, 15, stdin);
+
+                if(strncmp(campo, "POPULATION", 10) == 0)
+                {
+                    int populacao;
+                    scanf("%d", &populacao);
+                    getchar();
+
+                    if(especie.populacao != 0)
+                        result = 1;
+                    else
+                    {
+                        fseek(arquivo, -25, SEEK_CUR);
+                        fwrite(&populacao, sizeof(int),1,arquivo);
+                    }
+                }
+                else if(strncmp(campo, "STATUS", 6) == 0)
+                {
+                    char status[9];
+                    for(int h=0; h<9;h++)
+                        status[h] = '$';
+
+                    readline(status);
+
+                    if(strcmp(especie.status, "NULO") != 0)
+                        result = 1;
+                    else
+                    {
+                        fseek(arquivo, -21, SEEK_CUR);
+                        fwrite(status, sizeof(char),9,arquivo);
+                    }
+                }
+                else if(strncmp(campo, "HUMAN IMPACT", 12) == 0)
+                {
+                     int impact;
+                    scanf("%d", &impact);
+                    getchar();
+
+                    if(especie.impacto != 0)
+                        result = 1;
+                    else
+                    {   
+                        fseek(arquivo, -4, SEEK_CUR);
+                        fwrite(&impact, sizeof(int),1,arquivo);
+                    }
+                }
+                else
+                {
+                    printf(">> Esse campo não pode ser alterado ou não existe!!\n");
+                    return -1;
+                }
+
+                if(result == 1)
+                    printf("Informação já inserida no arquivo\n");
+
+                fseek(arquivo, k*tamanhoRegistro, SEEK_SET);
+            }
+            
+            break;
+        }
+    }
+
+    fclose(arquivo);
+    binarioNaTela(nomeArq);
+    return 0;
+
+}
+
+
+//////////////////////////////////////////// FUNÇÕES AUXILIARES
+
 int buscarEspecie(char *nomeArq);
 int registrarInformacao(char *nomeArq);
 
