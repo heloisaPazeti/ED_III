@@ -111,104 +111,120 @@ int buscarEspecie(char *nomeArq)
 // Altera os dados e imprime o binario.
 int registrarInformacao(char *nomeArq)
 {
-    int id, quantCampo;
-    int result, i, k = 0;
+     int id, quantCampo;
+    int resultado = -1, i;
     FILE *arquivo;
-    Especie especie;
+    Especie especie, tempEspecie;
+
+    strcpy(tempEspecie.status, "$");                          // "Inicializando" especie
+    tempEspecie.impacto = -1;
+    tempEspecie.populacao = -1;
 
     scanf("%d", &id);
 
-    arquivo = abrirArquivo(nomeArq, "rb+");                         // Abre arquivo - 'rb+' read+write em binário
+    arquivo = abrirArquivo(nomeArq, "rb+");                  // Abre arquivo - 'rb+' read+write em binário
     if(arquivo == NULL) {return -1;}
 
-    while(1)
+    scanf("%d", &quantCampo);
+    getchar();
+    for(i = 0; i < quantCampo; i++)                         // Enquanto tem que alterar campos
     {
-        k++;                                                        // Quantos arquivos foi avançando
-        if(fread(&especie.id, sizeof(int),1,arquivo) == 0)          // Chegou ao final e não encontrou o id
-        {
-            printf("Espécie não encontrada\n");
-            break;
-        }
+        char campo[15];
 
+        fflush(stdin);
+        fgets(campo, 15, stdin);                            // Recebe campo que deve ser alterado
+
+        if(strncmp(campo, "POPULATION", 10) == 0)           // Caso seja o campo População
+        {
+            int populacao;
+            scanf("%d", &populacao);                        // Nova quantidade de população
+            getchar();
+            tempEspecie.populacao = populacao;
+        }
+        else if(strncmp(campo, "STATUS", 6) == 0)           // Caso seja Status
+        {
+            for(int h=0; h<9;h++)                           // Deixa tudo com $
+                tempEspecie.status[h] = '$';
+
+            readline(tempEspecie.status);                   // Pega o novo status            
+        }
+        else if(strncmp(campo, "HUMAN IMPACT", 12) == 0)    // Caso seja o Impacto Humano
+        {
+            int impacto;
+            scanf("%d", &impacto);
+            getchar();
+            tempEspecie.impacto = impacto;                  // Novo impacto
+        }
+        else
+            printf(">> Esse campo não pode ser alterado ou não existe.\n");   // Caso o campo não exista ou não possa ser alterado (por ser um campo não nulo)
+    }
+
+    while(fread(&especie.id, sizeof(int),1,arquivo) != 0)
+    {
         if(especie.id != id)                                        // Se esse não for o id procurado
             fseek(arquivo, tamanhoRegistro-idSize, SEEK_CUR);       // Avança para o próximo registro (tamanho-idSize porque já foi lido o id)
         else
-        {                                                           // Quando encontrar o Id
-            scanf("%d", &quantCampo);                               // Quantos campos irá alterar
-            getchar();  
-            montarEspecie(&especie, arquivo);                       // Recupera registro desse id
-
-            for(i = 0; i < quantCampo; i++)                         // Enquanto tem que alterar campos
+        {
+            int desloc = 0;                                         // Para saber o quanto deslocar na memória
+            resultado = 0;                                          // Encontrou o registro
+            
+            montarEspecie(&especie, arquivo);                       // Coleta os dados anteriores dessa especie
+            fseek(arquivo, -(tamanhoRegistro-idSize), SEEK_CUR);    // Retorna ao começo do registro, após o id
+            
+            
+            if(tempEspecie.populacao != -1)                         // Caso queira alterar a população
             {
-                char campo[15];
-
-                fflush(stdin);
-                fgets(campo, 15, stdin);                            // Recebe campo que deve ser alterado
-
-                if(strncmp(campo, "POPULATION", 10) == 0)           // Caso seja o campo População
-                {
-                    int populacao;
-                    scanf("%d", &populacao);                        // Nova quantidade de população
-                    getchar();
-
-                    if(especie.populacao != 0)                      // Verifica se o campo está "vazio"
-                        result = 1;                                 // Não altera o campo, depois irá printar aviso
-                    else    
-                    {
-                        fseek(arquivo, -25, SEEK_CUR);              // Move ponteiro do final do registro para o campo de população
-                        fwrite(&populacao, sizeof(int), 1, arquivo);// Altera dados
-                    }
-                }
-                else if(strncmp(campo, "STATUS", 6) == 0)           // Caso seja Status
-                {
-                    char status[9];
-                    for(int h=0; h<9;h++)                           // Deixa tudo com $
-                        status[h] = '$';
-
-                    readline(status);                               // Pega o novo status
-
-                    if(strcmp(especie.status, "NULO") != 0)         // Verifica se o campo está "vazio" ou não
-                        result = 1;
-                    else
-                    {
-                        fseek(arquivo, -21, SEEK_CUR);              // Move o ponteiro do final do registro para o campo status
-                        fwrite(status, sizeof(char), 9, arquivo);   // Altera o campo status
-                    }
-                }
-                else if(strncmp(campo, "HUMAN IMPACT", 12) == 0)    // Caso seja o Impacto Humano
-                {
-                    int impact;
-                    scanf("%d", &impact);
-                    getchar();
-
-                    if(especie.impacto != 0)                        // Verifica se o campo está "vazio"
-                        result = 1;
-                    else
-                    {   
-                        fseek(arquivo, -4, SEEK_CUR);               // Move ponteiro do final do registro para o campo impacto
-                        fwrite(&impact, sizeof(int), 1, arquivo);   // Altera o campo do impacto
-                    }
-                }
+                if(especie.populacao != 0)                          // Informação já foi inserida
+                    printf("Informação já inserida no arquivo\n");
                 else
                 {
-                    printf(">> O campo <%s", campo ,"> não pode ser alterado ou não existe.\n");   // Caso o campo não exista ou não possa ser alterado (por ser um campo não nulo)
-                    return -1;
+                    fseek(arquivo, 102, SEEK_CUR);
+                    fwrite(&tempEspecie.populacao, sizeof(int), 1, arquivo);    // Coloca nova informação
+                    desloc = 4;                                                 // Avisa que a população foi alterada
                 }
-
-                if(result == 1)
-                    printf("Informação já inserida no arquivo\n");  // Caso algum campo não estivesse vazio
-
-                fseek(arquivo, k*tamanhoRegistro, SEEK_SET);        // Move o ponteiro para o final do registro (para os demais cálculos funcionarem)
             }
-            
-            break;
+
+            if(tempEspecie.status[0] != '$')                        // Caso queira alterar o status
+            {
+                if(strcmp(especie.status, "NULO") != 0)             // Mas já exista um valor nele
+                    printf("Informação já inserida no arquivo\n");
+                else
+                {
+                    if(desloc == 0)                                 // Checa se houve deslocamento na memória
+                        fseek(arquivo, 106, SEEK_CUR);
+                    
+                    fwrite(tempEspecie.status, sizeof(char), 9, arquivo);
+                    desloc = 9;
+                }
+            }
+
+            if(tempEspecie.impacto != -1)                           // Caso queira altera o impacto
+            {
+                if(especie.impacto != 0)                            // Mas esse dado já exista
+                    printf("Informação já inserida no arquivo\n");
+                else
+                {
+                    if(desloc == 0)                                 // Checa se houve deslocamentos
+                        fseek(arquivo, 123, SEEK_CUR);
+                    else if(desloc == 4)
+                        fseek(arquivo, 17, SEEK_CUR);
+                    else
+                        fseek(arquivo, 8, SEEK_CUR);
+
+                    fwrite(&tempEspecie.impacto, sizeof(int), 1, arquivo); 
+                }
+            }
+
+            break;                                                  // Sai do loop após alterar espécie
         }
     }
+
+    if(resultado == -1)                                             // Se não chegou a ser encontrado
+        printf("Espécie não encontrada\n");
 
     fclose(arquivo);
     binarioNaTela(nomeArq);
     return 0;
-
 }
 
 //////////////////////////////////////////// FUNÇÕES AUXILIARES
