@@ -85,11 +85,13 @@ int relatorioEspecies(char *nomeArq)
 // Com o byte offset é possível mover o ponteiro do leitor do arquivo para o registro desejado
 int buscarEspecie(char *nomeArq)
 {
-    int rrn, byteOffset;
+    int rrn = 0, byteOffset;
     FILE *arquivo;
     Especie especie;
 
-    scanf("%d", &rrn);
+    while(rrn <= 0)                                             // Esperando por um valor válido de rrn
+        scanf("%d", &rrn);
+
     byteOffset = rrn * tamanhoRegistro;
 
     arquivo = abrirArquivo(nomeArq, "rb");                      // Abre o arquivo - 'rb' read-only binário
@@ -138,6 +140,14 @@ int registrarInformacao(char *nomeArq)
 
     scanf("%d", &quantCampo);
     getchar();
+
+    if((quantCampo < 0) || (quantCampo > 3))
+    {
+        printf(">> Quantidade de Campos inválida. O máximo possível de campos alteráveis são três.");
+        return -1;
+    }
+
+
     for(i = 0; i < quantCampo; i++)                             // Enquanto tem que alterar campos
     {
         char campo[15];
@@ -147,9 +157,13 @@ int registrarInformacao(char *nomeArq)
 
         if(strncmp(campo, "POPULATION", 10) == 0)               // Caso seja o campo População
         {
-            int populacao;
-            scanf("%d", &populacao);                            // Nova quantidade de população
-            getchar();
+            int populacao = 0;
+            while(populacao <= 0)                               // Esperando inserir valor válido para população
+            {
+                scanf("%d", &populacao);                        // Nova quantidade de população
+                getchar();
+            }
+            
             tempEspecie.populacao = populacao;
         }
         else if(strncmp(campo, "STATUS", 6) == 0)               // Caso seja Status
@@ -162,8 +176,12 @@ int registrarInformacao(char *nomeArq)
         else if(strncmp(campo, "HUMAN IMPACT", 12) == 0)        // Caso seja o Impacto Humano
         {
             int impacto;
-            scanf("%d", &impacto);
-            getchar();
+            while(impacto <= 0)                                 // Esperando inserir valor válido
+            {
+                scanf("%d", &impacto);
+                getchar();
+            }
+            
             tempEspecie.impacto = impacto;                      // Novo impacto
         }
         else
