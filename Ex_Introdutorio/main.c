@@ -23,7 +23,7 @@ int main()
         case 3:
             buscarEspecie(arquivo);
             break;
-    
+
         case 4:
             registrarInformacao(arquivo);
             break;

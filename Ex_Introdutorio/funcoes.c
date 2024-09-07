@@ -3,34 +3,40 @@
 #include <string.h>
 #include "funcoes.h"
 #include "funcoesFornecidas.h"
+#include "funcoesAuxiliares.h"
 
 //////////////////////////////////////////// OPÇÕES DE REGISTROS
 
+// Recebe o número de espécies a serem registradas.
+// Para cada espécie, as propriedades são preenchidas pelo usuário e registradas em um arquivo binário.
+// Imprime o resultado da função binarioNaTela().
 int registrarEspecie(char *nomeArq)
 {
     FILE *arquivo;
     Especie especie;
     int i, num;
 
-    printf("%s", nomeArq);
+    arquivo = fopen(nomeArq,"wb");                              // Abre o arquivo - 'wb' write-only binário
 
-    arquivo = fopen(nomeArq,"wb");
+    if(arquivo == NULL) {return -1;}                            // Se o arquivo não for aberto, sai da função
 
-    scanf("%d", &num);
+    scanf("%d", &num);                                          // Lê o número de espécies que devem ser registradas
     getchar();
 
-    for(i=0; i<num; i++)
+    for(i=0; i<num; i++)                                        // Para cada espécie a ser registrada
     {
-        especie = criarEspecie();
-
-        fwrite(&especie.id, sizeof(int),1,arquivo);
-        fwrite(especie.nome, sizeof(char),41,arquivo);
-        fwrite(especie.nomeCient, sizeof(char),61,arquivo);
-        fwrite(&especie.populacao, sizeof(int),1,arquivo);
-        fwrite(especie.status, sizeof(char),9,arquivo);
-        fwrite(&especie.locX, sizeof(float),1,arquivo);
-        fwrite(&especie.locY, sizeof(float),1,arquivo);
-        fwrite(&especie.impacto, sizeof(int),1,arquivo);
+        especie = criarEspecie();                               // Cria a espécie
+        if (especie.id !=0)  
+        {                                                       // Recebe as propriedades da espécie em ordem e as registra no arquivo binário
+          fwrite(&especie.id, sizeof(int),1,arquivo);
+          fwrite(especie.nome, sizeof(char),41,arquivo);
+          fwrite(especie.nomeCient, sizeof(char),61,arquivo);
+          fwrite(&especie.populacao, sizeof(int),1,arquivo);
+          fwrite(especie.status, sizeof(char),9,arquivo);
+          fwrite(&especie.locX, sizeof(float),1,arquivo);
+          fwrite(&especie.locY, sizeof(float),1,arquivo);
+          fwrite(&especie.impacto, sizeof(int),1,arquivo);
+        }
     }
     fclose(arquivo);
 
@@ -40,28 +46,33 @@ int registrarEspecie(char *nomeArq)
 
 }
 
+// Lê espécie a espécie de um arquivo binário.
+// Mostra ao usuário por uma função auxiliar.
 int relatorioEspecies(char *nomeArq)
 {
     FILE *arquivo;
     Especie especie;
-    char c;
 
-    arquivo = fopen(nomeArq, "rb");
+    arquivo = fopen(nomeArq, "rb");                                     // Abre o arquivo - 'rb' read-only binário
 
-    while(1)
+    if(arquivo == NULL)                                                 // Caso não seja possível abrir o arquivo
     {
-        if(fread(&especie.id, sizeof(int),1,arquivo) == 0)
-            break;
+      printf("Falha no processamento do arquivo");
+      return -1;
+    }
+
+    while(1)                                                            // Loop infinito para ler os dados da espécie do arquivo
+    {
+        if(fread(&especie.id, sizeof(int),1,arquivo) == 0) break;       // Se a leitura falhar, é o fim do arquivo e o loop se encerra
         fread(especie.nome, sizeof(char), 41, arquivo);
         fread(especie.nomeCient, sizeof(char), 61, arquivo);
         fread(&especie.populacao, sizeof(int), 1, arquivo);
         fread(especie.status, sizeof(char), 9, arquivo);
         fread(&especie.locX, sizeof(float), 1, arquivo);
         fread(&especie.locY, sizeof(float), 1, arquivo);
-        if(fread(&especie.impacto, sizeof(int),1,arquivo) == 0)
-            break;
+        if(fread(&especie.impacto, sizeof(int),1,arquivo) == 0) break;  // Se a leitura falhar, é o fim do arquivo e o loop se encerra
 
-        mostrarRelatorio(especie);
+        mostrarRelatorio(especie);                                      // Utiliza a função para mostrar os dados obtidos na leitura ao usuário
 
     }
 
@@ -81,28 +92,28 @@ int buscarEspecie(char *nomeArq)
     scanf("%d", &rrn);
     byteOffset = rrn * tamanhoRegistro;
 
-    arquivo = abrirArquivo(nomeArq, "rb");                  // Abre o arquivo - 'rb' read-only binario
-    if(arquivo == NULL) {return -1;}                        // Se for nulo sai da função
+    arquivo = abrirArquivo(nomeArq, "rb");                      // Abre o arquivo - 'rb' read-only binário
+    if(arquivo == NULL) {return -1;}                            // Se for nulo sai da função
 
-    int result = fseek(arquivo, byteOffset, SEEK_SET);      // Move o ponteiro leitor do arquivo até o ponto desejado a partir do inicio
+    int result = fseek(arquivo, byteOffset, SEEK_SET);          // Move o ponteiro leitor do arquivo até o ponto desejado a partir do inicio
 
-    if(result != 0)                                         // Checa se encontrou esse ponto na memória
+    if(result != 0)                                             // Checa se encontrou esse ponto na memória
     {
         printf(">> Erro ao posicionar byte offset\n");
         return -1;
     }
-    
-    if(fread(&especie.id, sizeof(int),1,arquivo) == 0)      // Checa se o ID existe
+
+    if(fread(&especie.id, sizeof(int),1,arquivo) == 0)          // Checa se o ID existe
     {
         printf("Espécie não encontrada\n");
         return -1;
     }
 
-    montarEspecie(&especie, arquivo);                       // Recupera a especie nesse registro
-    mostrarRelatorio(especie);                              // Escreve as informações do registro
+    montarEspecie(&especie, arquivo);                           // Recupera a especie nesse registro
+    mostrarRelatorio(especie);                                  // Escreve as informações do registro
     fclose(arquivo);
     return 0;
-    
+
 }
 
 // A partir de um ID passado encontra o registro (caso exista).
@@ -111,49 +122,49 @@ int buscarEspecie(char *nomeArq)
 // Altera os dados e imprime o binario.
 int registrarInformacao(char *nomeArq)
 {
-     int id, quantCampo;
+    int id, quantCampo;
     int resultado = -1, i;
     FILE *arquivo;
     Especie especie, tempEspecie;
 
-    strcpy(tempEspecie.status, "$");                          // "Inicializando" especie
+    strcpy(tempEspecie.status, "$");                            // "Inicializando" especie
     tempEspecie.impacto = -1;
     tempEspecie.populacao = -1;
 
     scanf("%d", &id);
 
-    arquivo = abrirArquivo(nomeArq, "rb+");                  // Abre arquivo - 'rb+' read+write em binário
+    arquivo = abrirArquivo(nomeArq, "rb+");                     // Abre arquivo - 'rb+' read+write em binário
     if(arquivo == NULL) {return -1;}
 
     scanf("%d", &quantCampo);
     getchar();
-    for(i = 0; i < quantCampo; i++)                         // Enquanto tem que alterar campos
+    for(i = 0; i < quantCampo; i++)                             // Enquanto tem que alterar campos
     {
         char campo[15];
 
         fflush(stdin);
-        fgets(campo, 15, stdin);                            // Recebe campo que deve ser alterado
+        fgets(campo, 15, stdin);                                // Recebe campo que deve ser alterado
 
-        if(strncmp(campo, "POPULATION", 10) == 0)           // Caso seja o campo População
+        if(strncmp(campo, "POPULATION", 10) == 0)               // Caso seja o campo População
         {
             int populacao;
-            scanf("%d", &populacao);                        // Nova quantidade de população
+            scanf("%d", &populacao);                            // Nova quantidade de população
             getchar();
             tempEspecie.populacao = populacao;
         }
-        else if(strncmp(campo, "STATUS", 6) == 0)           // Caso seja Status
+        else if(strncmp(campo, "STATUS", 6) == 0)               // Caso seja Status
         {
-            for(int h=0; h<9;h++)                           // Deixa tudo com $
+            for(int h=0; h<9;h++)                               // Deixa tudo com $
                 tempEspecie.status[h] = '$';
 
-            readline(tempEspecie.status);                   // Pega o novo status            
+            readline(tempEspecie.status);                       // Pega o novo status
         }
-        else if(strncmp(campo, "HUMAN IMPACT", 12) == 0)    // Caso seja o Impacto Humano
+        else if(strncmp(campo, "HUMAN IMPACT", 12) == 0)        // Caso seja o Impacto Humano
         {
             int impacto;
             scanf("%d", &impacto);
             getchar();
-            tempEspecie.impacto = impacto;                  // Novo impacto
+            tempEspecie.impacto = impacto;                      // Novo impacto
         }
         else
             printf(">> Esse campo não pode ser alterado ou não existe.\n");   // Caso o campo não exista ou não possa ser alterado (por ser um campo não nulo)
@@ -167,11 +178,11 @@ int registrarInformacao(char *nomeArq)
         {
             int desloc = 0;                                         // Para saber o quanto deslocar na memória
             resultado = 0;                                          // Encontrou o registro
-            
+
             montarEspecie(&especie, arquivo);                       // Coleta os dados anteriores dessa especie
             fseek(arquivo, -(tamanhoRegistro-idSize), SEEK_CUR);    // Retorna ao começo do registro, após o id
-            
-            
+
+
             if(tempEspecie.populacao != -1)                         // Caso queira alterar a população
             {
                 if(especie.populacao != 0)                          // Informação já foi inserida
@@ -192,7 +203,7 @@ int registrarInformacao(char *nomeArq)
                 {
                     if(desloc == 0)                                 // Checa se houve deslocamento na memória
                         fseek(arquivo, 106, SEEK_CUR);
-                    
+
                     fwrite(tempEspecie.status, sizeof(char), 9, arquivo);
                     desloc = 9;
                 }
@@ -211,7 +222,7 @@ int registrarInformacao(char *nomeArq)
                     else
                         fseek(arquivo, 8, SEEK_CUR);
 
-                    fwrite(&tempEspecie.impacto, sizeof(int), 1, arquivo); 
+                    fwrite(&tempEspecie.impacto, sizeof(int), 1, arquivo);
                 }
             }
 
@@ -225,89 +236,4 @@ int registrarInformacao(char *nomeArq)
     fclose(arquivo);
     binarioNaTela(nomeArq);
     return 0;
-}
-
-//////////////////////////////////////////// FUNÇÕES AUXILIARES
-
-// Abre arquivo.
-FILE* abrirArquivo(char *nomeArq, char *mode)
-{
-    FILE *arquivo = fopen(nomeArq, mode);
-
-    if(arquivo == NULL)
-        printf(">> ARQUIVO <%s", nomeArq, "> NÃO ENCONTRADO.\n");
-
-    return arquivo;
-}
-
-Especie criarEspecie(void)
-{
-    Especie especie;
-    int j;
-
-    for(j=0; j<41;j++)
-    {
-        especie.nome[j] = '$';
-    }
-    for(j=0; j<61;j++)
-    {
-        especie.nomeCient[j] = '$';
-    }
-    for(j=0; j<9;j++)
-    {
-        especie.status[j] = '$';
-    }
-    scanf("%d", &especie.id);
-    getchar();
-    readline(especie.nome);
-    readline(especie.nomeCient);
-    scanf("%d", &especie.populacao);
-    getchar();
-    readline(especie.status);
-    scanf("%f %f", &especie.locX, &especie.locY);
-    getchar();
-    scanf("%d", &especie.impacto);
-    getchar();
-
-    return especie;
-}
-
-void mostrarRelatorio(Especie especie)
-{
-    printf("ID: %d\n", especie.id);
-        printf("Nome: %s\n", especie.nome);
-        printf("Nome Científico: %s\n", especie.nomeCient);
-        if(especie.populacao == 0)
-        {
-            printf("População: NULO\n");
-        }
-        else
-        {
-            printf("População: %d\n", especie.populacao);
-        }
-        printf("Status: %s\n", especie.status);
-        printf("Localização: (%.2f, %.2f)\n", especie.locX, especie.locY);
-        if(especie.impacto == 0)
-        {
-            printf("Impacto Humano: NULO\n");
-        }
-        else
-        {
-            printf("Impacto Humano: %d\n", especie.impacto);
-        }
-        printf("\n");
-}
-
-// Recupera o registro de alguma especie.
-// Supõe-se que o id já terá sido verificado e o registro existe.
-// Serão lidos os demais campos.
-int montarEspecie(Especie *especie, FILE *arquivo)
-{
-    fread(especie -> nome, sizeof(char), 41, arquivo);
-    fread(especie -> nomeCient, sizeof(char), 61, arquivo);
-    fread(&especie -> populacao, sizeof(int), 1, arquivo);
-    fread(especie -> status, sizeof(char), 9, arquivo);
-    fread(&especie -> locX, sizeof(float), 1, arquivo);
-    fread(&especie -> locY, sizeof(float), 1, arquivo);
-    fread(&especie -> impacto, sizeof(int),1,arquivo);
 }
