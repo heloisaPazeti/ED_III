@@ -1,33 +1,5 @@
 #include "structs.h"
 
-//////////////////////////////////////////////////////// STRUCTS
-
-typedef struct _cabecalho
-{
-    char status;
-    int topo;
-    int proxRRN;
-    int nroRegRem;
-    int nroPagDisco;
-    int qttCompacta;
-
-} RegCabecalho;
-
-typedef struct _dados
-{
-    int população;
-    float tamanho;
-    char unidadeMedida;
-    int velocidade;
-
-    char *nome;
-    char *especie;
-    char *habitat;
-    char *tipo;
-    char *dieta;
-    char *alimento;
-} RegDados;
-
 //////////////////////////////////////////////////////// INICIALIZAÇÕES
 
 RegCabecalho IniciarCabecalho()
