@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+//////////////////////////////////////////////////////// TAMANHOS
+#define tamRegistro 160
 
 //////////////////////////////////////////////////////// STRUCTS
 
@@ -16,7 +18,9 @@ typedef struct _cabecalho
 
 typedef struct _dados
 {
-    int população;
+    char removido[1];
+    int encadeamento;
+    int populacao;
     float tamanho;
     char unidadeMedida;
     int velocidade;

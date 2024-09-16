@@ -6,17 +6,22 @@
 int main()
 {
     int n;
+    char nomeArq[15];
 
-    scanf("%d", &n);
+    scanf("%d %s", &n, nomeArq);
+    printf("%d %s\n", n, nomeArq);
 
     switch (n)
     {
     case 1:
         EscreverArquivo();
         break;
+    case 3:
+        BuscarRegistros(nomeArq);
+        break;
     
     default:
-    printf("Essa não é uma opcao valida\n");
+        printf("Essa não é uma opcao valida\n");
         break;
     }
 
