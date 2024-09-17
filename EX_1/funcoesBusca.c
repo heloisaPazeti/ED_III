@@ -77,17 +77,17 @@ int definirTipo(char *nomeCampo)
 void imprimirRegistro(RegDados registro)
 {
     printf("Nome: %s\n", registro.nome);
-    if(strncmp(registro.especie,"$",1)!=0)        
+    if(strncmp(registro.especie,"$",1)!=0&& registro.especie[0] != '\0')        
         printf("Especie: %s\n", registro.especie);
-    if(strncmp(registro.tipo,"$",1)!=0)
+    if(strncmp(registro.tipo,"$",1)!=0&& registro.tipo[0] != '\0')
         printf("Tipo: %s\n", registro.tipo);
-    if(strncmp(registro.dieta,"$",1)!=0)
+    if(strncmp(registro.dieta,"$",1)!=0 && registro.dieta[0] != '\0')
         printf("Dieta: %s\n", registro.dieta);
     if(strncmp(registro.habitat,"$",1)!=0 && registro.habitat[0] != '\0')
         printf("Lugar que habitava: %s\n", registro.habitat);
     if(registro.tamanho != 0)
         printf("Tamanho: %.1f m\n", registro.tamanho);
-    if(registro.velocidade != 0)
+    if(registro.velocidade != 0 && registro.unidadeMedida != '\0')
         printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.unidadeMedida);
     printf("\n");
 }
