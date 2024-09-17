@@ -20,7 +20,7 @@ RegDados IniciarRegistroDados()
 {
     RegDados dados;
 
-    dados.população = 0;
+    dados.populacao = 0;
     dados.tamanho = 0;
     dados.unidadeMedida = '-';
     dados.velocidade = 0;

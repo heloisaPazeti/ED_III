@@ -1,5 +1,10 @@
+#ifndef STRUCTS_H
+#define STRUCTS_H
+
 #include <stdio.h>
 #include <stdlib.h>
+//////////////////////////////////////////////////////// TAMANHOS
+#define tamRegistro 160
 
 //////////////////////////////////////////////////////// STRUCTS
 
@@ -16,7 +21,9 @@ typedef struct _cabecalho
 
 typedef struct _dados
 {
-    int população;
+    char removido;
+    int encadeamento;
+    int populacao;
     float tamanho;
     char unidadeMedida;
     int velocidade;
@@ -33,3 +40,5 @@ typedef struct _dados
 
 RegCabecalho IniciarCabecalho(void);
 RegDados IniciarRegistroDados(void);
+#endif
+
