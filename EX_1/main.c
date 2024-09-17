@@ -3,6 +3,9 @@
 #include <string.h>
 #include "funcoes.h"
 
+
+##### TESTE
+
 int main()
 {
     int n;
