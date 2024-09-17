@@ -1,3 +1,6 @@
+#ifndef STRUCTS_H
+#define STRUCTS_H
+
 #include <stdio.h>
 #include <stdlib.h>
 //////////////////////////////////////////////////////// TAMANHOS
@@ -37,3 +40,5 @@ typedef struct _dados
 
 RegCabecalho IniciarCabecalho(void);
 RegDados IniciarRegistroDados(void);
+#endif
+

@@ -9,7 +9,6 @@ int main()
     char nomeArq[15];
 
     scanf("%d %s", &n, nomeArq);
-    printf("%d %s\n", n, nomeArq);
 
     switch (n)
     {

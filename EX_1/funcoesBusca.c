@@ -1,15 +1,33 @@
 #include "funcoesBusca.h"
+
+int numPagDisco(FILE *arquivo)
+{
+    int num;
+    fseek(arquivo, 13, SEEK_SET);
+    fread(&num, sizeof(int),1,arquivo);
+
+    return num;
+}
+
 RegDados lerRegistro(FILE *arquivo)
 {
-    RegDados temp;
+    RegDados temp, fim;
     char dado[142], *linha;
     
-    fread(&temp.removido, sizeof(int),1,arquivo);
+    if(fread(&temp.removido, sizeof(char),1,arquivo)==0)
+    {
+        fim.tamanho = -1;
+        return fim;
+    }    
     fread(&temp.encadeamento, sizeof(int),1,arquivo);
     fread(&temp.populacao, sizeof(int),1,arquivo);
     fread(&temp.tamanho, sizeof(int),1,arquivo);
     fread(&temp.unidadeMedida, sizeof(char),1,arquivo);
-    fread(&temp.velocidade, sizeof(int), 1,arquivo);
+    if(fread(&temp.velocidade, sizeof(int), 1,arquivo)==0)
+    {
+        fim.tamanho=-1;
+        return fim;
+    }
     fread(dado, sizeof(char), 142, arquivo);
 
     linha = strdup(dado);
@@ -58,17 +76,18 @@ int definirTipo(char *nomeCampo)
 
 void imprimirRegistro(RegDados registro)
 {
-    printf("Nome: %s", registro.nome);
-    if(registro.especie != NULL)        
-        printf("Especie: %s", registro.especie);
-    if(registro.tipo != NULL)
-        printf("Tipo: %s", registro.tipo);
-    if(registro.dieta != NULL)
-        printf("Dieta: %s", registro.dieta);
-    if(registro.habitat != NULL)
-        printf("Lugar que habitava: %s", registro.habitat);
+    printf("Nome: %s\n", registro.nome);
+    if(strncmp(registro.especie,"$",1)!=0)        
+        printf("Especie: %s\n", registro.especie);
+    if(strncmp(registro.tipo,"$",1)!=0)
+        printf("Tipo: %s\n", registro.tipo);
+    if(strncmp(registro.dieta,"$",1)!=0)
+        printf("Dieta: %s\n", registro.dieta);
+    if(strncmp(registro.habitat,"$",1)!=0)
+        printf("Lugar que habitava: %s\n", registro.habitat);
     if(registro.tamanho != 0)
-        printf("Tamanho: %f", registro.tamanho);
-    if(registro.velocidade != 0 && registro.unidadeMedida != NULL)
-        printf("Velocidade: %d %s", registro.velocidade, registro.unidadeMedida);
+        printf("Tamanho: %.1f m\n", registro.tamanho);
+    if(registro.velocidade != 0)
+        printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.unidadeMedida);
+    printf("\n");
 }
