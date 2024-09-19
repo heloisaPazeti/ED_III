@@ -1,24 +1,162 @@
+#include <math.h>
 #include "funcoes.h"
 #include "funcoesFornecidas.h"
 #include "funcoesBusca.h"
+#include "structs.h"
 
-int EscreverArquivo()
+int EscreverArquivo(char *nomeCSV)
 {
-    char arqCSV[15];
-    char arqBin[15];
-    RegCabecalho newCabecalho = IniciarCabecalho();
-    RegDados newDado = IniciarRegistroDados();
+    int  i;
+    int  qtdePagDisco, quantReg = 0;
+    int  sNome, sEspecie, sHabitat, sTipo, sDieta, sAlimento;
+    char nomeBin[15];
+    char *token, *tofree, *str;
+    char delim = '#';
+    char line[tamRegistro];
+    FILE *arqBin; 
+    FILE *arqCSV = fopen(nomeCSV, "r");
+    RegCabecalho cabecalho;
 
-    scanf("%s", arqCSV);
-    scanf("%s", arqBin);
-
-    while(newDado.populacao != -1)
+    if (arqCSV == NULL)
     {
-        //newDado = LerCSV(arqCSV);
-        //Escrever no arquivo
+        printf("Falha no processamento do arquivo [Arq. CSV == NULL]\n");
+        return -1;
     }
-   
+
+    scanf("%s", nomeBin);
+    arqBin = fopen(nomeBin, "wb");
+
+    fgets(line, tamRegistro, arqCSV);
+
+    // ESCREVER CABEÇALHO
+
+    cabecalho = IniciarCabecalho();
+    fwrite(&cabecalho.status, sizeof(char),1, arqBin);
+    fwrite(&cabecalho.topo, sizeof(int),1, arqBin);
+    fwrite(&cabecalho.proxRRN, sizeof(int),1, arqBin);
+    fwrite(&cabecalho.nroRegRem, sizeof(int),1, arqBin);
+    fwrite(&cabecalho.nroPagDisco, sizeof(int),1, arqBin);
+    fwrite(&cabecalho.qttCompacta, sizeof(int),1, arqBin);
+
+    for(i = 21; i < 1600; i++)
+        fwrite("$", sizeof(char), 1, arqBin);
+
+    while(!feof(arqCSV))
+    {
+        RegDados newDado = IniciarRegistroDados();
+        quantReg++;
+
+        fgets(line, tamRegistro, arqCSV);
+        int len = strlen(line);
+        if(line[len-1] == '\n')
+            line[len-1] = 0;
+
+        tofree = str = strdup(line);
+
+        for(int i = 0; i < 10; i++)
+        {
+            if(i < 9)
+                token = strsep(&str, ",");
+            else
+                token = strsep(&str, "\r");
+
+            switch (i)
+            {
+                case 0:
+                    newDado.nome = token;
+                    sNome = strlen(token);
+                    break;
+
+                case 1:
+                    newDado.dieta = token;
+                    sDieta = strlen(token);
+                    break;
+
+                case 2:
+                    newDado.habitat = token;
+                    sHabitat = strlen(token);
+                    break;
+
+                case 3:
+                    newDado.populacao = atoi(token);
+                    break;
+
+                case 4:
+                    newDado.tipo = token;
+                    sTipo = strlen(token);
+                    break;
+
+                case 5:
+                    newDado.velocidade = atoi(token);
+                    break;
+
+                case 6:
+                    newDado.unidadeMedida = token[0];
+                    break;
+
+                case 7:
+                    newDado.tamanho = atof(token);
+                    break;
+
+                case 8:
+                    newDado.especie = token;
+                    sEspecie = strlen(token);
+                    break;
+
+                case 9:
+                    newDado.alimento = token;
+                    sAlimento = strlen(token);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        fwrite(&newDado.removido, sizeof(char),1, arqBin);
+        fwrite(&newDado.encadeamento, sizeof(int),1, arqBin);
+        fwrite(&newDado.populacao, sizeof(int),1, arqBin);
+        fwrite(&newDado.tamanho, sizeof(float),1, arqBin);
+        fwrite(&newDado.unidadeMedida, sizeof(char),1, arqBin);
+        fwrite(&newDado.velocidade, sizeof(int),1, arqBin);
+        fwrite(newDado.nome, sizeof(char),sNome, arqBin);
+        fwrite(&delim, sizeof(char),1, arqBin);
+        fwrite(newDado.especie, sizeof(char),sEspecie, arqBin);
+        fwrite(&delim, sizeof(char),1, arqBin);
+        fwrite(newDado.habitat, sizeof(char),sHabitat, arqBin);
+        fwrite(&delim, sizeof(char),1, arqBin);
+        fwrite(newDado.tipo, sizeof(char),sTipo, arqBin);
+        fwrite(&delim, sizeof(char),1, arqBin);
+        fwrite(newDado.dieta, sizeof(char),sDieta, arqBin);
+        fwrite(&delim, sizeof(char),1, arqBin);
+        fwrite(newDado.alimento, sizeof(char),sAlimento, arqBin);
+        fwrite(&delim, sizeof(char),1, arqBin);
+
+        long int posicaoAtual = ftell(arqBin);
+        int posicaoFinal = 1600 + (quantReg*160);
+
+        for(i = posicaoAtual; i < posicaoFinal; i++)
+            fwrite("$", sizeof(char), 1, arqBin);
+    }
+
+    qtdePagDisco = (1+(quantReg/10));
+    if(qtdePagDisco*10 < quantReg+10)
+        qtdePagDisco++;
+
+    fseek(arqBin, 13, SEEK_SET);
+    fwrite(&qtdePagDisco, sizeof(int),1, arqBin);
+    fseek(arqBin, 5, SEEK_SET);
+    fwrite(&quantReg, sizeof(int), 1, arqBin);
+    fseek(arqBin, 0, SEEK_SET);
+    fwrite("1", sizeof(char),1, arqBin);
+
+    fclose(arqCSV);
+    fclose(arqBin);
+    binarioNaTela(nomeBin);
+
+    return 0;
 }
+
 
 int BuscarRegistros(char *nomeArq)
 {

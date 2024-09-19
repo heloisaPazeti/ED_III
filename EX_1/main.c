@@ -4,7 +4,6 @@
 #include "funcoes.h"
 
 
-##### TESTE
 
 int main()
 {
@@ -16,10 +15,10 @@ int main()
     switch (n)
     {
     case 1:
-        EscreverArquivo();
+        EscreverArquivo(nomeArq);
         break;
     case 3:
-        BuscarRegistros(nomeArq);
+        //BuscarRegistros(nomeArq);
         break;
     
     default:

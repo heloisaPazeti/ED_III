@@ -20,10 +20,13 @@ RegDados IniciarRegistroDados()
 {
     RegDados dados;
 
-    dados.populacao = 0;
-    dados.tamanho = 0;
-    dados.unidadeMedida = '-';
-    dados.velocidade = 0;
+    dados.removido = '0';
+    dados.encadeamento = -1;
+
+    dados.populacao = -1;
+    dados.tamanho = -1;
+    dados.unidadeMedida = '$';
+    dados.velocidade = -1;
 
     return dados;
 }

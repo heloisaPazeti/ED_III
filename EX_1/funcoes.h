@@ -6,7 +6,7 @@
 #include "structs.h"
 
 RegDados LerCSV();
-int EscreverArquivo();
+int EscreverArquivo(char *nomeCSV);
 int BuscarRegistros(char *nomeArq);
 int RemoverRegistros();
 int InserirRegistros();
