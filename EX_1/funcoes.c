@@ -78,7 +78,8 @@ int EscreverArquivo(char *nomeCSV)
                     break;
 
                 case 3:
-                    newDado.populacao = atoi(token);
+                    if(*token != '\0')
+                        newDado.populacao = atoi(token);
                     break;
 
                 case 4:
@@ -87,15 +88,18 @@ int EscreverArquivo(char *nomeCSV)
                     break;
 
                 case 5:
-                    newDado.velocidade = atoi(token);
+                    if(*token != '\0')
+                        newDado.velocidade = atoi(token);
                     break;
 
                 case 6:
-                    newDado.unidadeMedida = token[0];
+                    if(*token != '\0')
+                        newDado.unidadeMedida = token[0];
                     break;
 
                 case 7:
-                    newDado.tamanho = atof(token);
+                    if(*token != '\0')
+                        newDado.tamanho = atof(token);
                     break;
 
                 case 8:
