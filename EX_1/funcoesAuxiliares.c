@@ -2,15 +2,14 @@
 
 ///////////////////////////////////////////////////////////////// ESCREVER NO ARQUIVO (1)
 
-RegCabecalho EscreverCabecalho(FILE *arqBin)
+int EscreverCabecalho(FILE *arqBin, RegCabecalho cabecalho)
 {
-    RegCabecalho cabecalho = IniciarCabecalho();                                    // Inicializa novo Cabeçalho
+    fseek(arqBin, 0, SEEK_SET);                 // Para certificar de que está no local certo
 
     if (arqBin == NULL)
     {
         printf("Falha no processamento do arquivo [Arq. CSV == NULL]\n");
-        cabecalho.status = '2';
-        return cabecalho;
+        return -1;
     }
 
     fwrite(&cabecalho.status, sizeof(char),1, arqBin);                              // Escreve dados
@@ -23,7 +22,7 @@ RegCabecalho EscreverCabecalho(FILE *arqBin)
     for(int i = 21; i < 1600; i++)                                                  // Adiciona "lixo"
         fwrite("$", sizeof(char), 1, arqBin);
 
-    return cabecalho;
+    return 0;
 }
 
 // Escreve um registro no arquivo de acordo com a struct passada

@@ -7,7 +7,7 @@
 // Supõe-se que o arquivo já está aberto
 // Supõe-se que será fechado após o retorno da função
 
-RegCabecalho EscreverCabecalho(FILE *arqBin);
+int EscreverCabecalho(FILE *arqBin, RegCabecalho cabecalho);
 int EscreverRegistro(FILE *arqBin, RegDados novoRegisto, int quantReg);
 
 ///////////////////////////////////////////////////////////////// PRINTAR REGISTROS (2)

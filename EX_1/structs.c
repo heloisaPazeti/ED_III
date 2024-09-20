@@ -2,6 +2,7 @@
 
 //////////////////////////////////////////////////////// INICIALIZAÇÕES
 
+// Inicializa um cabeçalho com valores padrões ou nulos
 RegCabecalho IniciarCabecalho()
 {
     RegCabecalho cabecalho;
@@ -16,6 +17,7 @@ RegCabecalho IniciarCabecalho()
     return cabecalho;
 }
 
+// Inicializa novo registro com valores padrões ou nulos
 RegDados IniciarRegistroDados()
 {
     RegDados dados;

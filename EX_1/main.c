@@ -1,3 +1,8 @@
+///////////////////////// 1° TRABALHO ESTRUTURA DE DADOS III /////////////////////////
+// HELOÍSA PAZETI - 14577991                                                        //
+// EDUARDO BRIOSO LUCEIRO - 00000000                                                //
+//////////////////////////////////////////////////////////////////////////////////////
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

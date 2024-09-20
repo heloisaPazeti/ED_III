@@ -6,11 +6,12 @@
 
 ///////////////////////////////////////////////////////////////// ESCREVER NO ARQUIVO (1)
 
+// Escreve um arquivo binario a partir de um CSV
+// Escreve dados + cabeçalho
 int EscreverArquivo(char *nomeCSV)
 {
     int  i;
     int  qtdePagDisco, quantReg = 0;
-    int  sNome, sEspecie, sHabitat, sTipo, sDieta, sAlimento;
     char nomeBin[15];
     char *token, *tofree, *str;
     char delim = '#';
@@ -29,7 +30,8 @@ int EscreverArquivo(char *nomeCSV)
         return -1;
     }
 
-    cabecalho = EscreverCabecalho(arqBin);              // Escreve no arquivo os dados iniciais do cabeçalho
+    cabecalho = IniciarCabecalho();                    // Inicializa novo Cabeçalho
+    EscreverCabecalho(arqBin, cabecalho);              // Escreve no arquivo os dados iniciais do cabeçalho
 
     if(cabecalho.status == '2')
     {
@@ -131,6 +133,7 @@ int EscreverArquivo(char *nomeCSV)
 
 ///////////////////////////////////////////////////////////////// PRINTAR REGISTROS (2)
 
+// Escreve na tela todos os registros presentes no arquivo
 int EscreverRegistros(char *nomeArq)
 {
     int atualRRN = 0;
@@ -313,3 +316,54 @@ int BuscarRegistros(char *nomeArq)
 }
 
 ///////////////////////////////////////////////////////////////// COMPACTADOR (6)
+
+// Cria novo arquivo removendo registros excluidos
+// Adiciona novas informações ao cabeçalho
+int Compactador(char *nomeArq)
+{
+    int atualRRN = 0, qtdePagDisco, qtdeRRN = 0;
+    char *nomeArqFinal = "binario.bin";
+    FILE *arqBinOriginal, *arqBinFinal;
+    RegCabecalho cabecalho;
+    RegDados novoRegistro;
+
+    arqBinOriginal = fopen(nomeArq, "rb");
+    arqBinFinal = fopen(nomeArqFinal, "wb");
+
+    cabecalho = LerCabecalho(arqBinOriginal);                   // Lê o cabeçalho
+    EscreverCabecalho(arqBinFinal, cabecalho);                  // Escreve no novo arquivo
+    novoRegistro = lerRegistro(arqBinOriginal);                 // Lê o primeiro registro
+    atualRRN++;                                                 // Atualiza total de registros
+
+    while(((atualRRN) <= cabecalho.proxRRN))                    // Verifica se acabou o arquivo
+    {
+        if(novoRegistro.removido != '1')                        // Se for removido ignora
+        {
+            qtdeRRN++;                                          // Adiciona um novo registro
+            EscreverRegistro(arqBinFinal, novoRegistro, qtdeRRN);
+        }
+            
+    
+        novoRegistro = lerRegistro(arqBinOriginal);             // Lê o próximo
+        atualRRN++;
+    }
+
+    qtdePagDisco = (1+(qtdeRRN/10));                            // Calcula quantidade de páginas de disco
+    if(qtdePagDisco*10 < qtdeRRN+10)
+        qtdePagDisco++;
+
+    cabecalho.status = '1';                                     // Atualiza cabeçalho
+    cabecalho.topo = -1;
+    cabecalho.proxRRN = qtdeRRN;
+    cabecalho.nroRegRem = 0;
+    cabecalho.nroPagDisco = qtdePagDisco;
+    cabecalho.qttCompacta += 1;
+
+    EscreverCabecalho(arqBinFinal, cabecalho);                  // Altera cabeçalho no arquivo final
+
+    fclose(arqBinOriginal);
+    fclose(arqBinFinal);
+    binarioNaTela(nomeArqFinal);                               // Escreve binario
+
+    return 0;
+}
