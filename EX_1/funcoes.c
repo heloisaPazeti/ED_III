@@ -2,23 +2,23 @@
 #include "funcoesFornecidas.h"
 #include "funcoesBusca.h"
 
-int EscreverArquivo()
-{
-    char arqCSV[15];
-    char arqBin[15];
-    RegCabecalho newCabecalho = IniciarCabecalho();
-    RegDados newDado = IniciarRegistroDados();
+// int EscreverArquivo()
+// {
+//     char arqCSV[15];
+//     char arqBin[15];
+//     RegCabecalho newCabecalho = IniciarCabecalho();
+//     RegDados newDado = IniciarRegistroDados();
 
-    scanf("%s", arqCSV);
-    scanf("%s", arqBin);
+//     scanf("%s", arqCSV);
+//     scanf("%s", arqBin);
 
-    while(newDado.populacao != -1)
-    {
-        //newDado = LerCSV(arqCSV);
-        //Escrever no arquivo
-    }
+//     while(newDado.populacao != -1)
+//     {
+//         //newDado = LerCSV(arqCSV);
+//         //Escrever no arquivo
+//     }
    
-}
+// }
 
 int BuscarRegistros(char *nomeArq)
 {
@@ -86,14 +86,14 @@ int BuscarRegistros(char *nomeArq)
                     break;
                 
                 case 2:
-                    if(reg.tamanho == valorCampoFloat)
+                    if(reg.tamanho*100 == valorCampoFloat*100)
                     {
                         imprimirRegistro(reg);
                         ++encontrou;
                     }
                     break;
                 case 3:
-                    if(strncmp(valorCampo, &reg.unidadeMedida, 1)==0)
+                    if(strcmp(valorCampo, &reg.unidadeMedida)==0)
                     {
                         imprimirRegistro(reg);
                         ++encontrou;
@@ -107,42 +107,42 @@ int BuscarRegistros(char *nomeArq)
                     }
                     break;
                 case 5:
-                    if(strncmp(valorCampo, reg.nome, 10)==0)
+                    if(strcmp(valorCampo, reg.nome)==0)
                     {
                         imprimirRegistro(reg);
                         ++encontrou;
                     }
                     break;
                 case 6:
-                    if(strncmp(valorCampo, reg.especie, 10)==0)
+                    if(strcmp(valorCampo, reg.especie)==0)
                     {
                         imprimirRegistro(reg);
                         ++encontrou;
                     }
                     break;
                 case 7:
-                    if(strncmp(valorCampo, reg.habitat, 10)==0)
+                    if(strcmp(valorCampo, reg.habitat)==0)
                     {
                         imprimirRegistro(reg);
                         ++encontrou;
                     }
                     break;
                 case 8:
-                    if(strncmp(valorCampo, reg.tipo, 10)==0)
+                    if(strcmp(valorCampo, reg.tipo)==0)
                     {
                         imprimirRegistro(reg);
                         ++encontrou;
                     }
                     break;
                 case 9:
-                    if(strncmp(valorCampo, reg.dieta, 10)==0)
+                    if(strcmp(valorCampo, reg.dieta)==0)
                     {
                         imprimirRegistro(reg);
                         ++encontrou;
                     }
                     break;
                 case 10:
-                    if(strncmp(valorCampo, reg.alimento, 10)==0)
+                    if(strcmp(valorCampo, reg.alimento)==0)
                     {
                         imprimirRegistro(reg);
                         ++encontrou;
@@ -170,10 +170,9 @@ int RemoverRegistros(char *nomeArq)
 {
     int n;
     int i;
-    int j=0;
     int valorCampoInt;
     int tipoPesquisa;
-    int offset, encontrou, aux2;
+    int encontrou, aux2;
     int proxRRN;
     float valorCampoFloat;
     char nomeCampo[15], valorCampo[61], aux1[1];
@@ -194,7 +193,6 @@ int RemoverRegistros(char *nomeArq)
     for(i=0; i<n; i++)
     {
         fseek(arquivo, 1600, SEEK_SET);
-        j=0;
         encontrou = 0;
         scanf("%s", nomeCampo);
 
@@ -209,13 +207,14 @@ int RemoverRegistros(char *nomeArq)
         }
 
         else
+        {
             scan_quote_string(valorCampo);
-        
+        }
+
         tipoPesquisa = definirTipo(nomeCampo);
 
         while(1)
         {
-            offset = 1600+j*160;
             reg = lerRegistro(arquivo);
             
             if (reg.removido=='2') break;
@@ -226,71 +225,71 @@ int RemoverRegistros(char *nomeArq)
                 case 1:
                     if(reg.populacao == valorCampoInt)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
                 
                 case 2:
-                    if(reg.tamanho == valorCampoFloat)
+                    if(reg.tamanho*100 == valorCampoFloat*100)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
                 case 3:
-                    if(strncmp(valorCampo, &reg.unidadeMedida, 1)==0)
+                    if(strcmp(valorCampo, &reg.unidadeMedida)==0)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
                 case 4:
                     if(reg.velocidade == valorCampoInt)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
                 case 5:
-                    if(strncmp(valorCampo, reg.nome, 10)==0)
+                    if(strcmp(valorCampo, reg.nome)==0)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
                 case 6:
-                    if(strncmp(valorCampo, reg.especie, 10)==0)
+                    if(strcmp(valorCampo, reg.especie)==0)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
                 case 7:
-                    if(strncmp(valorCampo, reg.habitat, 10)==0)
+                    if(strcmp(valorCampo, reg.habitat)==0)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
                 case 8:
-                    if(strncmp(valorCampo, reg.tipo, 10)==0)
+                    if(strcmp(valorCampo, reg.tipo)==0)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
                 case 9:
-                    if(strncmp(valorCampo, reg.dieta, 10)==0)
+                    if(strcmp(valorCampo, reg.dieta)==0)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
                 case 10:
-                    if(strncmp(valorCampo, reg.alimento, 10)==0)
+                    if(strcmp(valorCampo, reg.alimento)==0)
                     {
-                        eliminarRegistro(reg, proxRRN);
+                        eliminarRegistro(arquivo, proxRRN);
                         ++encontrou;
                     }
                     break;
@@ -298,11 +297,8 @@ int RemoverRegistros(char *nomeArq)
                     printf("Erro\n");
                     break;
             }
-            
-            j++;
         }
        
-        if(encontrou==0) printf("Registro inexistente.\n\n");        
     }
 
     fclose(arquivo);

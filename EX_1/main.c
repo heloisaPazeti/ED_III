@@ -13,10 +13,13 @@ int main()
     switch (n)
     {
     case 1:
-        EscreverArquivo();
+        //EscreverArquivo();
         break;
     case 3:
         BuscarRegistros(nomeArq);
+        break;
+    case 4:
+        RemoverRegistros(nomeArq);
         break;
     
     default:

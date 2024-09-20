@@ -27,6 +27,11 @@ RegDados lerRegistro(FILE *arquivo)
         temp.removido = '2';
         return temp;
     }    
+    if(temp.removido == '1')
+    {
+        temp.removido = '2';
+        return temp;
+    }
     fread(&temp.encadeamento, sizeof(int),1,arquivo);
     fread(&temp.populacao, sizeof(int),1,arquivo);
     fread(&temp.tamanho, sizeof(float),1,arquivo);
@@ -100,10 +105,24 @@ void imprimirRegistro(RegDados registro)
     printf("\n");
 }
 
-void eliminarRegistro(RegDados registro, int proxRRN)
+void eliminarRegistro(FILE* arquivo, int proxRRN)
 {
-    registro.removido = '1';
-    registro.encadeamento = proxRRN;
-    
+    char completar[154];
+    int num = -1;
+    int i;
+    int removido = 1;
 
+    for(i=0; i<154; i++)
+    {
+        completar[i]='$';
+    }
+        
+
+    fwrite(&removido, sizeof(int), 1, arquivo);
+    fwrite(&num, sizeof(int), 1, arquivo);
+    fwrite(&num, sizeof(int), 1, arquivo);
+    fwrite(&num, sizeof(int), 1, arquivo);
+    fwrite(&num, sizeof(int), 1, arquivo);
+    fwrite(completar, sizeof(char), 154, arquivo);
+ 
 }
