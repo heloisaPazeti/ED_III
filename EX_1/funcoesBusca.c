@@ -9,6 +9,14 @@ int numPagDisco(FILE *arquivo)
     return num;
 }
 
+int buscarRRN(FILE *arquivo)
+{
+    int num;
+    fseek(arquivo, 5, SEEK_SET);
+    fread(&num, sizeof(int),1,arquivo);
+
+    return num;
+}
 RegDados lerRegistro(FILE *arquivo)
 {
     RegDados temp, fim;
@@ -90,4 +98,12 @@ void imprimirRegistro(RegDados registro)
     if(registro.velocidade != 0 && registro.unidadeMedida != '\0')
         printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.unidadeMedida);
     printf("\n");
+}
+
+void eliminarRegistro(RegDados registro, int proxRRN)
+{
+    registro.removido = '1';
+    registro.encadeamento = proxRRN;
+    
+
 }
