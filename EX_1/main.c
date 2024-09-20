@@ -17,10 +17,16 @@ int main()
     case 1:
         EscreverArquivo(nomeArq);
         break;
-    case 3:
-        //BuscarRegistros(nomeArq);
+    case 2:
+        EscreverRegistros(nomeArq);
         break;
-    
+    case 3:
+        BuscarRegistros(nomeArq);
+        break;
+    case 6:
+        Compactador(nomeArq);
+        break;
+
     default:
         printf("Essa não é uma opcao valida\n");
         break;

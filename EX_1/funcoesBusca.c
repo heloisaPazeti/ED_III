@@ -16,7 +16,7 @@ RegDados lerRegistro(FILE *arquivo)
     
     if(fread(&temp.removido, sizeof(char),1,arquivo)==0)
     {
-        fim.tamanho = -1;
+        fim.removido = 2;
         return fim;
     }    
     fread(&temp.encadeamento, sizeof(int),1,arquivo);
@@ -25,7 +25,7 @@ RegDados lerRegistro(FILE *arquivo)
     fread(&temp.unidadeMedida, sizeof(char),1,arquivo);
     if(fread(&temp.velocidade, sizeof(int), 1,arquivo)==0)
     {
-        fim.tamanho=-1;
+        fim.removido=2;
         return fim;
     }
     fread(dado, sizeof(char), 142, arquivo);
@@ -79,15 +79,15 @@ void imprimirRegistro(RegDados registro)
     printf("Nome: %s\n", registro.nome);
     if(strncmp(registro.especie,"$",1)!=0)        
         printf("Especie: %s\n", registro.especie);
-    if(strncmp(registro.tipo,"$",1)!=0)
+    if(strncmp(registro.tipo,"",1)!=0)
         printf("Tipo: %s\n", registro.tipo);
-    if(strncmp(registro.dieta,"$",1)!=0)
+    if(strncmp(registro.dieta,"",1)!=0)
         printf("Dieta: %s\n", registro.dieta);
-    if(strncmp(registro.habitat,"$",1)!=0)
+    if(strncmp(registro.habitat,"",1)!=0)
         printf("Lugar que habitava: %s\n", registro.habitat);
-    if(registro.tamanho != 0)
+    if(registro.tamanho != -1)
         printf("Tamanho: %.1f m\n", registro.tamanho);
-    if(registro.velocidade != 0)
+    if(registro.velocidade != -1)
         printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.unidadeMedida);
     printf("\n");
 }

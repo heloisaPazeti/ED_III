@@ -1,8 +1,10 @@
-#include <math.h>
 #include "funcoes.h"
 #include "funcoesFornecidas.h"
+#include "funcoesAuxiliares.h"
 #include "funcoesBusca.h"
 #include "structs.h"
+
+///////////////////////////////////////////////////////////////// ESCREVER NO ARQUIVO (1)
 
 int EscreverArquivo(char *nomeCSV)
 {
@@ -17,99 +19,88 @@ int EscreverArquivo(char *nomeCSV)
     FILE *arqCSV = fopen(nomeCSV, "r");
     RegCabecalho cabecalho;
 
-    if (arqCSV == NULL)
+    scanf("%s", nomeBin);
+    arqBin = fopen(nomeBin, "wb");
+
+
+    if (arqCSV == NULL || arqBin == NULL)
     {
         printf("Falha no processamento do arquivo [Arq. CSV == NULL]\n");
         return -1;
     }
 
-    scanf("%s", nomeBin);
-    arqBin = fopen(nomeBin, "wb");
+    cabecalho = EscreverCabecalho(arqBin);              // Escreve no arquivo os dados iniciais do cabeçalho
 
-    fgets(line, tamRegistro, arqCSV);
-
-    // ESCREVER CABEÇALHO
-
-    cabecalho = IniciarCabecalho();
-    fwrite(&cabecalho.status, sizeof(char),1, arqBin);
-    fwrite(&cabecalho.topo, sizeof(int),1, arqBin);
-    fwrite(&cabecalho.proxRRN, sizeof(int),1, arqBin);
-    fwrite(&cabecalho.nroRegRem, sizeof(int),1, arqBin);
-    fwrite(&cabecalho.nroPagDisco, sizeof(int),1, arqBin);
-    fwrite(&cabecalho.qttCompacta, sizeof(int),1, arqBin);
-
-    for(i = 21; i < 1600; i++)
-        fwrite("$", sizeof(char), 1, arqBin);
-
+    if(cabecalho.status == '2')
+    {
+        printf("Falha ao escrever cabeçalho.\n");
+        return -1;
+    }
+        
+    fgets(line, tamRegistro, arqCSV);                   // Le header do arquivo
     while(!feof(arqCSV))
     {
-        RegDados newDado = IniciarRegistroDados();
-        quantReg++;
+        RegDados novoReg = IniciarRegistroDados();      // Inicializa novo registro
+        quantReg++;                                     // Adiciona um registro
 
-        fgets(line, tamRegistro, arqCSV);
+        fgets(line, tamRegistro, arqCSV);               // Pega a linha do registro do csv
         int len = strlen(line);
-        if(line[len-1] == '\n')
+        if(line[len-1] == '\n')                         // Retira o \n
             line[len-1] = 0;
 
-        tofree = str = strdup(line);
+        tofree = str = strdup(line);                    // Reserva espaço de armazenamento
 
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 10; i++)                     // Lê cada campo de registro
         {
             if(i < 9)
-                token = strsep(&str, ",");
+                token = strsep(&str, ",");          
             else
-                token = strsep(&str, "\r");
+                token = strsep(&str, "\r");             // O último campo tem como separador o \r
 
             switch (i)
             {
                 case 0:
-                    newDado.nome = token;
-                    sNome = strlen(token);
+                    novoReg.nome = token;
                     break;
 
                 case 1:
-                    newDado.dieta = token;
-                    sDieta = strlen(token);
+                    novoReg.dieta = token;
                     break;
 
                 case 2:
-                    newDado.habitat = token;
-                    sHabitat = strlen(token);
+                    novoReg.habitat = token;
                     break;
 
                 case 3:
-                    if(*token != '\0')
-                        newDado.populacao = atoi(token);
+                    if(*token != '\0')                  // Caso token seja vazio
+                        novoReg.populacao = atoi(token);
                     break;
 
                 case 4:
-                    newDado.tipo = token;
-                    sTipo = strlen(token);
+                    novoReg.tipo = token;
                     break;
 
                 case 5:
                     if(*token != '\0')
-                        newDado.velocidade = atoi(token);
+                        novoReg.velocidade = atoi(token);
                     break;
 
                 case 6:
                     if(*token != '\0')
-                        newDado.unidadeMedida = token[0];
+                        novoReg.unidadeMedida = token[0];
                     break;
 
                 case 7:
                     if(*token != '\0')
-                        newDado.tamanho = atof(token);
+                        novoReg.tamanho = atof(token);
                     break;
 
                 case 8:
-                    newDado.especie = token;
-                    sEspecie = strlen(token);
+                    novoReg.especie = token;
                     break;
 
                 case 9:
-                    newDado.alimento = token;
-                    sAlimento = strlen(token);
+                    novoReg.alimento = token;
                     break;
 
                 default:
@@ -117,37 +108,14 @@ int EscreverArquivo(char *nomeCSV)
             }
         }
 
-        fwrite(&newDado.removido, sizeof(char),1, arqBin);
-        fwrite(&newDado.encadeamento, sizeof(int),1, arqBin);
-        fwrite(&newDado.populacao, sizeof(int),1, arqBin);
-        fwrite(&newDado.tamanho, sizeof(float),1, arqBin);
-        fwrite(&newDado.unidadeMedida, sizeof(char),1, arqBin);
-        fwrite(&newDado.velocidade, sizeof(int),1, arqBin);
-        fwrite(newDado.nome, sizeof(char),sNome, arqBin);
-        fwrite(&delim, sizeof(char),1, arqBin);
-        fwrite(newDado.especie, sizeof(char),sEspecie, arqBin);
-        fwrite(&delim, sizeof(char),1, arqBin);
-        fwrite(newDado.habitat, sizeof(char),sHabitat, arqBin);
-        fwrite(&delim, sizeof(char),1, arqBin);
-        fwrite(newDado.tipo, sizeof(char),sTipo, arqBin);
-        fwrite(&delim, sizeof(char),1, arqBin);
-        fwrite(newDado.dieta, sizeof(char),sDieta, arqBin);
-        fwrite(&delim, sizeof(char),1, arqBin);
-        fwrite(newDado.alimento, sizeof(char),sAlimento, arqBin);
-        fwrite(&delim, sizeof(char),1, arqBin);
-
-        long int posicaoAtual = ftell(arqBin);
-        int posicaoFinal = 1600 + (quantReg*160);
-
-        for(i = posicaoAtual; i < posicaoFinal; i++)
-            fwrite("$", sizeof(char), 1, arqBin);
+        EscreverRegistro(arqBin, novoReg, quantReg);        // Escreve o novo registro no arquivo binario
     }
 
-    qtdePagDisco = (1+(quantReg/10));
+    qtdePagDisco = (1+(quantReg/10));                       // Calcula quantidade de páginas de disco
     if(qtdePagDisco*10 < quantReg+10)
         qtdePagDisco++;
 
-    fseek(arqBin, 13, SEEK_SET);
+    fseek(arqBin, 13, SEEK_SET);                            // Altera dados do cabeçalho
     fwrite(&qtdePagDisco, sizeof(int),1, arqBin);
     fseek(arqBin, 5, SEEK_SET);
     fwrite(&quantReg, sizeof(int), 1, arqBin);
@@ -161,6 +129,42 @@ int EscreverArquivo(char *nomeCSV)
     return 0;
 }
 
+///////////////////////////////////////////////////////////////// PRINTAR REGISTROS (2)
+
+int EscreverRegistros(char *nomeArq)
+{
+    int atualRRN = 0;
+    FILE *arqBin;
+    RegDados novoRegistro;
+    RegCabecalho cabecalho;
+
+    arqBin = fopen(nomeArq, "rb");
+    if(arqBin == NULL)
+    {
+        printf("Erro na abertura do arquivo \n");
+        return -1;
+    }
+
+    cabecalho = LerCabecalho(arqBin);                   // Lê o cabeçalho
+    novoRegistro = lerRegistro(arqBin);                 // Lê o primeiro registro
+    atualRRN++;                                         // Aumenta o RRN atual
+
+    while(((atualRRN) <= cabecalho.proxRRN))            // Verifica se acabou o arquivo
+    {
+        if(novoRegistro.removido != '1')                // Se for removido ignora
+            imprimirRegistro(novoRegistro);
+        
+        novoRegistro = lerRegistro(arqBin);             // Lê o próximo
+        atualRRN++;
+    }
+
+    printf("\nNumero de paginas de disco: %d", cabecalho.nroPagDisco);      // Printa quantidade de páginas de disco
+    fclose(arqBin);
+    return 0;
+
+}
+
+///////////////////////////////////////////////////////////////// BUSCAR REGISTRO (3)
 
 int BuscarRegistros(char *nomeArq)
 {
@@ -307,3 +311,5 @@ int BuscarRegistros(char *nomeArq)
     }
     
 }
+
+///////////////////////////////////////////////////////////////// COMPACTADOR (6)
