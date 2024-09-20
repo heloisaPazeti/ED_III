@@ -193,30 +193,25 @@ int BuscarRegistros(char *nomeArq)
     
     numPag = numPagDisco(arquivo);
     scanf("%d", &n);
-    fseek(arquivo, 1600, SEEK_SET);
     for(i=0; i<n; i++)
     {
         fseek(arquivo, 1600, SEEK_SET);
         j=0;
         encontrou = 0;
         scanf("%s", nomeCampo);
-        getchar();
 
         if(strncmp(nomeCampo, "populacao",3)==0 || strncmp(nomeCampo, "velocidade",3)==0)
         {
             scanf("%d", &valorCampoInt);
-            getchar();
         }
 
-        if(strncmp(nomeCampo, "tamanho",3)==0)
+        else if(strncmp(nomeCampo, "tamanho",3)==0)
         {
             scanf("%f", &valorCampoFloat);
         }
 
         else
             scan_quote_string(valorCampo);
-
-        getchar();
         
         tipoPesquisa = definirTipo(nomeCampo);
         printf("Busca %d\n", i+1);
@@ -226,7 +221,8 @@ int BuscarRegistros(char *nomeArq)
             offset = 1600+j*160;
             reg = lerRegistro(arquivo);
             
-            if (reg.tamanho==-1) break;
+            if (reg.removido=='2') break;
+
 
             switch(tipoPesquisa)
             {
@@ -235,6 +231,7 @@ int BuscarRegistros(char *nomeArq)
                     {
                         imprimirRegistro(reg);
                         ++encontrou;
+                        //printf("%s", reg.habitat);
                     }
                     break;
                 
@@ -301,18 +298,21 @@ int BuscarRegistros(char *nomeArq)
                         ++encontrou;
                     }
                     break;
+                default:
+                    printf("Erro\n");
+                    break;
             }
             
-            fseek(arquivo, offset, SEEK_SET);
+            //fseek(arquivo, offset, SEEK_SET);
             j++;
         }
        
         if(encontrou==0) printf("Registro inexistente.\n\n");
 
         printf("Numero de paginas de disco: %d\n\n", numPag);
+
         
     }
-    
 }
 
 ///////////////////////////////////////////////////////////////// COMPACTADOR (6)
@@ -364,6 +364,5 @@ int Compactador(char *nomeArq)
     fclose(arqBinOriginal);
     fclose(arqBinFinal);
     binarioNaTela(nomeArqFinal);                               // Escreve binario
-
     return 0;
 }
