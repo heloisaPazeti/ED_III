@@ -317,6 +317,148 @@ int BuscarRegistros(char *nomeArq)
 
 ///////////////////////////////////////////////////////////////// COMPACTADOR (6)
 
+int RemoverRegistros(char *nomeArq)
+{
+    int n;
+    int i;
+    int valorCampoInt;
+    int tipoPesquisa;
+    int encontrou, aux2;
+    int proxRRN;
+    float valorCampoFloat;
+    char nomeCampo[15], valorCampo[61], aux1[1];
+    RegDados reg;
+    FILE *arquivo;
+
+    arquivo = fopen(nomeArq, "rb+");
+    if(arquivo == NULL)
+    {
+        printf("Erro na abertura do arquivo \n");
+        return -1;
+    }
+
+    encontrou = 0;
+    proxRRN = buscarRRN(arquivo);
+
+    scanf("%d", &n);
+    for(i=0; i<n; i++)
+    {
+        fseek(arquivo, 1600, SEEK_SET);
+        encontrou = 0;
+        scanf("%s", nomeCampo);
+
+        if(strncmp(nomeCampo, "populacao",3)==0 || strncmp(nomeCampo, "velocidade",3)==0)
+        {
+            scanf("%d", &valorCampoInt);
+        }
+
+        else if(strncmp(nomeCampo, "tamanho",3)==0)
+        {
+            scanf("%f", &valorCampoFloat);
+        }
+
+        else
+        {
+            scan_quote_string(valorCampo);
+        }
+
+        tipoPesquisa = definirTipo(nomeCampo);
+
+        while(1)
+        {
+            reg = lerRegistro(arquivo);
+            
+            if (reg.removido=='2') break;
+
+
+            switch(tipoPesquisa)
+            {
+                case 1:
+                    if(reg.populacao == valorCampoInt)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                
+                case 2:
+                    if(reg.tamanho*100 == valorCampoFloat*100)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                case 3:
+                    if(strcmp(valorCampo, &reg.unidadeMedida)==0)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                case 4:
+                    if(reg.velocidade == valorCampoInt)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                case 5:
+                    if(strcmp(valorCampo, reg.nome)==0)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                case 6:
+                    if(strcmp(valorCampo, reg.especie)==0)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                case 7:
+                    if(strcmp(valorCampo, reg.habitat)==0)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                case 8:
+                    if(strcmp(valorCampo, reg.tipo)==0)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                case 9:
+                    if(strcmp(valorCampo, reg.dieta)==0)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                case 10:
+                    if(strcmp(valorCampo, reg.alimento)==0)
+                    {
+                        eliminarRegistro(arquivo, proxRRN);
+                        ++encontrou;
+                    }
+                    break;
+                default:
+                    printf("Erro\n");
+                    break;
+            }
+        }
+       
+    }
+
+    fclose(arquivo);
+
+    binarioNaTela(nomeArq);
+    
+    return 0;
+}
+
 // Cria novo arquivo removendo registros excluidos
 // Adiciona novas informações ao cabeçalho
 int Compactador(char *nomeArq)

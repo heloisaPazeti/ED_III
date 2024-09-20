@@ -9,7 +9,7 @@ RegDados LerCSV();
 int EscreverArquivo(char *nomeCSV);
 int EscreverRegistros(char *nomeArq);
 int BuscarRegistros(char *nomeArq);
-int RemoverRegistros();
+int RemoverRegistros(char *nomeArq);
 int InserirRegistros();
 int Compactador(char *nomeArq);
 

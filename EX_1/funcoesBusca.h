@@ -10,6 +10,7 @@ RegDados lerRegistro(FILE *arquivo);
 int definirTipo(char *nomeCampo);
 void imprimirRegistro(RegDados registro);
 int numPagDisco(FILE *arquivo);
+void eliminarRegistro(FILE* arquivo, int proxRRN);
 
 #endif
 

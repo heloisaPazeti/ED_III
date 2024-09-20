@@ -91,3 +91,25 @@ void imprimirRegistro(RegDados registro)
         printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.unidadeMedida);
     printf("\n");
 }
+
+void eliminarRegistro(FILE* arquivo, int proxRRN)
+{
+    char completar[154];
+    int num = -1;
+    int i;
+    int removido = 1;
+
+    for(i=0; i<154; i++)
+    {
+        completar[i]='$';
+    }
+        
+
+    fwrite(&removido, sizeof(int), 1, arquivo);
+    fwrite(&num, sizeof(int), 1, arquivo);
+    fwrite(&num, sizeof(int), 1, arquivo);
+    fwrite(&num, sizeof(int), 1, arquivo);
+    fwrite(&num, sizeof(int), 1, arquivo);
+    fwrite(completar, sizeof(char), 154, arquivo);
+ 
+}
