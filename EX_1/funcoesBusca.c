@@ -38,7 +38,7 @@ RegDados lerRegistro(FILE *arquivo)
     temp.dieta = strsep(&linha, "#");
     temp.alimento = strsep(&linha, "#");
 
-    return temp;
+    return fim;
 }
 
 int definirTipo(char *nomeCampo)
@@ -85,9 +85,9 @@ void imprimirRegistro(RegDados registro)
         printf("Dieta: %s\n", registro.dieta);
     if(strncmp(registro.habitat,"$",1)!=0 && registro.habitat[0] != '\0')
         printf("Lugar que habitava: %s\n", registro.habitat);
-    if(registro.tamanho != 0)
+    if(registro.tamanho != -1)
         printf("Tamanho: %.1f m\n", registro.tamanho);
-    if(registro.velocidade != 0 && registro.unidadeMedida != '\0')
+    if(registro.velocidade != -1)
         printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.unidadeMedida);
     printf("\n");
 }

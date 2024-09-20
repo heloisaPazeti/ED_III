@@ -1,11 +1,12 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 //////////////////////////////////////////////////////// TAMANHOS
 #define tamRegistro 160
-
+#define cabecalhoFixo 21
 //////////////////////////////////////////////////////// STRUCTS
 
 typedef struct _cabecalho
