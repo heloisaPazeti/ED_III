@@ -28,6 +28,9 @@ int main()
     case 3:
         BuscarRegistros(nomeArq);
         break;
+    case 4:
+        RemoverRegistros(nomeArq);
+        break;
     case 6:
         Compactador(nomeArq);
         break;

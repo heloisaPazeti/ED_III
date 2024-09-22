@@ -222,112 +222,111 @@ int BuscarRegistros(char *nomeArq)
             reg = lerRegistro(arquivo);
             
             if (reg.removido=='2') break;
+            if (reg.removido=='1') fseek(arquivo, offset, SEEK_SET);
 
-
-            switch(tipoPesquisa)
+            if(reg.removido != '1')
             {
-                case 1:
-                    if(reg.populacao == valorCampoInt)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                        //printf("%s", reg.habitat);
-                    }
-                    break;
-                
-                case 2:
-                    if(reg.tamanho == valorCampoFloat)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                    }
-                    break;
-                case 3:
-                    if(strncmp(valorCampo, &reg.unidadeMedida, 1)==0)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                    }
-                    break;
-                case 4:
-                    if(reg.velocidade == valorCampoInt)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                    }
-                    break;
-                case 5:
-                    if(strncmp(valorCampo, reg.nome, 10)==0)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                    }
-                    break;
-                case 6:
-                    if(strncmp(valorCampo, reg.especie, 10)==0)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                    }
-                    break;
-                case 7:
-                    if(strncmp(valorCampo, reg.habitat, 10)==0)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                    }
-                    break;
-                case 8:
-                    if(strncmp(valorCampo, reg.tipo, 10)==0)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                    }
-                    break;
-                case 9:
-                    if(strncmp(valorCampo, reg.dieta, 10)==0)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                    }
-                    break;
-                case 10:
-                    if(strncmp(valorCampo, reg.alimento, 10)==0)
-                    {
-                        imprimirRegistro(reg);
-                        ++encontrou;
-                    }
-                    break;
-                default:
-                    printf("Erro\n");
-                    break;
+                switch(tipoPesquisa)
+                {
+                    case 1:
+                        if(reg.populacao == valorCampoInt)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    
+                    case 2:
+                        if(reg.tamanho == valorCampoFloat)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    case 3:
+                        if(strncmp(valorCampo, &reg.unidadeMedida, 1)==0)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    case 4:
+                        if(reg.velocidade == valorCampoInt)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    case 5:
+                        if(strcmp(valorCampo, reg.nome)==0)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    case 6:
+                        if(strcmp(valorCampo, reg.especie)==0)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    case 7:
+                        if(strcmp(valorCampo, reg.habitat)==0)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    case 8:
+                        if(strcmp(valorCampo, reg.tipo)==0)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    case 9:
+                        if(strcmp(valorCampo, reg.dieta)==0)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    case 10:
+                        if(strcmp(valorCampo, reg.alimento)==0)
+                        {
+                            imprimirRegistro(reg);
+                            ++encontrou;
+                        }
+                        break;
+                    default:
+                        printf("Erro\n");
+                        break;
+                }
             }
             
-            //fseek(arquivo, offset, SEEK_SET);
             j++;
         }
        
         if(encontrou==0) printf("Registro inexistente.\n\n");
 
-        printf("Numero de paginas de disco: %d\n\n", numPag);
-
-        
+        printf("Numero de paginas de disco: %d\n\n", numPag); 
     }
+
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////// COMPACTADOR (6)
 
 int RemoverRegistros(char *nomeArq)
 {
-    int n;
-    int i;
-    int valorCampoInt;
-    int tipoPesquisa;
-    int encontrou, aux2;
-    int proxRRN;
+    int n, i, aux, j;
+    int valorCampoInt, tipoPesquisa, topo, offset, encontrou, encadeamento;
     float valorCampoFloat;
     char nomeCampo[15], valorCampo[61], aux1[1];
     RegDados reg;
+    RegCabecalho cabecalho;
+
     FILE *arquivo;
 
     arquivo = fopen(nomeArq, "rb+");
@@ -338,13 +337,29 @@ int RemoverRegistros(char *nomeArq)
     }
 
     encontrou = 0;
-    proxRRN = buscarRRN(arquivo);
-
+    
+    
     scanf("%d", &n);
+
+    cabecalho = LerCabecalho(arquivo);
+    if(cabecalho.status == '0')
+    {
+        printf("Erro na abertura do arquivo");
+        return -1;
+    }
+
+    cabecalho.status = '0';
+
+    aux = EscreverCabecalho(arquivo, cabecalho);
+    encontrou = cabecalho.nroRegRem;
+    topo=cabecalho.topo;
     for(i=0; i<n; i++)
     {
         fseek(arquivo, 1600, SEEK_SET);
-        encontrou = 0;
+
+        j=0;
+        encadeamento = 0;
+
         scanf("%s", nomeCampo);
 
         if(strncmp(nomeCampo, "populacao",3)==0 || strncmp(nomeCampo, "velocidade",3)==0)
@@ -358,104 +373,121 @@ int RemoverRegistros(char *nomeArq)
         }
 
         else
-        {
             scan_quote_string(valorCampo);
-        }
-
+        
         tipoPesquisa = definirTipo(nomeCampo);
 
         while(1)
         {
+            offset = 1600+j*160;
             reg = lerRegistro(arquivo);
-            
+
             if (reg.removido=='2') break;
+            if (reg.removido=='1') fseek(arquivo, offset, SEEK_SET);
 
-
-            switch(tipoPesquisa)
+            if(reg.removido == '0')
             {
-                case 1:
-                    if(reg.populacao == valorCampoInt)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                
-                case 2:
-                    if(reg.tamanho*100 == valorCampoFloat*100)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                case 3:
-                    if(strcmp(valorCampo, &reg.unidadeMedida)==0)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                case 4:
-                    if(reg.velocidade == valorCampoInt)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                case 5:
-                    if(strcmp(valorCampo, reg.nome)==0)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                case 6:
-                    if(strcmp(valorCampo, reg.especie)==0)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                case 7:
-                    if(strcmp(valorCampo, reg.habitat)==0)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                case 8:
-                    if(strcmp(valorCampo, reg.tipo)==0)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                case 9:
-                    if(strcmp(valorCampo, reg.dieta)==0)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                case 10:
-                    if(strcmp(valorCampo, reg.alimento)==0)
-                    {
-                        eliminarRegistro(arquivo, proxRRN);
-                        ++encontrou;
-                    }
-                    break;
-                default:
-                    printf("Erro\n");
-                    break;
+                switch(tipoPesquisa)
+                {
+                    case 1:
+                        if(reg.populacao == valorCampoInt)
+                        {
+                            eliminarRegistro(arquivo, topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    
+                    case 2:
+                        if(reg.tamanho == valorCampoFloat)
+                        {
+                            eliminarRegistro(arquivo, topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    case 3:
+                        if(strcmp(valorCampo, &reg.unidadeMedida)==0)
+                        {
+                            eliminarRegistro(arquivo, topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    case 4:
+                        if(reg.velocidade == valorCampoInt)
+                        {
+                            eliminarRegistro(arquivo,topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    case 5:
+                        if(strcmp(valorCampo, reg.nome)==0)
+                        {
+                            eliminarRegistro(arquivo, topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    case 6:
+                        if(strcmp(valorCampo, reg.especie)==0)
+                        {
+                            eliminarRegistro(arquivo, topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    case 7:
+                        if(strcmp(valorCampo, reg.habitat)==0)
+                        {
+                            eliminarRegistro(arquivo, topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    case 8:
+                        if(strcmp(valorCampo, reg.tipo)==0)
+                        {
+                            eliminarRegistro(arquivo, topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    case 9:
+                        if(strcmp(valorCampo, reg.dieta)==0)
+                        {
+                            eliminarRegistro(arquivo,topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    case 10:
+                        if(strcmp(valorCampo, reg.alimento)==0)
+                        {
+                            eliminarRegistro(arquivo, topo);
+                            topo = encadeamento;
+                            ++encontrou;
+                        }
+                        break;
+                    default:
+                        printf("Erro\n");
+                        break;
+                }
             }
+            encadeamento++;
+            j++;
         }
-       
     }
 
-    fclose(arquivo);
+    cabecalho.nroRegRem = encontrou;
+    cabecalho.topo = topo-1;
+    cabecalho.status = '1';
 
+    aux = EscreverCabecalho(arquivo, cabecalho);
+    fclose(arquivo);
     binarioNaTela(nomeArq);
-    
+
     return 0;
 }
 
