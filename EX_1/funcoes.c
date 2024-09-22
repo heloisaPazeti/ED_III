@@ -320,11 +320,12 @@ int BuscarRegistros(char *nomeArq)
     return 0;
 }
 
+///////////////////////////////////////////////////////////////// REMOVER REGISTRO (4)
 
 int RemoverRegistros(char *nomeArq)
 {
     int n, i, aux, j;
-    int valorCampoInt, tipoPesquisa, topo, offset, encontrou, encadeamento;
+    int valorCampoInt, tipoPesquisa, topo, offset, remocoes;
     float valorCampoFloat;
     char nomeCampo[15], valorCampo[61], aux1[1];
     RegDados reg;
@@ -348,10 +349,10 @@ int RemoverRegistros(char *nomeArq)
     }
 
     cabecalho.status = '0';
+    remocoes = cabecalho.nroRegRem;
+    topo = cabecalho.topo;
 
     aux = EscreverCabecalho(arquivo, cabecalho);
-    encontrou = cabecalho.nroRegRem;
-    topo=cabecalho.topo;
 
     scanf("%d", &n);
 
@@ -360,8 +361,7 @@ int RemoverRegistros(char *nomeArq)
     {
         fseek(arquivo, 1600, SEEK_SET);
 
-        j=0;
-        encadeamento = -1;
+        j=-1;
 
         scanf("%s", nomeCampo);
 
@@ -384,22 +384,19 @@ int RemoverRegistros(char *nomeArq)
         {
             offset = 1600+j*160;
             reg = lerRegistro(arquivo);
-
             if (reg.removido=='2') break;
             if (reg.removido=='1') fseek(arquivo, offset, SEEK_SET);
 
             if(reg.removido == '0')
             {
-                if(cabecalho.topo == topo)
-                    topo++;
                 switch(tipoPesquisa)
                 {
                     case 1:
                         if(reg.populacao == valorCampoInt)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            topo = j;
+                            remocoes++;
                         }
                         break;
                     
@@ -407,72 +404,72 @@ int RemoverRegistros(char *nomeArq)
                         if(reg.tamanho == valorCampoFloat)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            topo = j;
+                            remocoes++;
                         }
                         break;
                     case 3:
                         if(strcmp(valorCampo, &reg.unidadeMedida)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            topo = j;
+                            remocoes++;
                         }
                         break;
                     case 4:
                         if(reg.velocidade == valorCampoInt)
                         {
                             eliminarRegistro(arquivo,topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            topo = j;
+                            remocoes++;
                         }
                         break;
                     case 5:
                         if(strcmp(valorCampo, reg.nome)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            topo = j;
+                            remocoes++;
                         }
                         break;
                     case 6:
                         if(strcmp(valorCampo, reg.especie)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            topo = j;
+                            remocoes++;
                         }
                         break;
                     case 7:
                         if(strcmp(valorCampo, reg.habitat)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            topo = j;
+                            remocoes++;
                         }
                         break;
                     case 8:
                         if(strcmp(valorCampo, reg.tipo)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            topo = j;
+                            remocoes++;
                         }
                         break;
                     case 9:
                         if(strcmp(valorCampo, reg.dieta)==0)
                         {
                             eliminarRegistro(arquivo,topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            topo = j;
+                            remocoes++;
                         }
                         break;
                     case 10:
                         if(strcmp(valorCampo, reg.alimento)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = encadeamento;
-                            ++encontrou;
+                            cabecalho.topo = j;
+                            remocoes++;
                         }
                         break;
                     default:
@@ -480,13 +477,12 @@ int RemoverRegistros(char *nomeArq)
                         break;
                 }
             }
-            encadeamento++;
             j++;
         }
     }
 
-    cabecalho.nroRegRem = encontrou;
     cabecalho.topo = topo;
+    cabecalho.nroRegRem = remocoes;
     cabecalho.status = '1';
 
     aux = EscreverCabecalho(arquivo, cabecalho);
