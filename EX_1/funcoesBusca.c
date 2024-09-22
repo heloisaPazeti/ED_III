@@ -1,5 +1,6 @@
 #include "funcoesBusca.h"
 
+// Acho que dá pra usar lerCabecalho no lugar das duas primeiras funções
 int numPagDisco(FILE *arquivo)
 {
     int num;
@@ -18,35 +19,36 @@ int buscarRRN(FILE *arquivo)
     return num;
 }
 
+// Lê um registro e retorna
 RegDados lerRegistro(FILE *arquivo)
 {
     RegDados temp, fim;
     char dado[142], *linha;
     
-    if(fread(&temp.removido, sizeof(char),1,arquivo)==0)
+    if(fread(&temp.removido, sizeof(char),1,arquivo)==0)    // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
     {
         temp.removido = '2';
         return temp;
     }    
-    if(temp.removido == '1')
+    if(temp.removido == '1')                // Caso o registro tenha sido removido, não completa a leitura e retorna 
     {
         return temp;
     }
-    if(temp.removido != '1')
+    if(temp.removido != '1')                // Caso o campo não tenha sido removido, a leitura dos campos é finalizada
     {
         fread(&temp.encadeamento, sizeof(int),1,arquivo);
         fread(&temp.populacao, sizeof(int),1,arquivo);
         fread(&temp.tamanho, sizeof(float),1,arquivo);
         fread(&temp.unidadeMedida, sizeof(char),1,arquivo);
         fread(&temp.velocidade, sizeof(int), 1,arquivo);
-        if(fread(dado, sizeof(char), 142, arquivo)==0)
+        if(fread(dado, sizeof(char), 142, arquivo)==0)          // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
         {
             temp.removido = '2';
             return temp;
         }
 
-        linha = strdup(dado);
-        temp.nome = strsep(&linha, "#");
+        linha = strdup(dado);               // A string de dados (armazena os campos de tamanho variável) é duplicada
+        temp.nome = strsep(&linha, "#");    // Separação dos dados de acordo com o separador '#'
         temp.especie = strsep(&linha, "#");
         temp.habitat = strsep(&linha, "#");
         temp.tipo = strsep(&linha, "#");
@@ -57,6 +59,8 @@ RegDados lerRegistro(FILE *arquivo)
     }
 }
 
+// Compara o nome do campo aos possíveis critérios de busca e retorna um inteiro
+// Busca facilitar as demais funções
 int definirTipo(char *nomeCampo)
 {
     if(strncmp(nomeCampo, "populacao", 3)==0)
@@ -90,6 +94,7 @@ int definirTipo(char *nomeCampo)
         return 10;
 }
 
+// Recebe um registro e mostra seus campos não vazios
 void imprimirRegistro(RegDados registro)
 {
     printf("Nome: %s\n", registro.nome);
@@ -108,6 +113,7 @@ void imprimirRegistro(RegDados registro)
     printf("\n");
 }
 
+// Elimina registros, mantendo apenas o sinalizador de remoção e um campo indicando o próximo campo vazio
 void eliminarRegistro(FILE* arquivo, int encadeamento)
 {
     char lixo = '$';
