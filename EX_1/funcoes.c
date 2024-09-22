@@ -335,11 +335,7 @@ int RemoverRegistros(char *nomeArq)
         printf("Erro na abertura do arquivo \n");
         return -1;
     }
-
-    encontrou = 0;
-    
-    
-    scanf("%d", &n);
+   
 
     cabecalho = LerCabecalho(arquivo);
     if(cabecalho.status == '0')
@@ -353,12 +349,16 @@ int RemoverRegistros(char *nomeArq)
     aux = EscreverCabecalho(arquivo, cabecalho);
     encontrou = cabecalho.nroRegRem;
     topo=cabecalho.topo;
+
+    scanf("%d", &n);
+
+
     for(i=0; i<n; i++)
     {
         fseek(arquivo, 1600, SEEK_SET);
 
         j=0;
-        encadeamento = 0;
+        encadeamento = -1;
 
         scanf("%s", nomeCampo);
 
@@ -481,7 +481,7 @@ int RemoverRegistros(char *nomeArq)
     }
 
     cabecalho.nroRegRem = encontrou;
-    cabecalho.topo = topo-1;
+    cabecalho.topo = topo;
     cabecalho.status = '1';
 
     aux = EscreverCabecalho(arquivo, cabecalho);
