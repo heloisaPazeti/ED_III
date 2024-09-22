@@ -1,24 +1,5 @@
 #include "funcoesBusca.h"
 
-// Acho que dá pra usar lerCabecalho no lugar das duas primeiras funções
-int numPagDisco(FILE *arquivo)
-{
-    int num;
-    fseek(arquivo, 13, SEEK_SET);
-    fread(&num, sizeof(int),1,arquivo);
-
-    return num;
-}
-
-int buscarRRN(FILE *arquivo)
-{
-    int num;
-    fseek(arquivo, 5, SEEK_SET);
-    fread(&num, sizeof(int),1,arquivo);
-
-    return num;
-}
-
 // Lê um registro e retorna
 RegDados lerRegistro(FILE *arquivo)
 {
@@ -30,25 +11,25 @@ RegDados lerRegistro(FILE *arquivo)
         temp.removido = '2';
         return temp;
     }    
-    if(temp.removido == '1')                // Caso o registro tenha sido removido, não completa a leitura e retorna 
+    if(temp.removido == '1')                                // Caso o registro tenha sido removido, não completa a leitura e retorna 
     {
         return temp;
     }
-    if(temp.removido != '1')                // Caso o campo não tenha sido removido, a leitura dos campos é finalizada
+    if(temp.removido != '1')                                // Caso o campo não tenha sido removido, a leitura dos campos é finalizada
     {
         fread(&temp.encadeamento, sizeof(int),1,arquivo);
         fread(&temp.populacao, sizeof(int),1,arquivo);
         fread(&temp.tamanho, sizeof(float),1,arquivo);
         fread(&temp.unidadeMedida, sizeof(char),1,arquivo);
         fread(&temp.velocidade, sizeof(int), 1,arquivo);
-        if(fread(dado, sizeof(char), 142, arquivo)==0)          // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
+        if(fread(dado, sizeof(char), 142, arquivo)==0)      // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
         {
             temp.removido = '2';
             return temp;
         }
 
-        linha = strdup(dado);               // A string de dados (armazena os campos de tamanho variável) é duplicada
-        temp.nome = strsep(&linha, "#");    // Separação dos dados de acordo com o separador '#'
+        linha = strdup(dado);                               // A string de dados (armazena os campos de tamanho variável) é duplicada
+        temp.nome = strsep(&linha, "#");                    // Separação dos dados de acordo com o separador '#'
         temp.especie = strsep(&linha, "#");
         temp.habitat = strsep(&linha, "#");
         temp.tipo = strsep(&linha, "#");

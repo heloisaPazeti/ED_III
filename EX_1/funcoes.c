@@ -173,15 +173,13 @@ int EscreverRegistros(char *nomeArq)
 // Escreve os registros correspondentes e o número de páginas de disco acessadas na busca
 int BuscarRegistros(char *nomeArq)
 {
-    int n;
-    int i;
-    int j=0;
+    int n, i;
     int valorCampoInt;
-    int tipoPesquisa, numPag;
-    int offset, encontrou, aux2;
+    int tipoPesquisa, numPag, encontrou;
     float valorCampoFloat;
     char nomeCampo[15], valorCampo[61], aux1[1];
     RegDados reg;
+    RegCabecalho cabecalho;
     FILE *arquivo;
 
     arquivo = fopen(nomeArq, "rb");                     // Inicializa o arquivo em modo de leitura
@@ -191,47 +189,51 @@ int BuscarRegistros(char *nomeArq)
         return -1;
     }
 
-    encontrou = 0;  
+    cabecalho = LerCabecalho(arquivo);                  // Lê o cabeçalho do arquivo
+    if(cabecalho.status == '0')                         // Caso o arquivos esteja inconsistente (status = 0), emite mensagem de erro
+    {
+        printf("Erro na abertura do arquivo");
+        return -1;
+    }
+
+    encontrou = 0;                                      // Inicializa o número de registros encontrados
     
-    numPag = numPagDisco(arquivo);                      // Obtém o número de páginas de disco a partir do cabeçalho
+    numPag = cabecalho.nroPagDisco;                     // Obtém o número de páginas de disco a partir do cabeçalho
     scanf("%d", &n);                                    // Lê o número de buscas a serem realizadas
     for(i=0; i<n; i++)
     {
         fseek(arquivo, 1600, SEEK_SET);                 // Posiciona o cursor após o cabeçalho
-        j=0;
         encontrou = 0;
         scanf("%s", nomeCampo);                         // Lê o nome do campo
 
-        if(strncmp(nomeCampo, "populacao",3)==0 || strncmp(nomeCampo, "velocidade",3)==0)   // Leitura caso o valor do campo seja um inteiro
+        tipoPesquisa = definirTipo(nomeCampo);          // Define um inteiro para o tipo de pesquisa
+
+        if(tipoPesquisa == 1 || tipoPesquisa == 4)      // Caso o campo seja um inteiro
         {
             scanf("%d", &valorCampoInt);
         }
 
-        else if(strncmp(nomeCampo, "tamanho",3)==0)      // Leitura caso o valor do campo seja um float
+        else if(tipoPesquisa == 2)                       // Caso o campo seja um float
         {
             scanf("%f", &valorCampoFloat);
         }
 
-        else
-            scan_quote_string(valorCampo);                 // Leitura caso o valor do campo seja uma string
-        
-        tipoPesquisa = definirTipo(nomeCampo);              // Define o tipo de pesquisa a ser realizada conforme o nome do campo
+        else                                             // Caso o campo seja uma string
+            scan_quote_string(valorCampo);                      
         printf("Busca %d\n", i+1); 
 
         while(1)
-        {
-            offset = 1600+j*160;                            // Calcula o offset ligado à busca
+        {                        
             reg = lerRegistro(arquivo);                     // Lê o registro no arquivo binário
             
             if (reg.removido=='2') break;                   // removido == '2' é uma flag criada em "lerRegistro" sinalizando o fim do arquivo
             if (reg.removido=='1') 
-                fseek(arquivo, offset, SEEK_SET);           // Caso o registro tenha sido removido, avança o cursor
+                fseek(arquivo, 159, SEEK_CUR);              // Caso o registro tenha sido removido, avança o cursor
 
             if(reg.removido == '0')                         // Caso o registro não tenha sido removido
             {
                 switch(tipoPesquisa)                        // Realiza a busca conforme o campo selecionado. Caso encontre um registro 
-                                                            // correspondente, imprime-o e aumenta a variável de registros encontrados
-                {
+                {                                           // correspondente, imprime-o e aumenta a variável de registros encontrados
                     case 1:
                         if(reg.populacao == valorCampoInt)
                         {
@@ -303,13 +305,11 @@ int BuscarRegistros(char *nomeArq)
                             ++encontrou;
                         }
                         break;
-                    default:
+                    default:                                    // Caso o campo tenha valor inválido
                         printf("Erro\n");
                         break;
                 }
             }
-            
-            j++;
         }
        
         if(encontrou==0) printf("Registro inexistente.\n\n");   // Caso nenhum registro tenha sido encontrado, informa ao usuário
@@ -324,78 +324,79 @@ int BuscarRegistros(char *nomeArq)
 
 int RemoverRegistros(char *nomeArq)
 {
-    int n, i, aux, j;
+    int n, i, proxRRN;
     int valorCampoInt, tipoPesquisa, topo, offset, remocoes;
     float valorCampoFloat;
-    char nomeCampo[15], valorCampo[61], aux1[1];
+    char nomeCampo[15], valorCampo[61];
     RegDados reg;
     RegCabecalho cabecalho;
 
     FILE *arquivo;
 
-    arquivo = fopen(nomeArq, "rb+");
-    if(arquivo == NULL)
+    arquivo = fopen(nomeArq, "rb+");                            // Abre o arquivo em modo de leitura e escrita
+    if(arquivo == NULL)                                         // Caso haja erro na abertura do arquivo, emite mensagem de erro
     {
         printf("Erro na abertura do arquivo \n");
         return -1;
     }
    
 
-    cabecalho = LerCabecalho(arquivo);
-    if(cabecalho.status == '0')
+    cabecalho = LerCabecalho(arquivo);                          // Lê o cabeçalho do arquivo
+    if(cabecalho.status == '0')                                 // Caso o cabeçalho indique inconsistência no arquivo, emite mensagem de erro
     {
         printf("Erro na abertura do arquivo");
         return -1;
     }
 
-    cabecalho.status = '0';
-    remocoes = cabecalho.nroRegRem;
-    topo = cabecalho.topo;
+    cabecalho.status = '0';                                     // Atualiza o status do arquivo durante a manipulação do arquivo
+    remocoes = cabecalho.nroRegRem;                             // O número inicial de remoções é o indicado no cabeçalho
+    topo = cabecalho.topo;                                      // O topo incial é o indicado pelo cabeçalho
 
-    aux = EscreverCabecalho(arquivo, cabecalho);
+    EscreverCabecalho(arquivo, cabecalho);                      // Reescreve o cabeçalho com os novos dados
 
-    scanf("%d", &n);
+    scanf("%d", &n);                                            // Lê o número de dados a serem removidos
 
 
-    for(i=0; i<n; i++)
+    for(i=0; i<n; i++)                        
     {
-        fseek(arquivo, 1600, SEEK_SET);
+        fseek(arquivo, 1600, SEEK_SET);                         // Posiciona o cursor para o começo dos dados no arquivo
 
-        j=-1;
+        proxRRN=-1;                                             // Inicializa a variável que indica o RRN do próximo remvoido
 
-        scanf("%s", nomeCampo);
+        scanf("%s", nomeCampo);                                 // Lê o nome do campo a ser removido
 
-        if(strncmp(nomeCampo, "populacao",3)==0 || strncmp(nomeCampo, "velocidade",3)==0)
+        tipoPesquisa = definirTipo(nomeCampo);                  // Define um inteiro de acordo com o campo a ser removido
+
+        if(tipoPesquisa == 1 || tipoPesquisa == 4)              // Caso o campo a ser removido seja um inteiro
         {
             scanf("%d", &valorCampoInt);
         }
 
-        else if(strncmp(nomeCampo, "tamanho",3)==0)
+        else if(tipoPesquisa == 2)                              // Caso o campo a ser removido seja um float
         {
             scanf("%f", &valorCampoFloat);
         }
 
-        else
+        else                                                    // Caso o campo a ser removido seja uma string
             scan_quote_string(valorCampo);
         
-        tipoPesquisa = definirTipo(nomeCampo);
-
         while(1)
         {
-            offset = 1600+j*160;
-            reg = lerRegistro(arquivo);
-            if (reg.removido=='2') break;
-            if (reg.removido=='1') fseek(arquivo, offset, SEEK_SET);
+            proxRRN++;                                          // Aumenta o valor do RRN conforme percorre os registros
+            reg = lerRegistro(arquivo);                         // Lê o registro
+            if (reg.removido=='2') break;                       // reg.removido = '2' indica fim do arquivo (função lerRegistro), sai do while
+            if (reg.removido=='1')                              // Caso o registro tenha sido removido, reposiciona o cursor ao final dele
+                fseek(arquivo, 159, SEEK_CUR);
 
-            if(reg.removido == '0')
-            {
+            if(reg.removido == '0')                             // Caso o registro não tenha sido removido, realiza a busca conforme o especificado
+            {                                                   // Quando encontra um registro, elimina-o, atualiza o valor do topo para o RRN correspondente e aumenta o número de remoções
                 switch(tipoPesquisa)
                 {
                     case 1:
                         if(reg.populacao == valorCampoInt)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = j;
+                            topo = proxRRN;
                             remocoes++;
                         }
                         break;
@@ -404,7 +405,7 @@ int RemoverRegistros(char *nomeArq)
                         if(reg.tamanho == valorCampoFloat)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = j;
+                            topo = proxRRN;
                             remocoes++;
                         }
                         break;
@@ -412,7 +413,7 @@ int RemoverRegistros(char *nomeArq)
                         if(strcmp(valorCampo, &reg.unidadeMedida)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = j;
+                            topo = proxRRN;
                             remocoes++;
                         }
                         break;
@@ -420,7 +421,7 @@ int RemoverRegistros(char *nomeArq)
                         if(reg.velocidade == valorCampoInt)
                         {
                             eliminarRegistro(arquivo,topo);
-                            topo = j;
+                            topo = proxRRN;
                             remocoes++;
                         }
                         break;
@@ -428,7 +429,7 @@ int RemoverRegistros(char *nomeArq)
                         if(strcmp(valorCampo, reg.nome)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = j;
+                            topo = proxRRN;
                             remocoes++;
                         }
                         break;
@@ -436,7 +437,7 @@ int RemoverRegistros(char *nomeArq)
                         if(strcmp(valorCampo, reg.especie)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = j;
+                            topo = proxRRN;
                             remocoes++;
                         }
                         break;
@@ -444,7 +445,7 @@ int RemoverRegistros(char *nomeArq)
                         if(strcmp(valorCampo, reg.habitat)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = j;
+                            topo = proxRRN;
                             remocoes++;
                         }
                         break;
@@ -452,7 +453,7 @@ int RemoverRegistros(char *nomeArq)
                         if(strcmp(valorCampo, reg.tipo)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            topo = j;
+                            topo = proxRRN;
                             remocoes++;
                         }
                         break;
@@ -460,7 +461,7 @@ int RemoverRegistros(char *nomeArq)
                         if(strcmp(valorCampo, reg.dieta)==0)
                         {
                             eliminarRegistro(arquivo,topo);
-                            topo = j;
+                            topo = proxRRN;
                             remocoes++;
                         }
                         break;
@@ -468,25 +469,25 @@ int RemoverRegistros(char *nomeArq)
                         if(strcmp(valorCampo, reg.alimento)==0)
                         {
                             eliminarRegistro(arquivo, topo);
-                            cabecalho.topo = j;
+                            cabecalho.topo = proxRRN;
                             remocoes++;
                         }
                         break;
-                    default:
+                    default:                                    // Se o valor do campo for inválido, emite mensagem de erro
                         printf("Erro\n");
                         break;
                 }
             }
-            j++;
         }
     }
 
-    cabecalho.topo = topo;
-    cabecalho.nroRegRem = remocoes;
-    cabecalho.status = '1';
+    cabecalho.topo = topo;                                      // Atualiza o valor do topo do cabeçalho
+    cabecalho.nroRegRem = remocoes;                             // Atualiza o número de remoções no cabeçalho
+    cabecalho.status = '1';                                     // Atualiza o status do arquivo
 
-    aux = EscreverCabecalho(arquivo, cabecalho);
+    EscreverCabecalho(arquivo, cabecalho);                      // Reescreve o cabeçalho com as novas informações
     fclose(arquivo);
+
     binarioNaTela(nomeArq);
 
     return 0;
