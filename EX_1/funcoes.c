@@ -387,6 +387,8 @@ int RemoverRegistros(char *nomeArq)
 
             if(reg.removido == '0')
             {
+                if(cabecalho.topo == topo)
+                    topo++;
                 switch(tipoPesquisa)
                 {
                     case 1:
