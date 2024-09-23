@@ -95,36 +95,18 @@ RegDados lerDadosDoTeclado()
 {
     RegDados registro;
     char populacao[4], tamanho[4], velocidade[4];
+    char *nome = NULL;
 
-    scan_quote_string(registro.nome);
-    scan_quote_string(registro.dieta);
-    scan_quote_string(registro.habitat);
-    scanf("%d", &registro.populacao);
-    // scanf("%s", populacao);
-    // if(strcmp(populacao, "NULO")!=0)
-    // {
-    //     registro.populacao = atoi(populacao);
-    // }
-    // else registro.populacao = 0;
-    scan_quote_string(registro.tipo);
-    scanf("%d", &registro.velocidade);
-    // scanf("%s", velocidade);
-    // if(strcmp(velocidade, "NULO")!=0)
-    // {
-    //     registro.velocidade = atoi(velocidade);
-    // }
-    // else registro.velocidade = 0;
-    scanf("%s", &registro.unidadeMedida);
-    scanf("%f", &registro.tamanho);
-    // scanf("%s", tamanho);
-    // if(strcmp(tamanho, "NULO")!=0)
-    // {
-    //     registro.populacao = atof(tamanho);
-    // }
-    // else registro.tamanho = 0;
-    scan_quote_string(registro.especie);
-    scan_quote_string(registro.alimento);
-    registro.removido = '0';
+    registro = IniciarRegistroDados();
+    nome = calloc(40, sizeof(char));
+    printf("1");
+    printf("%p", nome);
+    fgets(nome, 40, stdin);
+    printf("1");
+    
+    printf("1");
+
+    //registro.nome = nome;
 
     return registro;
 }

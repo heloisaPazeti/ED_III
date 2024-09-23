@@ -499,7 +499,7 @@ int InserirRegistros(char *nomeArq)
     int n, i, topo, rrn, nroReg;
     FILE *arquivo;
     RegCabecalho cabecalho;
-    RegDados registro;
+    RegDados registro, registro2;
 
     arquivo = fopen(nomeArq, "rb+");
 
@@ -510,12 +510,12 @@ int InserirRegistros(char *nomeArq)
     }
 
     cabecalho = LerCabecalho(arquivo);
-    if(cabecalho.status == '0')
-    {
-        printf("Erro de abertura do arquivo\n");
-        binarioNaTela(nomeArq);
-        return -1;
-    }
+    // if(cabecalho.status == '0')
+    // {
+    //     printf("Erro de abertura do arquivo\n");
+    //     binarioNaTela(nomeArq);
+    //     return -1;
+    // }
 
     topo = cabecalho.topo;
     rrn = cabecalho.proxRRN;
@@ -525,6 +525,7 @@ int InserirRegistros(char *nomeArq)
     EscreverCabecalho(arquivo, cabecalho);
 
     scanf("%d", &n);
+    getchar();
 
     fseek(arquivo, 1600, SEEK_SET);
 
@@ -532,24 +533,23 @@ int InserirRegistros(char *nomeArq)
     {
         if(topo == -1)
         {
-            fclose(arquivo);
-            arquivo = fopen(nomeArq, "ab");
+            registro = IniciarRegistroDados();
+            printf("%d", registro.populacao);
             registro = lerDadosDoTeclado();
             EscreverRegistro(arquivo, registro, nroReg);
-            fclose(arquivo);
-
-            arquivo = fopen(nomeArq, "rb+");
             rrn++;
             nroReg++; 
         }
         else if(topo != -1)
         {
             fseek(arquivo, 1600+160*topo, SEEK_SET);
+            registro = IniciarRegistroDados();
             registro = lerRegistro(arquivo);
             topo = registro.encadeamento;
 
             fseek(arquivo, -160, SEEK_CUR);
-            registro = lerDadosDoTeclado();
+            registro2 = IniciarRegistroDados();
+            registro2 = lerDadosDoTeclado();
             EscreverRegistro(arquivo, registro, topo);
             nroReg++;
         }
