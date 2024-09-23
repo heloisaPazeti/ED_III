@@ -13,6 +13,7 @@ RegDados lerRegistro(FILE *arquivo)
     }    
     if(temp.removido == '1')                                // Caso o registro tenha sido removido, não completa a leitura e retorna 
     {
+        fread(&temp.encadeamento, sizeof(int),1,arquivo);
         return temp;
     }
     if(temp.removido != '1')                                // Caso o campo não tenha sido removido, a leitura dos campos é finalizada

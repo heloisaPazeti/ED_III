@@ -2,6 +2,7 @@
 #define FUNCOESAUXILIARES_H
 
 #include "structs.h"
+#include "funcoesFornecidas.h"
 
 ///////////////////////////////////////////////////////////////// ESCREVER NO ARQUIVO (1)
 // Supõe-se que o arquivo já está aberto
@@ -13,5 +14,9 @@ int EscreverRegistro(FILE *arqBin, RegDados novoRegisto, int quantReg);
 ///////////////////////////////////////////////////////////////// PRINTAR REGISTROS (2)
 
 RegCabecalho LerCabecalho(FILE *arqBin);
+
+///////////////////////////////////////////////////////////////// ADICIONAR REGISTROS (5)
+void adicionarRegistro(RegDados registro, FILE *arquivo);
+RegDados lerDadosDoTeclado();
 
 #endif

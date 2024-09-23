@@ -89,3 +89,61 @@ RegCabecalho LerCabecalho(FILE *arqBin)
 
     return cabecalho;
 }
+
+///////////////////////////////////////////////////////////////// ADICIONAR REGISTROS (5)
+RegDados lerDadosDoTeclado()
+{
+    RegDados registro;
+    char populacao[4], tamanho[4], velocidade[4];
+
+    scan_quote_string(registro.nome);
+    scan_quote_string(registro.dieta);
+    scan_quote_string(registro.habitat);
+    scanf("%d", &registro.populacao);
+    // scanf("%s", populacao);
+    // if(strcmp(populacao, "NULO")!=0)
+    // {
+    //     registro.populacao = atoi(populacao);
+    // }
+    // else registro.populacao = 0;
+    scan_quote_string(registro.tipo);
+    scanf("%d", &registro.velocidade);
+    // scanf("%s", velocidade);
+    // if(strcmp(velocidade, "NULO")!=0)
+    // {
+    //     registro.velocidade = atoi(velocidade);
+    // }
+    // else registro.velocidade = 0;
+    scanf("%s", &registro.unidadeMedida);
+    scanf("%f", &registro.tamanho);
+    // scanf("%s", tamanho);
+    // if(strcmp(tamanho, "NULO")!=0)
+    // {
+    //     registro.populacao = atof(tamanho);
+    // }
+    // else registro.tamanho = 0;
+    scan_quote_string(registro.especie);
+    scan_quote_string(registro.alimento);
+    registro.removido = '0';
+
+    return registro;
+}
+
+void adicionarRegistro(RegDados registro, FILE *arquivo)
+{
+    fwrite(registro.nome, 1, sizeof(registro.nome), arquivo);
+    if(strncmp(registro.especie,"$",1)!=0&& registro.especie[0] != '\0')        
+        printf("Especie: %s\n", registro.especie);
+    if(strncmp(registro.tipo,"$",1)!=0&& registro.tipo[0] != '\0')
+        printf("Tipo: %s\n", registro.tipo);
+    if(strncmp(registro.dieta,"$",1)!=0 && registro.dieta[0] != '\0')
+        printf("Dieta: %s\n", registro.dieta);
+    if(strncmp(registro.habitat,"$",1)!=0 && registro.habitat[0] != '\0')
+        printf("Lugar que habitava: %s\n", registro.habitat);
+    if(registro.tamanho != -1)
+        printf("Tamanho: %.1f m\n", registro.tamanho);
+    if(registro.velocidade != -1)
+        printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.unidadeMedida);
+    printf("\n");
+}
+

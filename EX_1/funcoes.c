@@ -167,7 +167,7 @@ int EscreverRegistros(char *nomeArq)
 
 }
 
-///////////////////////////////////////////////////////////////// BUSCAR REGISTRO (3)
+///////////////////////////////////////////////////////////////// BUSCAR REGISTROS (3)
 
 // Realiza buscas conforme o campo e o valor especificados pelo usuário
 // Escreve os registros correspondentes e o número de páginas de disco acessadas na busca
@@ -320,7 +320,7 @@ int BuscarRegistros(char *nomeArq)
     return 0;
 }
 
-///////////////////////////////////////////////////////////////// REMOVER REGISTRO (4)
+///////////////////////////////////////////////////////////////// REMOVER REGISTROS (4)
 
 int RemoverRegistros(char *nomeArq)
 {
@@ -492,7 +492,78 @@ int RemoverRegistros(char *nomeArq)
 
     return 0;
 }
+///////////////////////////////////////////////////////////////// INSERIR REGISTROS (5)
 
+int InserirRegistros(char *nomeArq)
+{
+    int n, i, topo, rrn, nroReg;
+    FILE *arquivo;
+    RegCabecalho cabecalho;
+    RegDados registro;
+
+    arquivo = fopen(nomeArq, "rb+");
+
+    if(arquivo == NULL)
+    {
+        printf("Erro de abertura do arquivo\n");
+        return -1;
+    }
+
+    cabecalho = LerCabecalho(arquivo);
+    if(cabecalho.status == '0')
+    {
+        printf("Erro de abertura do arquivo\n");
+        binarioNaTela(nomeArq);
+        return -1;
+    }
+
+    topo = cabecalho.topo;
+    rrn = cabecalho.proxRRN;
+    nroReg = cabecalho.nroPagDisco*10;
+    cabecalho.status = '0';
+
+    EscreverCabecalho(arquivo, cabecalho);
+
+    scanf("%d", &n);
+
+    fseek(arquivo, 1600, SEEK_SET);
+
+    for(i=0; i<n; i++)
+    {
+        if(topo == -1)
+        {
+            fclose(arquivo);
+            arquivo = fopen(nomeArq, "ab");
+            registro = lerDadosDoTeclado();
+            EscreverRegistro(arquivo, registro, nroReg);
+            fclose(arquivo);
+
+            arquivo = fopen(nomeArq, "rb+");
+            rrn++;
+            nroReg++; 
+        }
+        else if(topo != -1)
+        {
+            fseek(arquivo, 1600+160*topo, SEEK_SET);
+            registro = lerRegistro(arquivo);
+            topo = registro.encadeamento;
+
+            fseek(arquivo, -160, SEEK_CUR);
+            registro = lerDadosDoTeclado();
+            EscreverRegistro(arquivo, registro, topo);
+            nroReg++;
+        }
+    }
+
+    cabecalho.status = '1';
+    cabecalho.topo = topo;
+    
+    EscreverCabecalho(arquivo, cabecalho);
+    
+    fclose(arquivo);
+    binarioNaTela(nomeArq);
+    return 0;
+}
 ///////////////////////////////////////////////////////////////// COMPACTADOR (6)
 
 // Cria novo arquivo removendo registros excluidos

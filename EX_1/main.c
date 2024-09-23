@@ -31,6 +31,9 @@ int main()
     case 4:
         RemoverRegistros(nomeArq);
         break;
+    case 5:
+        InserirRegistros(nomeArq);
+        break;
     case 6:
         Compactador(nomeArq);
         break;
