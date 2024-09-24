@@ -18,5 +18,6 @@ RegCabecalho LerCabecalho(FILE *arqBin);
 ///////////////////////////////////////////////////////////////// ADICIONAR REGISTROS (5)
 void adicionarRegistro(RegDados registro, FILE *arquivo);
 RegDados lerDadosDoTeclado();
+void SubstituirRegistro(FILE *arquivo, RegDados registro);
 
 #endif

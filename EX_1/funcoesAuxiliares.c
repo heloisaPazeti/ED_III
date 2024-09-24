@@ -41,11 +41,7 @@ int EscreverRegistro(FILE *arqBin, RegDados novoRegisto, int quantReg)
     int posicaoFinal;
     char delim = '#';
     int tamNome, tamEspecie, tamHabitat, tamTipo, tamDieta, tamAlimento;
-    printf("%p\n", novoRegisto.nome);
-    for(int i=0; i<strlen(novoRegisto.nome); i++)
-    {
-        printf("%c-", (novoRegisto.nome[i]));
-    }
+    
     if (arqBin == NULL)
     {
         printf("Falha no processamento do arquivo [Arq. CSV == NULL]\n");
@@ -61,16 +57,11 @@ int EscreverRegistro(FILE *arqBin, RegDados novoRegisto, int quantReg)
 
     fwrite(&novoRegisto.removido, sizeof(char),1, arqBin);                          // Escreve os dados
     fwrite(&novoRegisto.encadeamento, sizeof(int),1, arqBin);
-    if(novoRegisto.populacao!=-1)
-        fwrite(&novoRegisto.populacao, sizeof(int),1, arqBin);
-    if(novoRegisto.tamanho!=-1)
-        fwrite(&novoRegisto.tamanho, sizeof(float),1, arqBin);
+    fwrite(&novoRegisto.populacao, sizeof(int),1, arqBin);
+    fwrite(&novoRegisto.tamanho, sizeof(float),1, arqBin);
     fwrite(&novoRegisto.unidadeMedida, sizeof(char),1, arqBin);
-    if(novoRegisto.velocidade!=-1)
-        fwrite(&novoRegisto.velocidade, sizeof(int),1, arqBin);
+    fwrite(&novoRegisto.velocidade, sizeof(int),1, arqBin);
     fwrite(novoRegisto.nome, sizeof(char), tamNome, arqBin);
-    printf("%d\n", tamNome);
-    printf("%s", novoRegisto.nome);
     fwrite(&delim, sizeof(char),1, arqBin);
     fwrite(novoRegisto.especie, sizeof(char), tamEspecie, arqBin);
     fwrite(&delim, sizeof(char),1, arqBin);
@@ -122,75 +113,43 @@ RegCabecalho LerCabecalho(FILE *arqBin)
 RegDados lerDadosDoTeclado()
 {
     RegDados registro;
-    char populacao[10], tamanho[10], velocidade[10];
-    char nome[40], dieta[40], habitat[40], tipo[40];
-    char medidaVelocidade[10], especie[40], alimento[40];
+    char *populacao, *tamanho, *velocidade, *medidaVelocidade;
 
     registro = IniciarRegistroDados();
 
-    scan_quote_string(nome);
-    scan_quote_string(dieta);
-    scan_quote_string(habitat);
+    populacao = calloc(10, sizeof(char));
+    tamanho = calloc(10, sizeof(char));
+    velocidade = calloc(10, sizeof(char));
+    medidaVelocidade = calloc(10, sizeof(char));
+
+    scan_quote_string(registro.nome);
+    scan_quote_string(registro.dieta);
+    scan_quote_string(registro.habitat);
     scan_quote_string(populacao);
-    scan_quote_string(tipo);
+    scan_quote_string(registro.tipo);
     scan_quote_string(velocidade);
     scan_quote_string(medidaVelocidade);
     scan_quote_string(tamanho);
-    scan_quote_string(especie);
-    scan_quote_string(alimento); 
+    scan_quote_string(registro.especie);
+    scan_quote_string(registro.alimento); 
 
-    free(registro.nome);
-    registro.nome= nome;
-
-    free(registro.dieta);
-    registro.dieta = dieta;
-
-    free(registro.habitat);
-    if(strcmp(habitat, "NULO")==0)
-        registro.habitat = "\0";
-    else registro.habitat = habitat;
-
-    if(strcmp(populacao, "NULO")==0)
+    if(strcmp(populacao, "")==0)
         registro.populacao = -1;
     else registro.populacao = atoi(populacao);
 
-    free(registro.tipo);
-    if(strcmp(tipo, "NULO")==0)
-        registro.tipo = "\0";
-    else registro.tipo = tipo;
-
-    if(strcmp(velocidade, "NULO")==0)
+    if(strcmp(velocidade, "")==0)
         registro.velocidade = -1;
     else registro.velocidade = atoi(velocidade);
 
-    if(strcmp(medidaVelocidade, "NULO")==0)
-        registro.unidadeMedida = '\0';
+    if(strcmp(medidaVelocidade, "")==0)
+        registro.unidadeMedida = '$';
     else registro.unidadeMedida = medidaVelocidade[0];
 
-    if(strcmp(tamanho, "NULO")==0)
+    if(strcmp(tamanho, "")==0)
         registro.tamanho = -1;
     else registro.tamanho = atof(tamanho);
 
-    free(registro.especie);
-    if(strcmp(especie, "NULO")==0)
-        registro.especie = "\0";
-    else registro.especie = especie;
-
-    free(registro.alimento);
-    if(strcmp(alimento, "NULO")==0)
-        registro.alimento = "\0";
-    else registro.alimento = alimento;
-
-    // printf("%s\n", registro.nome);
-    // printf("%d\n", registro.populacao);
-    // printf("%f\n", registro.tamanho);
-    // printf("%c\n", registro.unidadeMedida);
-    // printf("%d\n", registro.velocidade);
-    // printf("%s\n", registro.especie);
-    // printf("%s\n", registro.habitat);
-    // printf("%s\n", registro.tipo);
-    // printf("%s\n", registro.dieta);
-    // printf("%s\n", registro.alimento);
+    registro.removido = '0';
 
     return registro;
 }
@@ -211,5 +170,28 @@ void adicionarRegistro(RegDados registro, FILE *arquivo)
     if(registro.velocidade != -1)
         printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.unidadeMedida);
     printf("\n");
+}
+
+void SubstituirRegistro(FILE *arquivo, RegDados registro)
+{
+    char delim = '#';
+    fwrite(&registro.removido, sizeof(char),1, arquivo); 
+    fwrite(&registro.encadeamento, sizeof(int),1, arquivo);
+    fwrite(&registro.populacao, sizeof(int),1, arquivo);
+    fwrite(&registro.tamanho, sizeof(float),1, arquivo);
+    fwrite(&registro.unidadeMedida, sizeof(char),1, arquivo);
+    fwrite(&registro.velocidade, sizeof(int),1, arquivo);
+    fwrite(registro.nome, sizeof(char), strlen(registro.nome), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.especie, sizeof(char), strlen(registro.especie), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.habitat, sizeof(char), strlen(registro.habitat), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.tipo, sizeof(char), strlen(registro.tipo), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.dieta, sizeof(char), strlen(registro.dieta), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.alimento, sizeof(char), strlen(registro.alimento), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
 }
 
