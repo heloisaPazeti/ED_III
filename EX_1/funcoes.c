@@ -149,19 +149,36 @@ int EscreverRegistros(char *nomeArq)
     }
 
     cabecalho = LerCabecalho(arqBin);                   // Lê o cabeçalho
+    if(cabecalho.status == '0')                         // Caso o arquivos esteja inconsistente (status = 0), emite mensagem de erro
+    {
+        printf("Erro na abertura do arquivo");
+        return -1;
+    }
+
+    cabecalho.status = '0';                             // Atualiza o status do arquivo durante a manipulação do arquivo
+
+    EscreverCabecalho(arqBin, cabecalho);               // Reescreve o cabeçalho com os novos dados
+    
     novoRegistro = lerRegistro(arqBin);                 // Lê o primeiro registro
     atualRRN++;                                         // Aumenta o RRN atual
 
     while(((atualRRN) <= cabecalho.proxRRN))            // Verifica se acabou o arquivo
     {
-        if(novoRegistro.removido != '1')                // Se for removido ignora
+        if(novoRegistro.removido == '0')                // Se for removido ignora
             imprimirRegistro(novoRegistro);
+
+        if(novoRegistro.removido == '1')
+            fseek(arqBin, 155, SEEK_CUR);
         
         novoRegistro = lerRegistro(arqBin);             // Lê o próximo
         atualRRN++;
     }
 
-    printf("\nNumero de paginas de disco: %d", cabecalho.nroPagDisco);      // Printa quantidade de páginas de disco
+    printf("Numero de paginas de disco: %d\n\n", cabecalho.nroPagDisco);      // Printa quantidade de páginas de disco
+
+    cabecalho.status = '1';                             // Atualiza o status do cabeçalho
+    EscreverCabecalho(arqBin, cabecalho);
+
     fclose(arqBin);
     return 0;
 
@@ -196,6 +213,10 @@ int BuscarRegistros(char *nomeArq)
         printf("Erro na abertura do arquivo");
         return -1;
     }
+
+    cabecalho.status = '0';                                     // Atualiza o status do arquivo durante a manipulação do arquivo
+    
+    EscreverCabecalho(arquivo, cabecalho);                      // Reescreve o cabeçalho com os novos dados
     encontrou = 0;                                      // Inicializa o número de registros encontrados
 
     numPag = cabecalho.nroPagDisco;                     // Obtém o número de páginas de disco a partir do cabeçalho
@@ -318,11 +339,18 @@ int BuscarRegistros(char *nomeArq)
         printf("Numero de paginas de disco: %d\n\n", numPag);   // Mostra o número de páginas de disco
     }
 
+    cabecalho.status = '1';                             // Atualiza o status do cabeçalho
+    EscreverCabecalho(arquivo, cabecalho);
+
+    fclose(arquivo);
+
     return 0;
 }
 
 ///////////////////////////////////////////////////////////////// REMOVER REGISTRO (4)
 
+// Elimina registros segundo critérios escolhidos pelo usuário
+// Atualiza os dados do arquivo
 int RemoverRegistros(char *nomeArq)
 {
     int n, i, proxRRN;
@@ -361,7 +389,7 @@ int RemoverRegistros(char *nomeArq)
     for(i=0; i<n; i++)                        
     {
         fseek(arquivo, 1600, SEEK_SET);                         // Posiciona o cursor para o começo dos dados no arquivo
-        proxRRN=-1;                                             // Inicializa a variável que indica o RRN do próximo remvoido
+        proxRRN=-1;                                             // Inicializa a variável que indica o RRN do próximo removido
 
         scanf("%s", nomeCampo);                                 // Lê o nome do campo a ser removido
 
@@ -493,6 +521,7 @@ int RemoverRegistros(char *nomeArq)
 
 ///////////////////////////////////////////////////////////////// INSERIR REGISTROS (5)
 
+// Insere registros em um arquivo binário seguindo o conceito de lista de registros logicamente removidos
 int InserirRegistros(char *nomeArq)
 {
     int n, i, topo, rrn, nroReg, removidos;
@@ -587,14 +616,22 @@ int Compactador(char *nomeArq)
     arqBinOriginal = fopen(nomeArq, "rb");
     arqBinFinal = fopen(nomeArqFinal, "wb");
 
-    cabecalho = LerCabecalho(arqBinOriginal);                   // Lê o cabeçalho
+    cabecalho = LerCabecalho(arqBinOriginal);           // Lê o cabeçalho
+
+    if(cabecalho.status == '0')                         // Caso o arquivos esteja inconsistente (status = 0), emite mensagem de erro
+    {
+        printf("Erro na abertura do arquivo");
+        return -1;
+    }
+
+    cabecalho.status = '0';                                     // Atualiza o status do arquivo durante a manipulação do arquivo
     EscreverCabecalho(arqBinFinal, cabecalho);                  // Escreve no novo arquivo
     novoRegistro = lerRegistro(arqBinOriginal);                 // Lê o primeiro registro
     atualRRN++;                                                 // Atualiza total de registros
 
     while(((atualRRN) <= cabecalho.proxRRN))                    // Verifica se acabou o arquivo
     {
-        if(novoRegistro.removido != '1')                        // Se for removido ignora
+        if(novoRegistro.removido == '0')                        // Se for removido ignora
         {
             qtdeRRN++;                                          // Adiciona um novo registro
             escreverRegistro(arqBinFinal, novoRegistro, qtdeRRN);
@@ -602,6 +639,10 @@ int Compactador(char *nomeArq)
             
     
         novoRegistro = lerRegistro(arqBinOriginal);             // Lê o próximo
+
+         if(novoRegistro.removido == '1')
+            fseek(arqBinOriginal, 155, SEEK_CUR);
+
         atualRRN++;
     }
 
