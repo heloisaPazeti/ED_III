@@ -30,5 +30,12 @@ RegDados IniciarRegistroDados()
     dados.unidadeMedida = '$';
     dados.velocidade = -1;
 
+    dados.nome = calloc(160, sizeof(char));
+    dados.especie = calloc(160, sizeof(char));
+    dados.habitat = calloc(160, sizeof(char));
+    dados.tipo = calloc(160, sizeof(char));
+    dados.dieta = calloc(160, sizeof(char));
+    dados.alimento = calloc(160, sizeof(char));
+
     return dados;
 }
