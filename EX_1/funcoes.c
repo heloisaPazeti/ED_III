@@ -534,7 +534,10 @@ int InserirRegistros(char *nomeArq)
             // printf("%d", registro.populacao);
             registro = lerDadosDoTeclado();
             rrn++;
-            printf("%s\n", registro.nome);
+            for(int j=0; j<strlen(registro.nome); j++)
+            {
+                printf("%c-", (registro.nome[j]));
+            }
             fseek(arquivo, 0, SEEK_END);
             EscreverRegistro(arquivo, registro, rrn);
         }

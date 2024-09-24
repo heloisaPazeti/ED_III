@@ -41,7 +41,11 @@ int EscreverRegistro(FILE *arqBin, RegDados novoRegisto, int quantReg)
     int posicaoFinal;
     char delim = '#';
     int tamNome, tamEspecie, tamHabitat, tamTipo, tamDieta, tamAlimento;
-    printf("%s\n", novoRegisto.nome);
+    printf("%p\n", novoRegisto.nome);
+    for(int i=0; i<strlen(novoRegisto.nome); i++)
+    {
+        printf("%c-", (novoRegisto.nome[i]));
+    }
     if (arqBin == NULL)
     {
         printf("Falha no processamento do arquivo [Arq. CSV == NULL]\n");
