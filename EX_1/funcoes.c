@@ -497,6 +497,7 @@ int RemoverRegistros(char *nomeArq)
 int InserirRegistros(char *nomeArq)
 {
     int n, i, topo, rrn, nroReg;
+    long int tamanho;
     FILE *arquivo;
     RegCabecalho cabecalho;
     RegDados registro, registro2;
@@ -519,29 +520,27 @@ int InserirRegistros(char *nomeArq)
 
     topo = cabecalho.topo;
     rrn = cabecalho.proxRRN;
-    nroReg = cabecalho.nroPagDisco*10;
     cabecalho.status = '0';
 
     EscreverCabecalho(arquivo, cabecalho);
 
     scanf("%d", &n);
-    getchar();
-
-    fseek(arquivo, 1600, SEEK_SET);
 
     for(i=0; i<n; i++)
     {
         if(topo == -1)
         {
             registro = IniciarRegistroDados();
-            printf("%d", registro.populacao);
+            // printf("%d", registro.populacao);
             registro = lerDadosDoTeclado();
-            EscreverRegistro(arquivo, registro, nroReg);
             rrn++;
-            nroReg++; 
+            printf("%s\n", registro.nome);
+            fseek(arquivo, 0, SEEK_END);
+            EscreverRegistro(arquivo, registro, rrn);
         }
         else if(topo != -1)
         {
+            //printf("aaaaaaaaaaaaaaaaaaaaaaa\n");
             fseek(arquivo, 1600+160*topo, SEEK_SET);
             registro = IniciarRegistroDados();
             registro = lerRegistro(arquivo);
@@ -551,13 +550,18 @@ int InserirRegistros(char *nomeArq)
             registro2 = IniciarRegistroDados();
             registro2 = lerDadosDoTeclado();
             EscreverRegistro(arquivo, registro, topo);
-            nroReg++;
         }
     }
-
+    fseek(arquivo, 0, SEEK_END);
+    tamanho = ftell(arquivo);
     cabecalho.status = '1';
     cabecalho.topo = topo;
-    
+    cabecalho.proxRRN = rrn;
+    float div = (float)tamanho/1600;
+    if(div > (int)div)
+        (int)div++;
+
+    cabecalho.nroPagDisco = (int)div;
     EscreverCabecalho(arquivo, cabecalho);
     
     fclose(arquivo);
