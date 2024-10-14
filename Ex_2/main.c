@@ -1,4 +1,4 @@
-///////////////////////// 1° TRABALHO ESTRUTURA DE DADOS III /////////////////////////
+///////////////////////// 2° TRABALHO ESTRUTURA DE DADOS III /////////////////////////
 // HELOÍSA PAZETI - 14577991                                                        //
 // EDUARDO BRIOSO LUCEIRO - 14607621                                                //
 //////////////////////////////////////////////////////////////////////////////////////
@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "funcoes.h"
+#include "funcoesArvoreB.h"
 
 
 
@@ -14,8 +15,10 @@ int main()
 {
     int n;
     char nomeArq[15];
+    char nomeArqArvore[15];
 
     scanf("%d %s", &n, nomeArq);
+    scanf("%d %s", &n, nomeArqArvore);
 
     switch (n)
     {
@@ -36,6 +39,18 @@ int main()
         break;
     case 6:
         Compactador(nomeArq);
+        break;
+
+    case 7:
+        CriarArvore(nomeArq, nomeArqArvore);
+        break;
+
+    case 8:
+        BuscarRegistroArvore(nomeArq, nomeArqArvore);
+        break;
+
+    case 9:
+        AdicionarRegistroARvore(nomeArq, nomeArqArvore);
         break;
 
     default:
