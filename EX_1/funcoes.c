@@ -214,9 +214,9 @@ int BuscarRegistros(char *nomeArq)
         return -1;
     }
 
-    cabecalho.status = '0';                                     // Atualiza o status do arquivo durante a manipulação do arquivo
+    cabecalho.status = '0';                             // Atualiza o status do arquivo durante a manipulação do arquivo
     
-    EscreverCabecalho(arquivo, cabecalho);                      // Reescreve o cabeçalho com os novos dados
+    EscreverCabecalho(arquivo, cabecalho);              // Reescreve o cabeçalho com os novos dados
     encontrou = 0;                                      // Inicializa o número de registros encontrados
 
     numPag = cabecalho.nroPagDisco;                     // Obtém o número de páginas de disco a partir do cabeçalho
@@ -234,7 +234,7 @@ int BuscarRegistros(char *nomeArq)
             scanf("%d", &valorCampoInt);
         }
 
-        else if(tipoPesquisa == 2)                       // Caso o campo seja um float
+        else if(tipoPesquisa == 2)                      // Caso o campo seja um float
         {
             scanf("%f", &valorCampoFloat);
         }
