@@ -7,47 +7,33 @@
 #include <stdlib.h>
 #include <string.h>
 #include "funcoes.h"
-#include "funcoesArvoreB.h"
-
 
 int main()
 {
     int n;
-    char arq[15], arqArvore[15];
+    char nomeArq[15];
 
-    scanf("%d %s %s", &n, arq, arqArvore);
+    scanf("%d %s", &n, nomeArq);
 
     switch (n)
     {
     case 1:
-        EscreverArquivo(arq);
+        EscreverArquivo(nomeArq);
         break;
     case 2:
-        EscreverRegistros(arq);
+        EscreverRegistros(nomeArq);
         break;
     case 3:
-        BuscarRegistros(arq);
+        BuscarRegistros(nomeArq);
         break;
     case 4:
-        RemoverRegistros(arq);
+        RemoverRegistros(nomeArq);
         break;
     case 5:
-        InserirRegistros(arq);
+        InserirRegistros(nomeArq);
         break;
     case 6:
-        Compactador(arq);
-        break;
-
-    case 7:
-        CriarArvore(arq, arqArvore);
-        break;
-
-    case 8:
-        CriarArvore(arq, arqArvore);
-        break;
-
-    case 9:
-        CriarArvore(arq, arqArvore);
+        Compactador(nomeArq);
         break;
 
     default:

@@ -11,14 +11,13 @@
 
 
 
-int main()
+int main() 
 {
     int n;
     char nomeArq[15];
     char nomeArqArvore[15];
 
-    scanf("%d %s", &n, nomeArq);
-    scanf("%d %s", &n, nomeArqArvore);
+    scanf("%d %s %s", &n, nomeArq, nomeArqArvore);
 
     switch (n)
     {

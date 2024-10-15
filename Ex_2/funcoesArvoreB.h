@@ -27,8 +27,8 @@ typedef struct _noArvBin
     int nroChavesNo;
     int RRNdoNo;
     int P[tamP];
-    int C[tamCPR];
-    int PR[tamCPR];
+    long int C[tamCPR];
+    long int PR[tamCPR];
 
 } NoArvBin;
 
