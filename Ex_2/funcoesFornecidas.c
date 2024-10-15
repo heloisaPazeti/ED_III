@@ -1,4 +1,7 @@
-#include "funcoesFornecidas.h"
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<ctype.h>
 
 void binarioNaTela(char *nomeArquivoBinario) { /* Você não precisa entender o código dessa função. */
 
@@ -61,4 +64,58 @@ void scan_quote_string(char *str) {
 	} else { // EOF
 		strcpy(str, "");
 	}
+}
+
+/*  
+    Converte o nome do dinossauro para long
+
+    OBS:   retorna -1 se o primeiro caracter é '*'
+
+    COMO FUNCIONA:
+
+        Para converter os nomes para long e garantir que nomes diferentes 
+        deem números diferentes interpretamos eles como números em base 6
+
+        Um número L com n digitos dI em base 6 é escrito como:
+
+            L = d0 * 6^0 + d1 * 6^1 + d2 * 6^2 + d3 * 6^3 + ... + dn * 6^n-1
+
+        Nota-se que estamos escrevendo do digito menos significativo para o 
+        mais significativo
+*/
+long converteNome(char* str) {
+    /* O registro que tem essa string como chave foi removido */
+    if(str[0] == '*')
+        return -1;
+
+    /* Começamos com o primeiro digito na ordem de 6^0 = 1 */
+    long power = 1;
+
+    /* Faz a conversão char por char para chegar ao resultado */
+    long result = 0;
+    for(int i = 0; i < strlen(str); i++) {
+        int cur_digit;
+        /* Checa pelas letras minúsculas e as converte para números */
+        if(str[i] >= 'a' && str[i] <= 'z')
+            cur_digit = str[i] - 'a';
+        /* Checa pelas letras maiúsculas e as converte para números */
+        else if(str[i] >= 'A' && str[i] <= 'Z')
+            cur_digit = str[i] - 'A';
+
+        /*
+            Multiplica o digito atual pelo ordem da posição atual
+            e adiciona no resultado
+            Primeira posição:   6^0 = 1
+            Segunda posição:    6^1 = 6
+            Terceira posição:   6^2 = 36
+            Quarta posição:     6^3 = 216
+            Quinta posição:     6^4 = 1.296
+        */
+        result += cur_digit * power;
+
+        /* Aumenta a ordem atual */
+        power *= 6;
+    }
+
+    return result;
 }
