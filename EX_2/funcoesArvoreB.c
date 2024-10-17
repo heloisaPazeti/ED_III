@@ -25,6 +25,12 @@ int BuscarRegistroArvore(char *nomeArq, char *nomeArqArvore)
 
     scanf("%s", campo);                                 // Escaneia campo da chave
     scan_quote_string(chave);                           // Escaneia chave de procura
+
+    if(strncmp(campo, "nome", 4) != 0)
+    {
+        printf("A arvore esta indexada de acordo com o campo nome. Nao com: %s\n", campo);
+        return -1;
+    }
     
     result = BuscarNoArvore(nomeArqArvore, chave);      // Busca na arvore -> retorna com no e posicao
 
