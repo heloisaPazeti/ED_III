@@ -1,6 +1,6 @@
 #include "structs.h"
 
-//////////////////////////////////////////////////////// INICIALIZAÇÕES
+//////////////////////////////////////////////////////// INICIALIZADORES REGISTROS
 
 // Inicializa um cabeçalho com valores padrões ou nulos
 RegCabecalho IniciarCabecalho()
@@ -38,4 +38,36 @@ RegDados IniciarRegistroDados()
     dados.alimento = calloc(160, sizeof(char));
 
     return dados;
+}
+
+//////////////////////////////////////////////////////// INICIALIZADORES ARVORES
+
+CabecalhoArvBin CriarCabecalhoArvBin()
+{
+    CabecalhoArvBin newCabecalho;
+
+    newCabecalho.status = '0';
+    newCabecalho.noRaiz = -1;
+    newCabecalho.RRNproxNo = 0;
+
+    for (int i = 0; i < 83; i++)
+        newCabecalho.lixo[i] = '$';
+
+    return newCabecalho;
+}
+
+NoArvBin CriarNo()
+{
+    NoArvBin newNo;
+    int i;
+
+    newNo.folha = '1';
+    newNo.nroChavesNo = 0;
+    newNo.RRNdoNo = -1;
+
+    newNo.P = calloc(tamP, sizeof(int));
+    newNo.C = calloc(tamCPR, 8);
+    newNo.PR = calloc(tamCPR, 8);
+
+    return newNo;
 }

@@ -8,8 +8,6 @@
 #include <string.h>
 #include "funcoes.h"
 
-
-
 int main()
 {
     int n;
