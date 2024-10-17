@@ -6,10 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "funcoes.h"
 #include "funcoesArvoreB.h"
-
-
 
 int main() 
 {
@@ -21,40 +18,22 @@ int main()
 
     switch (n)
     {
-    case 1:
-        EscreverArquivo(nomeArq);
-        break;
-    case 2:
-        EscreverRegistros(nomeArq);
-        break;
-    case 3:
-        BuscarRegistros(nomeArq);
-        break;
-    case 4:
-        RemoverRegistros(nomeArq);
-        break;
-    case 5:
-        InserirRegistros(nomeArq);
-        break;
-    case 6:
-        Compactador(nomeArq);
-        break;
+        
+        case 7:
+            CriarArvore(nomeArq, nomeArqArvore);
+            break;
 
-    case 7:
-        CriarArvore(nomeArq, nomeArqArvore);
-        break;
+        case 8:
+            BuscarRegistroArvore(nomeArq, nomeArqArvore);
+            break;
 
-    case 8:
-        BuscarRegistroArvore(nomeArq, nomeArqArvore);
-        break;
+        case 9:
+            AdicionarRegistroARvore(nomeArq, nomeArqArvore);
+            break;
 
-    case 9:
-        AdicionarRegistroARvore(nomeArq, nomeArqArvore);
-        break;
-
-    default:
-        printf("Essa não é uma opcao valida\n");
-        break;
+        default:
+            printf("Essa não é uma opcao valida\n");
+            break;
     }
 
     return 0;
