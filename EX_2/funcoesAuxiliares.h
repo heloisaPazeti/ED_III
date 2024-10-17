@@ -13,9 +13,15 @@ NoArvBin LerNoArvore(char *arquivo, int rrn);
 
 NoPos BuscarNoArvore(char *arquivo, char *chave);
 
+//////////////////////////////////////////////////////// CHECAGENS
+
+int ChecarCabecalho(CabecalhoArvBin cabecalho);
+int ChecarArvoreVazia(CabecalhoArvBin cabecalho);
+int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq);
+
 //////////////////////////////////////////////////////// FUNCOES TRABALHO 1
 
-RegDados lerRegistro(FILE *arquivo);
+RegDados lerRegistro(FILE *arqBin, char *arquivo);
 void imprimirRegistro(RegDados registro);
 
 #endif

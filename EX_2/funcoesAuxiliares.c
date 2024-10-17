@@ -5,15 +5,11 @@
 
 CabecalhoArvBin LerCabecalhoArvore(char *arquivo)
 {
-    CabecalhoArvBin cabecalho = CriarCabecalhoArvBin();
+    CabecalhoArvBin cabecalho = CriarCabecalhoArvBin(); // Inicializa Arvore
     FILE *arqBin = fopen(arquivo, "rb");
 
-    if (arqBin == NULL)
-    {
-        printf("Arquivo nulo.\n");
-        return cabecalho;
-    }
-
+    if (ChecarIntegridadeArquivo(arqBin, arquivo) < 0) return cabecalho;
+    
     fread(&cabecalho.status, sizeof(char), 1, arqBin);
     fread(&cabecalho.noRaiz, sizeof(int), 1, arqBin);
     fread(&cabecalho.RRNproxNo, sizeof(int), 1, arqBin);
@@ -23,14 +19,14 @@ CabecalhoArvBin LerCabecalhoArvore(char *arquivo)
     return cabecalho;
 }
 
+// Le o nó no rrn especifico
 NoArvBin LerNoArvore(char *arquivo, int rrn)
 {
-    NoArvBin no = CriarNo();
+    NoArvBin no = CriarNo();                    // Inicializa no
     FILE *arqBin = fopen(arquivo, "rb");
     int i;
 
-    if (arqBin == NULL)
-        return no;
+    if (ChecarIntegridadeArquivo(arqBin, arquivo) < 0) return no;
         
     fseek(arqBin, (rrn * tamNo) + tamCabecalho, SEEK_SET);
 
@@ -38,23 +34,24 @@ NoArvBin LerNoArvore(char *arquivo, int rrn)
     fread(&no.nroChavesNo, sizeof(int), 1, arqBin);
     fread(&no.RRNdoNo, sizeof(int), 1, arqBin);
 
-    for (i = 0; i < no.nroChavesNo; i++)
+    for (i = 0; i < no.nroChavesNo; i++)        // Le todos os Pi, Ci, PRi
     {
         fread(&no.P[i], sizeof(int), 1, arqBin);
         fread(&no.C[i], sizeof(long), 1, arqBin);
         fread(&no.PR[i], sizeof(long), 1, arqBin);
     }
 
-    fread(&no.P[i], sizeof(int), 1, arqBin);
+    fread(&no.P[i], sizeof(int), 1, arqBin);    // Le o ponteiro final
     fclose(arqBin);
     return no;
 }
 
 //////////////////////////////////////////////////////// FUNCOES DE BUSCA
 
-// Retorna posicao na arvore na qual está / deveria estar o registro
-// Se houver retorna o rrn
-// Se não houver retorna -1
+// Retorna uma struct com no + pos na arvore na qual está / deveria estar o registro
+// Se houver retorna o no + rrn
+// Se não houver retorna na posicao -1
+// Retorna -2 na posicao se der algum erro
 NoPos BuscarNoArvore(char *arquivo, char *chave)
 {
     CabecalhoArvBin cabecalho = LerCabecalhoArvore(arquivo);
@@ -64,76 +61,102 @@ NoPos BuscarNoArvore(char *arquivo, char *chave)
 
     noPos.pos = -2;
 
-    if (cabecalho.status == '0')
-    {
-        printf("Cabecalho corrompido.\n");
-        return noPos;
-    }
+    if ((ChecarCabecalho(cabecalho) < 0) || (ChecarArvoreVazia(cabecalho) < 0)) return noPos;
 
-    if (cabecalho.noRaiz == -1)
+    nextRrr = cabecalho.noRaiz;                     // Pega o rrn da raiz
+    while (noPos.pos < -1)                          // Enquanto não encontrar o fim ou a chave
     {
-        printf("Essa arvore esta vazia.\n");
-        return noPos;
-    }
-
-    nextRrr = cabecalho.noRaiz;
-
-    while (noPos.pos < -1)
-    {
-        no = LerNoArvore(arquivo, nextRrr);
-        for (int i = 0; i < no.nroChavesNo; i++)
+        no = LerNoArvore(arquivo, nextRrr);         // Le o no
+        for (int i = 0; i < no.nroChavesNo; i++)    // Checa todas as chaves no no
         {
-            if (no.C[i] == converteNome(chave))
+            if (no.C[i] == converteNome(chave))     // Se encontrou
             {
-                noPos.no = no;
-                noPos.pos = i;
+                noPos.no = no;                      // Seleciona o no
+                noPos.pos = i;                      // Seleciona a pos
                 break;
             }
-            else if (no.C[i] > converteNome(chave))
+            else if (no.C[i] > converteNome(chave)) // Se a chave atual for maior que a chave procurada
             {
-                nextRrr = no.P[i];
+                nextRrr = no.P[i];                  // "Desce" para o no Pi
                 break;
             }
-            else if (i == (no.nroChavesNo - 1))
-                nextRrr = no.P[i+1];
+            else if (i == (no.nroChavesNo - 1))     // Se chegar ao final da arvore
+                nextRrr = no.P[i+1];                // "Desce" para o no Pi+1
         }
 
-        if (nextRrr == -1)
+        if (nextRrr == -1)                          // Caso nao tenha encontrado
             noPos.pos = -1;
     }
 
-    if (noPos.pos == -1)
+    if (noPos.pos == -1)                            // Registro não existe
         printf("Registro inexistente.\n");
 
     return noPos;
 }
 
+//////////////////////////////////////////////////////// CHECAGENS
+
+int ChecarCabecalho(CabecalhoArvBin cabecalho)
+{
+    if (cabecalho.status == '0')
+    {
+        printf("Cabecalho corrompido.\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+int ChecarArvoreVazia(CabecalhoArvBin cabecalho)
+{
+    if (cabecalho.noRaiz == -1)
+    {
+        printf("Essa arvore esta vazia.\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq)
+{
+    if(arquivo == NULL)
+    {
+        printf("Foi impossível de abrir o arquivo: %s\n", nomeArq);
+        return -1;
+    }
+
+    return 0;
+}
+
 //////////////////////////////////////////////////////// FUNCOES TRABALHO 1
 
 // Lê um registro e retorna
-RegDados lerRegistro(FILE *arquivo)
+RegDados lerRegistro(FILE *arqBin, char *arquivo)
 {
     RegDados temp, fim;
     char dado[142], *linha;
-    
-    if(fread(&temp.removido, sizeof(char),1,arquivo)==0)    // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
+
+    if(ChecarIntegridadeArquivo(arqBin, arquivo) < 0) return temp;
+
+    if(fread(&temp.removido, sizeof(char),1,arqBin)==0)    // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
     {
         temp.removido = '2';
         return temp;
     }    
     if(temp.removido == '1')                                // Caso o registro tenha sido removido, não completa a leitura e retorna 
     {
-        fread(&temp.encadeamento, sizeof(int),1,arquivo);
+        fread(&temp.encadeamento, sizeof(int),1,arqBin);
         return temp;
     }
     if(temp.removido != '1')                                // Caso o campo não tenha sido removido, a leitura dos campos é finalizada
     {
-        fread(&temp.encadeamento, sizeof(int),1,arquivo);
-        fread(&temp.populacao, sizeof(int),1,arquivo);
-        fread(&temp.tamanho, sizeof(float),1,arquivo);
-        fread(&temp.unidadeMedida, sizeof(char),1,arquivo);
-        fread(&temp.velocidade, sizeof(int), 1,arquivo);
-        if(fread(dado, sizeof(char), 142, arquivo)==0)      // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
+        fread(&temp.encadeamento, sizeof(int),1,arqBin);
+        fread(&temp.populacao, sizeof(int),1,arqBin);
+        fread(&temp.tamanho, sizeof(float),1,arqBin);
+        fread(&temp.unidadeMedida, sizeof(char),1,arqBin);
+        fread(&temp.velocidade, sizeof(int), 1,arqBin);
+        if(fread(dado, sizeof(char), 142, arqBin)==0)      // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
         {
             temp.removido = '2';
             return temp;
