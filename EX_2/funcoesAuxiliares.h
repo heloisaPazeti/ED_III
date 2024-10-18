@@ -8,10 +8,18 @@
 
 CabecalhoArvBin LerCabecalhoArvore(char *arquivo);
 NoArvBin LerNoArvore(char *arquivo, int rrn);
+int EscreverCabecalho(FILE *arqBin, RegCabecalho cabecalho);
+int EscreverRegistro(FILE *arqBin, RegDados novoRegisto, int quantReg);
+RegCabecalho LerCabecalho(FILE *arqBin);
 
 //////////////////////////////////////////////////////// FUNCOES DE BUSCA
 
 NoPos BuscarNoArvore(char *arquivo, char *chave);
+
+//////////////////////////////////////////////////////// FUNCOES DE INSERCAO
+
+void InserirNoSemOverflow(char *nomeArqArvore, NoPos result, char *chave, int rrn);
+void InserirNoComOverflow(char *nomeArqArvore, NoPos result, char *chave, int rrn);
 
 //////////////////////////////////////////////////////// CHECAGENS
 
@@ -23,5 +31,10 @@ int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq);
 
 RegDados lerRegistro(FILE *arqBin, char *arquivo);
 void imprimirRegistro(RegDados registro);
+
+///////////////////////////////////////////////////////////////// ADICIONAR REGISTROS (5)
+void adicionarRegistro(RegDados registro, FILE *arquivo);
+RegDados lerDadosDoTeclado();
+int tamanhoString(char *string);
 
 #endif

@@ -46,6 +46,66 @@ NoArvBin LerNoArvore(char *arquivo, int rrn)
     return no;
 }
 
+//////////////////////////////////////////////////////// FUNCOES DE ESCRITA
+
+EscreveNo(FILE *arqArvBin, NoArvBin no, int offset)
+{
+    int i;
+
+    fseek(arqArvBin, offset, SEEK_SET);
+
+    fwrite(no.folha, sizeof(char), 1, arqArvBin);
+    fwrite(no.nroChavesNo, sizeof(int), 1, arqArvBin);
+    fwrite(no.RRNdoNo, sizeof(int), 1, arqArvBin);
+
+    for (i = 0; i < no.nroChavesNo; i++)        
+    {
+        fwrite(no.P[i], sizeof(int), 1,  arqArvBin);
+        fwrite(no.C[i], sizeof(long), 1,  arqArvBin);
+        fwrite(no.PR[i], sizeof(long), 1,  arqArvBin);
+    }
+}
+
+//////////////////////////////////////////////////////// FUNCOES DE INSERCAO
+
+void InserirNoSemOverflow(char *nomeArqArvore, NoPos result, char *chave, int rrn)
+{
+    long int convert;
+    int offset;
+    int pos;
+    NoArvBin no;
+    FILE *arqArvBin;
+    
+    arqArvBin = fopen(nomeArqArvore, "wb+");
+
+    convert = converteNome(chave);
+    offset = tamCabecalho + result.no.RRNdoNo*tamNo + pos*tamRegistro;
+
+    
+    pos = result.posAnt;
+    // Árvore vazia: cria um novo nó, o qual é raiz e folha
+    if(result.pos == -2)
+    {
+        CabecalhoArvBin cabecalho = CriarCabecalhoArvBin(); // Inicializa Arvore
+        offset = tamCabecalho;
+        fseek(arqArvBin, offset, SEEK_SET);
+        no = CriarNo();
+        
+        no.folha = '1'; 
+        no.nroChavesNo = 1;
+        no.RRNdoNo = 1;
+        no.C[0] = convert;
+        no.P[0]= -1;
+        no.PR[0]= rrn;
+
+        EscreveNo(arqArvBin, no, offset);
+    }
+    
+    // Insere em um nó existente PRECISA ORDENAR AS CHAVES <3
+    EscreveNo(arqArvBin, no, offset);
+}
+
+void InserirNoComOverflow(char *nomeArqArvore, NoPos result, char *chave);
 //////////////////////////////////////////////////////// FUNCOES DE BUSCA
 
 // Retorna uma struct com no + pos na arvore na qual está / deveria estar o registro
@@ -78,6 +138,7 @@ NoPos BuscarNoArvore(char *arquivo, char *chave)
             else if (no.C[i] > converteNome(chave)) // Se a chave atual for maior que a chave procurada
             {
                 nextRrr = no.P[i];                  // "Desce" para o no Pi
+                noPos.posAnt = i+1;
                 break;
             }
             else if (i == (no.nroChavesNo - 1))     // Se chegar ao final da arvore
@@ -85,7 +146,10 @@ NoPos BuscarNoArvore(char *arquivo, char *chave)
         }
 
         if (nextRrr == -1)                          // Caso nao tenha encontrado
+        {
             noPos.pos = -1;
+            noPos.posAnt = i;
+        }
     }
 
     if (noPos.pos == -1)                            // Registro não existe
@@ -191,3 +255,119 @@ void imprimirRegistro(RegDados registro)
         printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.unidadeMedida);
     printf("\n");
 }
+
+// Calcula o tamanho de uma string
+int tamanhoString(char *string)
+{
+    int i=0;
+    while(string[i]!='\0')
+        i++;
+
+    return i;
+}
+///////////////////////////////////////////////////////////////// ESCREVER NO ARQUIVO (1)
+
+int EscreverCabecalho(FILE *arqBin, RegCabecalho cabecalho)
+{
+    fseek(arqBin, 0, SEEK_SET);                 // Para certificar de que está no local certo
+
+    if (arqBin == NULL)
+    {
+        printf("Falha no processamento do arquivo [Arq. CSV == NULL]\n");
+        return -1;
+    }
+
+    fwrite(&cabecalho.status, sizeof(char),1, arqBin);                              // Escreve dados
+    fwrite(&cabecalho.topo, sizeof(int),1, arqBin);
+    fwrite(&cabecalho.proxRRN, sizeof(int),1, arqBin);
+    fwrite(&cabecalho.nroRegRem, sizeof(int),1, arqBin);
+    fwrite(&cabecalho.nroPagDisco, sizeof(int),1, arqBin);
+    fwrite(&cabecalho.qttCompacta, sizeof(int),1, arqBin);
+
+    for(int i = 21; i < 1600; i++)                                                  // Adiciona "lixo"
+        fwrite("$", sizeof(char), 1, arqBin);
+
+    return 0;
+}
+
+
+
+///////////////////////////////////////////////////////////////// PRINTAR REGISTROS (2)
+
+// Le os dados do cabeçalho de um arquivo e retorna uma struct cabeçalho
+RegCabecalho LerCabecalho(FILE *arqBin)
+{
+    RegCabecalho cabecalho;
+
+    if (arqBin == NULL)
+    {
+        printf("Falha no processamento do arquivo [Arq. CSV == NULL]\n");
+        cabecalho.status = '2';
+        return cabecalho;
+    }
+
+    fseek(arqBin, 0, SEEK_SET);
+
+    fread(&cabecalho.status, sizeof(char),1,arqBin);
+    fread(&cabecalho.topo, sizeof(int),1,arqBin);
+    fread(&cabecalho.proxRRN, sizeof(int),1,arqBin);
+    fread(&cabecalho.nroRegRem, sizeof(int),1,arqBin);
+    fread(&cabecalho.nroPagDisco, sizeof(int),1,arqBin);
+    fread(&cabecalho.qttCompacta, sizeof(int),1,arqBin);
+
+    fseek(arqBin, 1600, SEEK_SET);
+
+    return cabecalho;
+}
+
+///////////////////////////////////////////////////////////////// ADICIONAR REGISTROS (5)
+
+// Lê dados do teclado e atribui os valroes a uma variável de registro
+RegDados lerDadosDoTeclado()
+{
+    RegDados registro;
+    char *populacao, *tamanho, *velocidade, *medidaVelocidade;
+
+    registro = IniciarRegistroDados();              // Inicializa um registro
+
+    // Aloca espaço para as variáveis que precisam ser manipuladas 
+    populacao = calloc(10, sizeof(char));
+    tamanho = calloc(10, sizeof(char));
+    velocidade = calloc(10, sizeof(char));
+    medidaVelocidade = calloc(10, sizeof(char));
+
+
+    // Lê todos os campos do teclado
+    scan_quote_string(registro.nome);
+    scan_quote_string(registro.dieta);
+    scan_quote_string(registro.habitat);
+    scan_quote_string(populacao);
+    scan_quote_string(registro.tipo);
+    scan_quote_string(velocidade);
+    scan_quote_string(medidaVelocidade);
+    scan_quote_string(tamanho);
+    scan_quote_string(registro.especie);
+    scan_quote_string(registro.alimento); 
+
+    if(strcmp(populacao, "")==0)                    // Caso o campo seja nulo, atualiza o valor da variável para -1        
+        registro.populacao = -1;
+    else registro.populacao = atoi(populacao);      // Caso contrário, a variável recebe o valor lido
+
+    if(strcmp(velocidade, "")==0)                   // Caso o campo seja nulo, atualiza o valor da variável para -1
+        registro.velocidade = -1;
+    else registro.velocidade = atoi(velocidade);    // Caso contrário, a variável recebe o valor lido
+
+    if(strcmp(medidaVelocidade, "")==0)            // Caso o campo seja nulo, atualiza o valor da variável para '$' 
+        registro.unidadeMedida = '$';
+    else registro.unidadeMedida = medidaVelocidade[0];  // Caso contrário, a variável recebe o valor lido
+
+    if(strcmp(tamanho, "")==0)                      // Caso o campo seja nulo, atualiza o valor da variável para -1
+        registro.tamanho = -1;
+    else registro.tamanho = atof(tamanho);          // Caso contrário, a variável recebe o valor lido
+
+    registro.removido = '0';                        // Certifica que registro.removido = '0'
+
+    return registro;
+}
+
+

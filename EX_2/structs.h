@@ -74,6 +74,7 @@ typedef struct _noPos
 {
     NoArvBin no;
     int pos;
+    int posAnt;
 
 } NoPos;
 
