@@ -1,6 +1,7 @@
 #include "funcoesArvoreB.h"
 #include "funcoesFornecidas.h"
 #include "funcoesAuxiliares.h"
+#include "funcoes.h"
 
 ///////////////////////////////////////////////////////////////// CRIAR ARVORE (7)
 
@@ -50,9 +51,44 @@ int BuscarRegistroArvore(char *nomeArq, char *nomeArqArvore)
 
 ///////////////////////////////////////////////////////////////// ADICIONAR REGISTRO (9)
 
-int AdicionarRegistroARvore(char *nomeArq, char *nomeArqArvore)
+int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
 {
-    // Lembrar de chamar a função 5
+    int n;
+    int i;
+    int rrn;
+    NoPos result;
+    char *chave;
+    CabecalhoArvBin cabecalho;
+
+    cabecalho = CriarCabecalhoArvBin();
+
+    for(i=0; i<n; i++)
+    {
+        chave = (char *)calloc(40, sizeof(char));
+
+        scan_quote_string(chave);
+
+        rrn = InserirRegistrosAdap(nomeArq);
+
+        result = BuscarNoArvore(nomeArqArvore, chave);
+        
+        // Caso a chave ainda não esteja na árvore, ela deve ser acrescentada
+        if(result.pos == -1 || result.pos == -2)
+        {
+            // Ocorre overflow do nó 
+            if(result.no.nroChavesNo == tamCPR)
+            { 
+                InserirNoComOverflow(nomeArqArvore, result, chave, rrn);
+            }
+            // Há espaço no nó
+            else
+            {
+                InserirNoSemOverflow(nomeArqArvore, result, chave, rrn);
+            }  
+        }
+        free(chave);
+    };
+    return 0;
 }
 
 ///////////////////////////////////////////////////////////////// OUTROS

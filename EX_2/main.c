@@ -28,7 +28,7 @@ int main()
             break;
 
         case 9:
-            AdicionarRegistroARvore(nomeArq, nomeArqArvore);
+            AdicionarRegistroArvore(nomeArq, nomeArqArvore);
             break;
 
         default:
