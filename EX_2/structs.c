@@ -65,9 +65,12 @@ NoArvBin CriarNo()
     newNo.nroChavesNo = 1;
     newNo.RRNdoNo = -1;
 
-    newNo.P = calloc(tamP, sizeof(int));
-    newNo.C = calloc(tamCPR, 8);
-    newNo.PR = calloc(tamCPR, 8);
+    newNo.P = calloc(ordemArvore, sizeof(int));
+    newNo.info = calloc(tamCPR, sizeof(RegistroInfo));
+
+    //newNo.P = calloc(ordemArvore, sizeof(int));
+    //newNo.C = calloc(tamCPR, 8);
+    //newNo.PR = calloc(tamCPR, 8);
 
     return newNo;
 }

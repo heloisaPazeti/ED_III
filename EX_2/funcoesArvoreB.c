@@ -1,7 +1,7 @@
 #include "funcoesArvoreB.h"
 #include "funcoesFornecidas.h"
 #include "funcoesAuxiliares.h"
-#include "funcoes.h"
+//#include "funcoes.h"
 
 ///////////////////////////////////////////////////////////////// CRIAR ARVORE (7)
 
@@ -16,7 +16,7 @@ int BuscarRegistroArvore(char *nomeArq, char *nomeArqArvore)
 {
     char *campo, *chave;
     NoArvBin no;
-    NoPos result;
+    NoPos resultado;
     RegDados reg;
     FILE *arq;
 
@@ -33,15 +33,15 @@ int BuscarRegistroArvore(char *nomeArq, char *nomeArqArvore)
         return -1;
     }
     
-    result = BuscarNoArvore(nomeArqArvore, chave);      // Busca na arvore -> retorna com no e posicao
+    resultado = BuscarNoArvore(nomeArqArvore, chave);      // Busca na arvore -> retorna com no e posicao
 
-    if (result.pos == -2 || result.pos == -1)           // Não foi encontrado ou encontrou algum erro
+    if (resultado.pos == -2 || resultado.pos == -1)           // Não foi encontrado ou encontrou algum erro
         return -1;
 
     arq = fopen(nomeArq, "rb");                         // Abre arquivo de registros
     if(ChecarIntegridadeArquivo(arq, nomeArq) < 0) return -1;
 
-    fseek(arq, result.no.PR[result.pos], SEEK_SET);     // Vai para a posicao da chave
+    fseek(arq, resultado.no.PR[resultado.pos], SEEK_SET);     // Vai para a posicao da chave
     reg = lerRegistro(arq, nomeArq);                             // Lê o registro
     imprimirRegistro(reg);                              // Imprime o registro
 
@@ -57,40 +57,47 @@ int BuscarRegistroArvore(char *nomeArq, char *nomeArqArvore)
     // Overflow no raiz
 int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
 {
-    int n;
-    int i;
+    int n, i, retorno;
     int rrn;
-    NoPos result;
+    NoPos resultado;
     char *chave;
     CabecalhoArvBin cabecalho;
 
-    cabecalho = CriarCabecalhoArvBin();
+    //cabecalho = CriarCabecalhoArvBin();
+
+    cabecalho = LerCabecalhoArvore(nomeArqArvore);
+    if(cabecalho.status != 1) return -1;
+
+    if(AlterarCabecalho(nomeArqArvore, '0', cabecalho.noRaiz, cabecalho.RRNproxNo) == -1) return -1;
 
     scanf("%d", &n);
 
     for(i=0; i<n; i++)
     {
-        chave = (char *)calloc(40, sizeof(char));
+        RegDados registro = lerDadosDoTeclado();
 
-        scan_quote_string(chave);
+        //chave = (char *)calloc(40, sizeof(char));
+        //scan_quote_string(chave);
 
-        rrn = InserirRegistrosAdap(nomeArq);
-        result = BuscarNoArvore(nomeArqArvore, chave);
+        rrn = InserirRegistrosAdap(nomeArq, registro);
+        resultado = BuscarNoArvore(nomeArqArvore, registro.nome);
 
-        if(result.pos != -1) continue;                      // Encontrou já na árvore
+        if(resultado.pos != -1) continue;                      // Encontrou já na árvore
 
         if(ChecarArvoreVazia(cabecalho, 0) == -1)
-            InsereArvoreVazia(nomeArqArvore, chave, rrn);
+            retorno = InsereArvoreVazia(nomeArqArvore, registro.nome, rrn);
         else
         { 
-            if(result.no.nroChavesNo == tamCPR)                             // Ocorre overflow do nó
-                InserirNoComOverflow(nomeArqArvore, result, chave, rrn);
+            if(resultado.no.nroChavesNo == tamCPR)                             // Ocorre overflow do nó
+                retorno = InserirNoComOverflow(nomeArqArvore, resultado, registro.nome, rrn);
             else                                                            // Há espaço no nó
-                InserirNoSemOverflow(nomeArqArvore, result, chave, rrn);
+                retorno = InserirNoSemOverflow(nomeArqArvore, resultado, registro.nome, rrn);
         }
 
-        free(chave);
+        //free(chave);
     }
-    return 0;
+
+    if (AlterarCabecalho(nomeArqArvore, '1', 0, 1) == -1) return -1;
+    return retorno;
 }
 

@@ -603,13 +603,13 @@ int InserirRegistros(char *nomeArq)
 }
 
 // Insere registros em um arquivo binário seguindo o conceito de lista de registros logicamente removidos
-int InserirRegistrosAdap(char *nomeArq)
+int InserirRegistrosAdap(char *nomeArq, RegDados registro)
 {
     int topo, rrn, nroReg, removidos;
     long int tamanho;
     FILE *arquivo;
     RegCabecalho cabecalho;
-    RegDados registro, registro2;
+    RegDados registro2;
 
     arquivo = fopen(nomeArq, "rb+");
 
@@ -632,14 +632,12 @@ int InserirRegistrosAdap(char *nomeArq)
     removidos = cabecalho.nroRegRem;                    // A quantidade inicial de registros removidos é a indicada pelo cabeçalho
 
     cabecalho.status = '0';                             // Muda o status do cabeçalho durante a manipulação do arquivo
-    
-
     EscreverCabecalho(arquivo, cabecalho);              // Atualiza o status do cabeçalho
 
     if(topo == -1)                                  // Caso topo = -1, não há registros removidos e a inserção é feita ao final do arquivo
     {
-        registro = IniciarRegistroDados();          // Inicializa um novo registro
-        registro = lerDadosDoTeclado();             // Lê o registro do teclado
+        //registro = IniciarRegistroDados();          // Inicializa um novo registro
+        //registro = lerDadosDoTeclado();             // Lê o registro do teclado
         rrn++;                                      // Aumenta o rrn
         fseek(arquivo, 0, SEEK_END);                // Posiciona o cursor ao final do arquivo
         escreverRegistro(arquivo, registro, rrn);   // Escreve o registro no arquivo
@@ -647,17 +645,17 @@ int InserirRegistrosAdap(char *nomeArq)
     else if(topo != -1)                             // Caso topo != -1, a inserção deve ser feita no registro do topo
     {
         fseek(arquivo, 1600+160*topo, SEEK_SET);    // Posiciona o cursor no topo
-        registro = lerRegistro(arquivo);            // Lê o registro do topo
-        topo = registro.encadeamento;               // Atauliza o topo para o encadeamento do registro a ser substituído
+        registro2 = lerRegistro(arquivo);            // Lê o registro do topo
+        topo = registro2.encadeamento;               // Atauliza o topo para o encadeamento do registro a ser substituído
 
-        registro2 = IniciarRegistroDados();         // Inicializa um segundo registro de dados
-        registro2 = lerDadosDoTeclado();            // Lê o registro de dados do teclado
-        if(registro.removido == '1')                // Confirma que o registro havia sido removido
+        //registro = IniciarRegistroDados();         // Inicializa um segundo registro de dados
+        //registro = lerDadosDoTeclado();            // Lê o registro de dados do teclado
+        if(registro2.removido == '1')                // Confirma que o registro havia sido removido
         {
             fseek(arquivo, -5, SEEK_CUR);           // Reposiciona o cursor 
             removidos--;                            // Diminui o número de registros removidos
         }
-        substituirRegistro(arquivo, registro2);     // Substitui o registro removido pelo novo
+        substituirRegistro(arquivo, registro);     // Substitui o registro removido pelo novo
 
     }
     

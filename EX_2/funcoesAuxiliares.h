@@ -19,8 +19,8 @@ NoPos BuscarNoArvore(char *arquivo, char *chave);
 //////////////////////////////////////////////////////// FUNCOES DE INSERCAO
 
 int InserirArvoreVazia(char *nomeArqArvore, char *chave, int rrn);
-void InserirNoSemOverflow(char *nomeArqArvore, NoPos result, char *chave, int rrn);
-void InserirNoComOverflow(char *nomeArqArvore, NoPos result, char *chave, int rrn);
+int InserirNoSemOverflow(char *nomeArqArvore, NoPos result, char *chave, int pr);
+int InserirNoComOverflow(char *nomeArqArvore, NoPos result, char *chave, int rrn);
 
 //////////////////////////////////////////////////////// CHECAGENS
 
@@ -31,11 +31,15 @@ int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq);
 //////////////////////////////////////////////////////// HELPERS
 
 int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo);
+NoArvBin OrdenaNo(NoPos noPos);
+RegistroInfo* OrdenaInfos(int size, NoPos resultado, RegistroInfo info);
 
 //////////////////////////////////////////////////////// FUNCOES TRABALHO 1
 
 RegDados lerRegistro(FILE *arqBin, char *arquivo);
 void imprimirRegistro(RegDados registro);
+RegDados lerDadosDoTeclado();
+int InserirRegistrosAdap(char *nomeArq, RegDados registro);
 
 ///////////////////////////////////////////////////////////////// ADICIONAR REGISTROS (5)
 void adicionarRegistro(RegDados registro, FILE *arquivo);
