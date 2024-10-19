@@ -51,6 +51,10 @@ int BuscarRegistroArvore(char *nomeArq, char *nomeArqArvore)
 
 ///////////////////////////////////////////////////////////////// ADICIONAR REGISTRO (9)
 
+// Situações de Inserção
+    // Arvore Vazia
+    // Inserir em folha
+    // Overflow no raiz
 int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
 {
     int n;
@@ -62,6 +66,8 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
 
     cabecalho = CriarCabecalhoArvBin();
 
+    scanf("%d", &n);
+
     for(i=0; i<n; i++)
     {
         chave = (char *)calloc(40, sizeof(char));
@@ -69,27 +75,22 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
         scan_quote_string(chave);
 
         rrn = InserirRegistrosAdap(nomeArq);
-
         result = BuscarNoArvore(nomeArqArvore, chave);
-        
-        // Caso a chave ainda não esteja na árvore, ela deve ser acrescentada
-        if(result.pos == -1 || result.pos == -2)
-        {
-            // Ocorre overflow do nó 
-            if(result.no.nroChavesNo == tamCPR)
-            { 
+
+        if(result.pos != -1) continue;                      // Encontrou já na árvore
+
+        if(ChecarArvoreVazia(cabecalho, 0) == -1)
+            InsereArvoreVazia(nomeArqArvore, chave, rrn);
+        else
+        { 
+            if(result.no.nroChavesNo == tamCPR)                             // Ocorre overflow do nó
                 InserirNoComOverflow(nomeArqArvore, result, chave, rrn);
-            }
-            // Há espaço no nó
-            else
-            {
+            else                                                            // Há espaço no nó
                 InserirNoSemOverflow(nomeArqArvore, result, chave, rrn);
-            }  
         }
+
         free(chave);
-    };
+    }
     return 0;
 }
-
-///////////////////////////////////////////////////////////////// OUTROS
 

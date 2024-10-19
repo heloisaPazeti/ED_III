@@ -18,14 +18,19 @@ NoPos BuscarNoArvore(char *arquivo, char *chave);
 
 //////////////////////////////////////////////////////// FUNCOES DE INSERCAO
 
+int InserirArvoreVazia(char *nomeArqArvore, char *chave, int rrn);
 void InserirNoSemOverflow(char *nomeArqArvore, NoPos result, char *chave, int rrn);
 void InserirNoComOverflow(char *nomeArqArvore, NoPos result, char *chave, int rrn);
 
 //////////////////////////////////////////////////////// CHECAGENS
 
 int ChecarCabecalho(CabecalhoArvBin cabecalho);
-int ChecarArvoreVazia(CabecalhoArvBin cabecalho);
+int ChecarArvoreVazia(CabecalhoArvBin cabecalho, int printError);
 int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq);
+
+//////////////////////////////////////////////////////// HELPERS
+
+int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo);
 
 //////////////////////////////////////////////////////// FUNCOES TRABALHO 1
 

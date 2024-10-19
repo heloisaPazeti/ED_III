@@ -7,6 +7,7 @@
 
 //////////////////////////////////////////////////////// TAMANHOS REGISTROS
 #define tamRegistro 160
+#define tamTotalCabecalho 1600
 #define cabecalhoFixo 21
 
 //////////////////////////////////////////////////////// TAMANHOS ARVORE
@@ -47,6 +48,8 @@ typedef struct _dados
 
 } RegDados;
 
+//////////////////////////////////////////////////////// STRUCTS ARVORE
+
 typedef struct _cabecalhoArvBin
 {
     char status;
@@ -55,8 +58,6 @@ typedef struct _cabecalhoArvBin
     char lixo[83];
 
 } CabecalhoArvBin;
-
-//////////////////////////////////////////////////////// STRUCTS ARVORE
 
 typedef struct _noArvBin
 {

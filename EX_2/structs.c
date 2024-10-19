@@ -62,7 +62,7 @@ NoArvBin CriarNo()
     int i;
 
     newNo.folha = '1';
-    newNo.nroChavesNo = 0;
+    newNo.nroChavesNo = 1;
     newNo.RRNdoNo = -1;
 
     newNo.P = calloc(tamP, sizeof(int));

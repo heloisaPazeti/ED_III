@@ -48,6 +48,7 @@ NoArvBin LerNoArvore(char *arquivo, int rrn)
 
 //////////////////////////////////////////////////////// FUNCOES DE ESCRITA
 
+/*
 EscreveNo(FILE *arqArvBin, NoArvBin no, int offset)
 {
     int i;
@@ -64,9 +65,50 @@ EscreveNo(FILE *arqArvBin, NoArvBin no, int offset)
         fwrite(no.C[i], sizeof(long), 1,  arqArvBin);
         fwrite(no.PR[i], sizeof(long), 1,  arqArvBin);
     }
+}*/
+
+int EscreveNo(char *nomeArq, NoArvBin no, int offset)
+{
+    int i;
+    FILE *arqArvBin = fopen(nomeArq, "wb+");
+    if(ChecarIntegridadeArquivo(arqArvBin, nomeArq) == -1) return -1;
+
+    fseek(arqArvBin, offset, SEEK_SET);
+    fwrite(no.folha, sizeof(char), 1, arqArvBin);
+    fwrite(no.nroChavesNo, sizeof(int), 1, arqArvBin);
+    fwrite(no.RRNdoNo, sizeof(int), 1, arqArvBin);
+
+    for (i = 0; i < no.nroChavesNo; i++)        
+    {
+        fwrite(no.P[i], sizeof(int), 1,  arqArvBin);
+        fwrite(no.C[i], sizeof(long), 1,  arqArvBin);
+        fwrite(no.PR[i], sizeof(long), 1,  arqArvBin);
+    }
 }
 
 //////////////////////////////////////////////////////// FUNCOES DE INSERCAO
+
+int InserirArvoreVazia(char *nomeArqArvore, char *chave, int rrn)
+{
+    CabecalhoArvBin cabecalho;
+    NoArvBin no;
+    int result;
+
+    cabecalho = LerCabecalhoArvore(nomeArqArvore);
+    if(cabecalho.status != 1) return -1;
+
+    if(AlterarCabecalho(nomeArqArvore, '0', cabecalho.noRaiz, cabecalho.RRNproxNo) == -1) return -1;
+
+    no = CriarNo();
+    no.C[0] = converteNome(chave);
+    no.PR[0] = (rrn*tamRegistro) + tamTotalCabecalho;
+    no.RRNdoNo = 0;
+
+    if (EscreveNo(nomeArqArvore, no, 93) == -1) return -1;
+    if (AlterarCabecalho(nomeArqArvore, '1', 0, 1) == -1) return -1;
+
+    return 0;
+}
 
 void InserirNoSemOverflow(char *nomeArqArvore, NoPos result, char *chave, int rrn)
 {
@@ -77,6 +119,7 @@ void InserirNoSemOverflow(char *nomeArqArvore, NoPos result, char *chave, int rr
     FILE *arqArvBin;
     
     arqArvBin = fopen(nomeArqArvore, "wb+");
+    if(ChecarIntegridadeArquivo(arqArvBin, nomeArqArvore) == -1) return;
 
     convert = converteNome(chave);
     offset = tamCabecalho + result.no.RRNdoNo*tamNo + pos*tamRegistro;
@@ -121,7 +164,7 @@ NoPos BuscarNoArvore(char *arquivo, char *chave)
 
     noPos.pos = -2;
 
-    if ((ChecarCabecalho(cabecalho) < 0) || (ChecarArvoreVazia(cabecalho) < 0)) return noPos;
+    if ((ChecarCabecalho(cabecalho) < 0) || (ChecarArvoreVazia(cabecalho, 1) < 0)) return noPos;
 
     nextRrr = cabecalho.noRaiz;                     // Pega o rrn da raiz
     while (noPos.pos < -1)                          // Enquanto não encontrar o fim ou a chave
@@ -171,11 +214,11 @@ int ChecarCabecalho(CabecalhoArvBin cabecalho)
     return 0;
 }
 
-int ChecarArvoreVazia(CabecalhoArvBin cabecalho)
+int ChecarArvoreVazia(CabecalhoArvBin cabecalho, int printError)
 {
     if (cabecalho.noRaiz == -1)
     {
-        printf("Essa arvore esta vazia.\n");
+        if(printError == 1) printf("Essa arvore esta vazia.\n");
         return -1;
     }
 
@@ -192,6 +235,23 @@ int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq)
 
     return 0;
 }
+
+
+//////////////////////////////////////////////////////// HELPERS
+
+int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo)
+{
+    FILE *arq = fopen(nomeArq, "wb+");
+
+    if(ChecarIntegridadeArquivo(arq, nomeArq) == -1) return -1;
+
+    fwrite(status, sizeof(char), 1, arq);
+    fwrite(noRaiz, sizeof(int), 1, arq);
+    fwrite(rrnProxNo, sizeof(int), 1, arq);
+    fclose(arq);
+    return 0;
+}
+
 
 //////////////////////////////////////////////////////// FUNCOES TRABALHO 1
 
