@@ -71,9 +71,5 @@ NoArvBin CriarNo()
     for(int i = 0; i < ordemArvore; i++)
         newNo.P[i] = -1;
 
-    //newNo.P = calloc(ordemArvore, sizeof(int));
-    //newNo.C = calloc(tamCPR, 8);
-    //newNo.PR = calloc(tamCPR, 8);
-
     return newNo;
 }

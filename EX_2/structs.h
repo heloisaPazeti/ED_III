@@ -73,10 +73,7 @@ typedef struct _noArvBin
 
     int *P;
     RegistroInfo *info;
-
-    //long int *C;
-    //long int *PR;
-
+    
 } NoArvBin;
 
 typedef struct _noPos

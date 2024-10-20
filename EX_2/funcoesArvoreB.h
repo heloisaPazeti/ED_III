@@ -1,9 +1,7 @@
 #ifndef FUNCOESARVOREB_H
 #define FUNCOESARVOREB_H
 
-#include "structs.h"
-#include "funcoesFornecidas.h"
-
+#include "funcoesAuxiliares.h"
 
 ///////////////////////////////////////////////////////////////// CRIAR ARVORE (7)
 
