@@ -58,6 +58,13 @@ typedef struct _cabecalhoArvBin
 
 } CabecalhoArvBin;
 
+typedef struct _registroInfo
+{
+    long int C;
+    long int PR;
+
+} RegistroInfo;
+
 typedef struct _noArvBin
 {
     char folha;
@@ -72,16 +79,10 @@ typedef struct _noArvBin
 
 } NoArvBin;
 
-typedef struct _registroInfo
-{
-    long int C;
-    long int PR;
-
-} RegistroInfo;
-
 typedef struct _noPos
 {
     NoArvBin no;        // No em que foi encontrado / deveria estar
+    NoArvBin noAnt;     // No anterior para insercao com overflow
     int pos;            // Posição i do no em que foi encontrado
     int posInsercao;    // Posição i do no que deveria estar
 

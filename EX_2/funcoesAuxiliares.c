@@ -48,42 +48,25 @@ NoArvBin LerNoArvore(char *arquivo, int rrn)
 
 //////////////////////////////////////////////////////// FUNCOES DE ESCRITA
 
-/*
-EscreveNo(FILE *arqArvBin, NoArvBin no, int offset)
+int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
 {
-    int i;
-
-    fseek(arqArvBin, offset, SEEK_SET);
-
-    fwrite(no.folha, sizeof(char), 1, arqArvBin);
-    fwrite(no.nroChavesNo, sizeof(int), 1, arqArvBin);
-    fwrite(no.RRNdoNo, sizeof(int), 1, arqArvBin);
-
-    for (i = 0; i < no.nroChavesNo; i++)        
-    {
-        fwrite(no.P[i], sizeof(int), 1,  arqArvBin);
-        fwrite(no.C[i], sizeof(long), 1,  arqArvBin);
-        fwrite(no.PR[i], sizeof(long), 1,  arqArvBin);
-    }
-}*/
-
-int EscreveNo(char *nomeArq, NoArvBin no, int offset)
-{
-    int i;
+    int i, offset = rrn*tamNo + tamCabecalhoArvore;
     FILE *arqArvBin = fopen(nomeArq, "wb+");
     if(ChecarIntegridadeArquivo(arqArvBin, nomeArq) == -1) return -1;
 
     fseek(arqArvBin, offset, SEEK_SET);
-    fwrite(no.folha, sizeof(char), 1, arqArvBin);
-    fwrite(no.nroChavesNo, sizeof(int), 1, arqArvBin);
-    fwrite(no.RRNdoNo, sizeof(int), 1, arqArvBin);
+    fwrite(&no.folha, sizeof(char), 1, arqArvBin);
+    fwrite(&no.nroChavesNo, sizeof(int), 1, arqArvBin);
+    fwrite(&no.RRNdoNo, sizeof(int), 1, arqArvBin);
 
     for (i = 0; i < no.nroChavesNo; i++)        
     {
-        fwrite(no.P[i], sizeof(int), 1,  arqArvBin);
-        fwrite(no.info[i].C, sizeof(long), 1,  arqArvBin);
-        fwrite(no.info[i].PR, sizeof(long), 1,  arqArvBin);
+        fwrite(&no.P[i], sizeof(int), 1,  arqArvBin);
+        fwrite(&no.info[i].C, sizeof(long), 1,  arqArvBin);
+        fwrite(&no.info[i].PR, sizeof(long), 1,  arqArvBin);
     }
+
+    fwrite(&no.P[i], sizeof(int), 1,  arqArvBin);
 }
 
 //////////////////////////////////////////////////////// FUNCOES DE INSERCAO
@@ -95,20 +78,21 @@ int InserirArvoreVazia(char *nomeArqArvore, char *chave, int pr)
     int resultado;
 
     no = CriarNo();
+    no.nroChavesNo = 1;
     no.info[0].C = converteNome(chave);
     no.info[0].PR = pr;
     no.RRNdoNo = 0;
 
-    if (EscreveNo(nomeArqArvore, no, tamCabecalhoArvore) == -1) return -1;
+    if (EscreveNo(nomeArqArvore, no, 0) == -1) return -1;
 
     return 0;
 }
 
-int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, char *chave, int pr)
+int InserirNoSemOverflow(char *nomeArqArvore, int posInsercao, RegistroInfo info)
 {
     NoArvBin no;
-    no = OrdenaNo(no, resultado, converteNome(chave), pr);
-    if(EscreveNo(nomeArqArvore, no, no.RRNdoNo*tamNo + tamCabecalhoArvore) == -1) return -1;
+    no = OrdenaNo(no, posInsercao, info);
+    if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
 
     return 0;
 
@@ -151,27 +135,80 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
     NoArvBin noDireito = CriarNo();
     int posicaoPromovida = 2;                   // (m/2 + 0.5)-1 => Como ordem é impar soma-se 0.5 e retira-se 1 pela contagem começar no zero. 
 
-    infosOrdenadas = OrdenaInfos(ordemArvore, resultado, info);
+    infosOrdenadas = OrdenaInfos(ordemArvore, resultado.no, resultado.posInsercao, info);
 
-    for(int i = 0; i < 5; i++)
+    for(int i = 0; i < ordemArvore; i++)
     {
         if(i < posicaoPromovida)
+        {
             noEsquerdo.info[i] = infosOrdenadas[i];
+            noEsquerdo.P[i] = resultado.no.P[i];
+        }
         else if(i > posicaoPromovida)
+        {
             noDireito.info[i-posicaoPromovida-1] = infosOrdenadas[i];
+            noDireito.P[i-posicaoPromovida-1] = resultado.no.P[i];
+        }
     }
 
-    //PromoveChave(resultado.no.infos[posicaoPromovida]);
+    noEsquerdo = AlterarNo(noEsquerdo, resultado.no.folha, posicaoPromovida, resultado.no.RRNdoNo);
+    noDireito = AlterarNo(noDireito, resultado.no.folha, posicaoPromovida, LerCabecalhoArvore(nomeArqArvore).RRNproxNo);
 
-    noEsquerdo.folha = resultado.no.folha;
-    noDireito.folha = resultado.no.folha;
+    if(resultado.noAnt.RRNdoNo <= -1)                           // Overflow na Raiz
+    {
+        NoArvBin novaRaiz = CriarNo();
 
-    noEsquerdo.nroChavesNo = posicaoPromovida;
-    noDireito.nroChavesNo = posicaoPromovida;
+        novaRaiz = AlterarNo(novaRaiz, 0, 1, LerCabecalhoArvore(nomeArqArvore).RRNproxNo);
+        novaRaiz.P[0] = noEsquerdo.RRNdoNo;
+        novaRaiz.P[1] = noDireito.RRNdoNo;
+        AlterarCabecalho(nomeArqArvore, 1, novaRaiz.RRNdoNo, novaRaiz.RRNdoNo++);
 
-    noEsquerdo.RRNdoNo = resultado.no.RRNdoNo;
-    noDireito.RRNdoNo = LerCabecalho(fopen(nomeArqArvore, "rb")).proxRRN;
+        resultado.noAnt = novaRaiz;
+    }
+    else
+    {
+        int novaPosicao = EncontraPosicao(resultado.noAnt, resultado.no.info[posicaoPromovida]);
+        resultado.noAnt.nroChavesNo++;
 
+        for(int i = novaPosicao+2; i < resultado.noAnt.nroChavesNo; i++)
+            resultado.noAnt.P[i] = resultado.noAnt.P[i-1]; 
+
+        //resultado.noAnt.P[novaPosicao] = noEsquerdo.RRNdoNo;
+        resultado.noAnt.P[novaPosicao++] = noDireito.RRNdoNo;
+    }
+    
+    PromoveChave(nomeArqArvore, resultado.no.info[posicaoPromovida], resultado.noAnt);
+
+
+    EscreveNo(nomeArqArvore, noEsquerdo, noEsquerdo.RRNdoNo);
+    EscreveNo(nomeArqArvore, noDireito, noDireito.RRNdoNo);
+
+}
+
+int PromoveChave(char *nomeArqArvore, RegistroInfo promovido, NoArvBin noPromocao)
+{
+    int posInsercao = EncontraPosicao(noPromocao, promovido);
+    if(noPromocao.nroChavesNo >= tamCPR)                                    // Ocorre overflow na promocao
+    {
+        NoPos resultado = BuscarNoArvore(nomeArqArvore, noPromocao.info[0].C);
+        resultado.pos= -1;
+        resultado.posInsercao = posInsercao;
+        if(resultado.noAnt.RRNdoNo <= -1)
+        {
+            printf("Anterior inexistente.\n");
+            return -1;
+        }
+
+        InserirNoComOverflow(nomeArqArvore, resultado, promovido);
+    }
+    else                                                                    // Não ocorre overflow
+    {
+        InserirNoSemOverflow(nomeArqArvore, posInsercao, promovido);
+        //NoArvBin noOrdenado = OrdenaNo(noPromocao, posInsercao, promovido);
+        //if (EscreveNo(nomeArqArvore, noOrdenado, noOrdenado.RRNdoNo) == -1) return -1;
+    }
+
+    return 0;
 }
 
 //////////////////////////////////////////////////////// FUNCOES DE BUSCA
@@ -180,10 +217,10 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
 // Se houver retorna o no + rrn
 // Se não houver retorna na posicao -1
 // Retorna -2 na posicao se der algum erro
-NoPos BuscarNoArvore(char *arquivo, char *chave)
+NoPos BuscarNoArvore(char *arquivo, long int chave)
 {
     CabecalhoArvBin cabecalho = LerCabecalhoArvore(arquivo);
-    NoArvBin no;
+    NoArvBin no = CriarNo();
     NoPos noPos;
     int i, nextRrr;
 
@@ -194,16 +231,17 @@ NoPos BuscarNoArvore(char *arquivo, char *chave)
     nextRrr = cabecalho.noRaiz;                     // Pega o rrn da raiz
     while (noPos.pos < -1)                          // Enquanto não encontrar o fim ou a chave
     {
+        noPos.noAnt = no;
         no = LerNoArvore(arquivo, nextRrr);         // Le o no
         for (int i = 0; i < no.nroChavesNo; i++)    // Checa todas as chaves no no
         {
-            if (no.info[i].C == converteNome(chave))     // Se encontrou
+            if (no.info[i].C == chave)     // Se encontrou
             {
                 noPos.no = no;                      // Seleciona o no
                 noPos.pos = i;                      // Seleciona a pos
                 break;
             }
-            else if (no.info[i].C > converteNome(chave)) // Se a chave atual for maior que a chave procurada
+            else if (no.info[i].C > chave) // Se a chave atual for maior que a chave procurada
             {
                 nextRrr = no.P[i];                  // "Desce" para o no Pi
                 noPos.posInsercao = i;
@@ -273,54 +311,56 @@ int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo)
 
     if(ChecarIntegridadeArquivo(arq, nomeArq) == -1) return -1;
 
-    fwrite(status, sizeof(char), 1, arq);
-    fwrite(noRaiz, sizeof(int), 1, arq);
-    fwrite(rrnProxNo, sizeof(int), 1, arq);
+    fwrite(&status, sizeof(char), 1, arq);
+    fwrite(&noRaiz, sizeof(int), 1, arq);
+    fwrite(&rrnProxNo, sizeof(int), 1, arq);
     fclose(arq);
     return 0;
 }
 
-NoArvBin OrdenaNo(NoArvBin noOriginal, NoPos noPos, long int chave, long int pr)
+NoArvBin AlterarNo(NoArvBin no, char folha, int nroChavesNo, int rrnNo)
+{
+    no.folha = folha;
+    no.nroChavesNo = nroChavesNo;
+    no.RRNdoNo = rrnNo;
+
+    return no;
+}
+
+NoArvBin OrdenaNo(NoArvBin noOriginal, int posInsercao, RegistroInfo info)
 {
     NoArvBin noFinal = noOriginal;
 
-    noFinal.info[noPos.posInsercao].C = chave;
-    noFinal.info[noPos.posInsercao].PR = pr;
-
-    for(int i = noPos.posInsercao+1; i < noFinal.nroChavesNo; i++)
-    {
-        noFinal.info[i].C = noOriginal.info[i-1].C;
-        noFinal.info[i].PR = noOriginal.info[i-1].PR;
-    }
-
+    noFinal.info = OrdenaInfos(noFinal.nroChavesNo, noFinal, posInsercao, info);
     return noFinal;
 }
 
-RegistroInfo* OrdenaInfos(int size, NoPos resultado, RegistroInfo info)
+//RegistroInfo* OrdenaInfos(int size, NoPos resultado, RegistroInfo info)
+RegistroInfo* OrdenaInfos(int size, NoArvBin no, int posInsercao, RegistroInfo info)
 {
     RegistroInfo *infosOrdenadas = calloc(size, sizeof(RegistroInfo));
 
-    for(int i = 0; i < size; i++)
+    infosOrdenadas = no.info;
+    infosOrdenadas[posInsercao].C = info.C;
+    infosOrdenadas[posInsercao].PR = info.PR;
+
+    for(int i = posInsercao+1; i < size; i++)
     {
-        if(i < resultado.posInsercao)
-        {
-            infosOrdenadas[i].C = resultado.no.info[i].C;
-            infosOrdenadas[i].PR = resultado.no.info[i].PR;
-        }
-        else if(i == resultado.posInsercao)
-        {
-            infosOrdenadas[i].C = info.C;
-            infosOrdenadas[i].PR = info.PR;
-        }
-        else
-        {
-            infosOrdenadas[i].C = resultado.no.info[i-1].C;
-            infosOrdenadas[i].PR = resultado.no.info[i-1].PR;
-        }
+        infosOrdenadas[i].C = no.info[i-1].C;
+        infosOrdenadas[i].PR = no.info[i-1].PR;
     }
 
     return infosOrdenadas;
 }
+
+int EncontraPosicao(NoArvBin no, RegistroInfo info)
+{
+    for(int i = 0; i < no.nroChavesNo; i++)
+        if(no.info[i].C > info.C) return i;
+    
+    return no.nroChavesNo;
+}
+
 //////////////////////////////////////////////////////// FUNCOES TRABALHO 1
 
 // Lê um registro e retorna
@@ -366,6 +406,52 @@ RegDados lerRegistro(FILE *arqBin, char *arquivo)
     }
 }
 
+int escreverRegistro(FILE *arqBin, RegDados novoRegisto, int quantReg)
+{
+    long int posicaoAtual;
+    int posicaoFinal;
+    char delim = '#';
+    int tamNome, tamEspecie, tamHabitat, tamTipo, tamDieta, tamAlimento;
+    
+    if (arqBin == NULL)
+    {
+        printf("Falha no processamento do arquivo [Arq. CSV == NULL]\n");
+        return -1;
+    }
+
+    tamNome = tamanhoString(novoRegisto.nome);
+    tamEspecie = tamanhoString(novoRegisto.especie);
+    tamHabitat = tamanhoString(novoRegisto.habitat);
+    tamTipo = tamanhoString(novoRegisto.tipo);
+    tamDieta = tamanhoString(novoRegisto.dieta);
+    tamAlimento = tamanhoString(novoRegisto.alimento);
+
+    fwrite(&novoRegisto.removido, sizeof(char),1, arqBin);                          // Escreve os dados
+    fwrite(&novoRegisto.encadeamento, sizeof(int),1, arqBin);
+    fwrite(&novoRegisto.populacao, sizeof(int),1, arqBin);
+    fwrite(&novoRegisto.tamanho, sizeof(float),1, arqBin);
+    fwrite(&novoRegisto.unidadeMedida, sizeof(char),1, arqBin);
+    fwrite(&novoRegisto.velocidade, sizeof(int),1, arqBin);
+    fwrite(novoRegisto.nome, sizeof(char), tamNome, arqBin);
+    fwrite(&delim, sizeof(char),1, arqBin);
+    fwrite(novoRegisto.especie, sizeof(char), tamEspecie, arqBin);
+    fwrite(&delim, sizeof(char),1, arqBin);
+    fwrite(novoRegisto.habitat, sizeof(char), tamHabitat, arqBin);
+    fwrite(&delim, sizeof(char),1, arqBin);
+    fwrite(novoRegisto.tipo, sizeof(char), tamTipo, arqBin);
+    fwrite(&delim, sizeof(char),1, arqBin);
+    fwrite(novoRegisto.dieta, sizeof(char), tamDieta, arqBin);
+    fwrite(&delim, sizeof(char),1, arqBin);
+    fwrite(novoRegisto.alimento, sizeof(char), tamAlimento, arqBin);
+    fwrite(&delim, sizeof(char),1, arqBin);
+
+    posicaoAtual = ftell(arqBin);                                                   // ftell -> posição atual
+    posicaoFinal = 1600 + (quantReg*160);                                           // Calcula posição no registro
+
+    for(int i = posicaoAtual; i < posicaoFinal; i++)                                // Adiciona lixo
+        fwrite("$", sizeof(char), 1, arqBin);
+}
+
 void imprimirRegistro(RegDados registro)
 {
     printf("Nome: %s\n", registro.nome);
@@ -384,14 +470,27 @@ void imprimirRegistro(RegDados registro)
     printf("\n");
 }
 
-// Calcula o tamanho de uma string
-int tamanhoString(char *string)
+void substituirRegistro(FILE *arquivo, RegDados registro)
 {
-    int i=0;
-    while(string[i]!='\0')
-        i++;
-
-    return i;
+    char delim = '#';
+    fwrite(&registro.removido, sizeof(char),1, arquivo); 
+    fwrite(&registro.encadeamento, sizeof(int),1, arquivo);
+    fwrite(&registro.populacao, sizeof(int),1, arquivo);
+    fwrite(&registro.tamanho, sizeof(float),1, arquivo);
+    fwrite(&registro.unidadeMedida, sizeof(char),1, arquivo);
+    fwrite(&registro.velocidade, sizeof(int),1, arquivo);
+    fwrite(registro.nome, sizeof(char), strlen(registro.nome), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.especie, sizeof(char), strlen(registro.especie), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.habitat, sizeof(char), strlen(registro.habitat), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.tipo, sizeof(char), strlen(registro.tipo), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.dieta, sizeof(char), strlen(registro.dieta), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
+    fwrite(registro.alimento, sizeof(char), strlen(registro.alimento), arquivo);
+    fwrite(&delim, sizeof(char),1, arquivo);
 }
 
 RegDados lerDadosDoTeclado()
@@ -439,6 +538,16 @@ RegDados lerDadosDoTeclado()
     registro.removido = '0';                        // Certifica que registro.removido = '0'
 
     return registro;
+}
+
+// Calcula o tamanho de uma string
+int tamanhoString(char *string)
+{
+    int i=0;
+    while(string[i]!='\0')
+        i++;
+
+    return i;
 }
 
 int InserirRegistrosAdap(char *nomeArq, RegDados registro)
@@ -483,7 +592,7 @@ int InserirRegistrosAdap(char *nomeArq, RegDados registro)
     else if(topo != -1)                             // Caso topo != -1, a inserção deve ser feita no registro do topo
     {
         fseek(arquivo, 1600+160*topo, SEEK_SET);    // Posiciona o cursor no topo
-        registro2 = lerRegistro(arquivo);            // Lê o registro do topo
+        registro2 = lerRegistro(arquivo, nomeArq);            // Lê o registro do topo
         topo = registro2.encadeamento;               // Atauliza o topo para o encadeamento do registro a ser substituído
 
         //registro = IniciarRegistroDados();         // Inicializa um segundo registro de dados
@@ -515,8 +624,6 @@ int InserirRegistrosAdap(char *nomeArq, RegDados registro)
     return rrn;
 }
 
-///////////////////////////////////////////////////////////////// ESCREVER NO ARQUIVO (1)
-
 int EscreverCabecalho(FILE *arqBin, RegCabecalho cabecalho)
 {
     fseek(arqBin, 0, SEEK_SET);                 // Para certificar de que está no local certo
@@ -539,8 +646,6 @@ int EscreverCabecalho(FILE *arqBin, RegCabecalho cabecalho)
 
     return 0;
 }
-
-///////////////////////////////////////////////////////////////// PRINTAR REGISTROS (2)
 
 // Le os dados do cabeçalho de um arquivo e retorna uma struct cabeçalho
 RegCabecalho LerCabecalho(FILE *arqBin)
@@ -567,55 +672,3 @@ RegCabecalho LerCabecalho(FILE *arqBin)
 
     return cabecalho;
 }
-
-///////////////////////////////////////////////////////////////// ADICIONAR REGISTROS (5)
-
-// Lê dados do teclado e atribui os valroes a uma variável de registro
-RegDados lerDadosDoTeclado()
-{
-    RegDados registro;
-    char *populacao, *tamanho, *velocidade, *medidaVelocidade;
-
-    registro = IniciarRegistroDados();              // Inicializa um registro
-
-    // Aloca espaço para as variáveis que precisam ser manipuladas 
-    populacao = calloc(10, sizeof(char));
-    tamanho = calloc(10, sizeof(char));
-    velocidade = calloc(10, sizeof(char));
-    medidaVelocidade = calloc(10, sizeof(char));
-
-
-    // Lê todos os campos do teclado
-    scan_quote_string(registro.nome);
-    scan_quote_string(registro.dieta);
-    scan_quote_string(registro.habitat);
-    scan_quote_string(populacao);
-    scan_quote_string(registro.tipo);
-    scan_quote_string(velocidade);
-    scan_quote_string(medidaVelocidade);
-    scan_quote_string(tamanho);
-    scan_quote_string(registro.especie);
-    scan_quote_string(registro.alimento); 
-
-    if(strcmp(populacao, "")==0)                    // Caso o campo seja nulo, atualiza o valor da variável para -1        
-        registro.populacao = -1;
-    else registro.populacao = atoi(populacao);      // Caso contrário, a variável recebe o valor lido
-
-    if(strcmp(velocidade, "")==0)                   // Caso o campo seja nulo, atualiza o valor da variável para -1
-        registro.velocidade = -1;
-    else registro.velocidade = atoi(velocidade);    // Caso contrário, a variável recebe o valor lido
-
-    if(strcmp(medidaVelocidade, "")==0)            // Caso o campo seja nulo, atualiza o valor da variável para '$' 
-        registro.unidadeMedida = '$';
-    else registro.unidadeMedida = medidaVelocidade[0];  // Caso contrário, a variável recebe o valor lido
-
-    if(strcmp(tamanho, "")==0)                      // Caso o campo seja nulo, atualiza o valor da variável para -1
-        registro.tamanho = -1;
-    else registro.tamanho = atof(tamanho);          // Caso contrário, a variável recebe o valor lido
-
-    registro.removido = '0';                        // Certifica que registro.removido = '0'
-
-    return registro;
-}
-
-

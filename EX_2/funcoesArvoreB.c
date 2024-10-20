@@ -33,7 +33,7 @@ int BuscarRegistroArvore(char *nomeArq, char *nomeArqArvore)
         return -1;
     }
     
-    resultado = BuscarNoArvore(nomeArqArvore, chave);      // Busca na arvore -> retorna com no e posicao
+    resultado = BuscarNoArvore(nomeArqArvore, converteNome(chave));      // Busca na arvore -> retorna com no e posicao
 
     if (resultado.pos == -2 || resultado.pos == -1)           // Não foi encontrado ou encontrou algum erro
         return -1;
@@ -41,7 +41,7 @@ int BuscarRegistroArvore(char *nomeArq, char *nomeArqArvore)
     arq = fopen(nomeArq, "rb");                         // Abre arquivo de registros
     if(ChecarIntegridadeArquivo(arq, nomeArq) < 0) return -1;
 
-    fseek(arq, resultado.no.PR[resultado.pos], SEEK_SET);     // Vai para a posicao da chave
+    fseek(arq, resultado.no.info[resultado.pos].PR, SEEK_SET);     // Vai para a posicao da chave
     reg = lerRegistro(arq, nomeArq);                             // Lê o registro
     imprimirRegistro(reg);                              // Imprime o registro
 
@@ -80,18 +80,22 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
         //scan_quote_string(chave);
 
         rrn = InserirRegistrosAdap(nomeArq, registro);
-        resultado = BuscarNoArvore(nomeArqArvore, registro.nome);
+        resultado = BuscarNoArvore(nomeArqArvore, converteNome(registro.nome));
 
         if(resultado.pos != -1) continue;                      // Encontrou já na árvore
+        resultado.no.nroChavesNo++;
 
         if(ChecarArvoreVazia(cabecalho, 0) == -1)
-            retorno = InsereArvoreVazia(nomeArqArvore, registro.nome, rrn);
+            retorno = InserirArvoreVazia(nomeArqArvore, registro.nome, rrn);
         else
         { 
+            RegistroInfo info;
+            info.C = converteNome(registro.nome);
+            info.PR = rrn*tamRegistro + tamTotalCabecalho;
             if(resultado.no.nroChavesNo == tamCPR)                             // Ocorre overflow do nó
-                retorno = InserirNoComOverflow(nomeArqArvore, resultado, registro.nome, rrn);
+                retorno = InserirNoComOverflow(nomeArqArvore, resultado, info);
             else                                                            // Há espaço no nó
-                retorno = InserirNoSemOverflow(nomeArqArvore, resultado, registro.nome, rrn);
+                retorno = InserirNoSemOverflow(nomeArqArvore, resultado.posInsercao, info);
         }
 
         //free(chave);

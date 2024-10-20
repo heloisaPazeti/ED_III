@@ -62,11 +62,14 @@ NoArvBin CriarNo()
     int i;
 
     newNo.folha = '1';
-    newNo.nroChavesNo = 1;
+    newNo.nroChavesNo = 0;
     newNo.RRNdoNo = -1;
 
     newNo.P = calloc(ordemArvore, sizeof(int));
     newNo.info = calloc(tamCPR, sizeof(RegistroInfo));
+
+    for(int i = 0; i < ordemArvore; i++)
+        newNo.P[i] = -1;
 
     //newNo.P = calloc(ordemArvore, sizeof(int));
     //newNo.C = calloc(tamCPR, 8);
