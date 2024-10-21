@@ -166,7 +166,7 @@ RegistroInfo* OrdenaInfos(int size, NoArvBin no, int posInsercao, RegistroInfo i
         infosOrdenadas[i].PR = -1;
     }
 
-    for(i = 0; i < (no.nroChavesNo+1); i++)
+    for(i = 0; i < (no.nroChavesNo); i++)
     {
         if(i < posInsercao)
         {

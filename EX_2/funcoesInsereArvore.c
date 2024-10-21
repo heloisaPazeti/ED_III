@@ -22,7 +22,7 @@ int InserirArvoreVazia(char *nomeArqArvore, char *chave, int pr)
 int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info)
 {
     NoArvBin no = CriarNo();
-    resultado.no.nroChavesNo++;
+    //resultado.no.nroChavesNo++;
     no = OrdenaNo(resultado.no, resultado.posInsercao, info);
     if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
 

@@ -221,6 +221,7 @@ int InserirRegistrosAdap(char *nomeArq, RegDados registro)
 
     if(topo == -1)                                  // Caso topo = -1, não há registros removidos e a inserção é feita ao final do arquivo
     {
+        //printf("TOPO == -1\n");
         rrn++;                                      // Aumenta o rrn
         fseek(arquivo, 0, SEEK_END);                // Posiciona o cursor ao final do arquivo
         escreverRegistro(arquivo, registro, rrn);   // Escreve o registro no arquivo

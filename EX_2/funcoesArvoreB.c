@@ -76,10 +76,9 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
         RegDados registro = lerTeclado();
         rrn = InserirRegistrosAdap(nomeArq, registro);
         resultado = BuscarNoArvore(nomeArqArvore, converteNome(registro.nome));
-
         
         if(resultado.pos != -1) continue;                      // Encontrou já na árvore
-        //resultado.no.nroChavesNo++;
+        resultado.no.nroChavesNo++;
 
         if(resultado.posInsercao == -2)
             retorno = InserirArvoreVazia(nomeArqArvore, registro.nome, rrn);
@@ -88,11 +87,11 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
             RegistroInfo info;
             info.C = converteNome(registro.nome);
             info.PR = (rrn*tamRegistro) + tamTotalCabecalho;
+            printf("CHAVE: %s || OFFSET: %d || RRN NO: %d || POSICAO INSERCAO: %d\n",registro.nome, (rrn*tamRegistro + 1600), resultado.no.RRNdoNo, resultado.posInsercao);
             if(resultado.no.nroChavesNo > tamCPR)                          // Ocorre overflow do nó 
                 retorno = InserirNoComOverflow(nomeArqArvore, resultado, info);                      
             else 
             {
-                printf("SEM OVERFLOW");
                 retorno = InserirNoSemOverflow(nomeArqArvore, resultado, info);
             }                                                           // Há espaço no nó
         
