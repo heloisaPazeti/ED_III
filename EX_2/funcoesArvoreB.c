@@ -66,21 +66,14 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
     char *chave;
     CabecalhoArvBin cabecalho;
 
-    //binarioNaTela(nomeArqArvore);
-
 
     cabecalho = LerCabecalhoArvore(nomeArqArvore);
     if(cabecalho.status == 1) return -1;
-
-    //if(AlterarCabecalho(nomeArqArvore, '0', cabecalho.noRaiz, cabecalho.RRNproxNo) == -1) return -1;
-
     scanf("%d", &n);
 
     for(i=0; i<n; i++)
     {
         RegDados registro = lerTeclado();
-        //imprimeRegistro(registro);
-        
         rrn = InserirRegistrosAdap(nomeArq, registro);
         resultado = BuscarNoArvore(nomeArqArvore, converteNome(registro.nome));
 
@@ -102,10 +95,8 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
         
         }
 
-        //break;  // PRA FAZER APENAS UMA VEZ -> RETIRAR DEPOIS
     }
 
-    //if (AlterarCabecalho(nomeArqArvore, '1', 0, 1) == -1) return -1;
 
     binarioNaTela(nomeArqArvore);
     return retorno;

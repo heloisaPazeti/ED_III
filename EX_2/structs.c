@@ -50,7 +50,7 @@ CabecalhoArvBin CriarCabecalhoArvBin()
     newCabecalho.noRaiz = -1;
     newCabecalho.RRNproxNo = 0;
 
-    for (int i = 0; i < 83; i++)
+    for (int i = 0; i < 84; i++)
         newCabecalho.lixo[i] = '$';
 
     return newCabecalho;

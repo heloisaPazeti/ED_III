@@ -54,7 +54,7 @@ typedef struct _cabecalhoArvBin
     char status;
     int  noRaiz;
     int  RRNproxNo;
-    char lixo[83];
+    char lixo[84];
 
 } CabecalhoArvBin;
 

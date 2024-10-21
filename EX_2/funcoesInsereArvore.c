@@ -23,8 +23,6 @@ int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
 {
     NoArvBin no;
     no = OrdenaNo(resultado.no, resultado.posInsercao, info);
-
-
     if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
     return 0;
 }
