@@ -20,18 +20,14 @@ NoPos BuscarNoArvore(char *arquivo, long int chave)
 
     nextRrr = cabecalho.noRaiz;                     // Pega o rrn da raiz
 
-    printf("CHAVE PROCURADA: %ld || RRN RAIZ: %d\n", chave, nextRrr);
-
     while (noPos.pos == -2)                         // Enquanto não encontrar o fim ou a chave
     {
         noPos.noAnt = no;
         no = LerNoArvore(arquivo, nextRrr);         // Le o no
-        printf("RRN ATUAL: %d -> C[0]: %ld\n", nextRrr, no.info[0].C);
         noPos.no = no;
         
         if(no.nroChavesNo <= 0)
         {
-            printf("SEM CHAVES!\n");
             noPos.pos = 0;
             noPos.posInsercao = 0;
             return noPos;
@@ -65,6 +61,20 @@ NoPos BuscarNoArvore(char *arquivo, long int chave)
             noPos.posInsercao = i;
         }
     }
+
+    /*
+    printf(">>>>>>>>> CHAVE PROCURADA: %ld || QUANTIDADE DE NÓS: %d\n\n", chave, noPos.no.nroChavesNo);
+
+    for(int i = 0; i < noPos.no.nroChavesNo; i++)
+        printf("CHAVE NO NÓ[%d]: %ld || ", i, noPos.no.info[i].C);
+
+    printf("\n\n");
+
+    for(i = 0; i < noPos.noAnt.nroChavesNo; i++)
+        printf("CHAVE ANTERIOR[%d]: %ld || ", i, noPos.noAnt.info[i].C);
+
+    printf("\n\n");
+    */
 
     return noPos;
 }

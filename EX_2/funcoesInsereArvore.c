@@ -21,17 +21,10 @@ int InserirArvoreVazia(char *nomeArqArvore, char *chave, int pr)
 
 int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info)
 {
-    NoArvBin no;
+    NoArvBin no = CriarNo();
+    resultado.no.nroChavesNo++;
     no = OrdenaNo(resultado.no, resultado.posInsercao, info);
     if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
-
-    for(int i = 0; i < no.nroChavesNo; i++)
-    {
-        printf("CHAVE[%d]: %ld -> ", i, no.info[i].C);
-    }
-
-    printf("\n");
-
 
     return 0;
 }
@@ -41,7 +34,7 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
     RegistroInfo *infosOrdenadas;
     NoArvBin noEsquerdo = CriarNo();
     NoArvBin noDireito = CriarNo();
-    int posicaoPromovida = 2;                   // (m/2 + 0.5)-1 => Como ordem é impar soma-se 0.5 e retira-se 1 pela contagem começar no zero. 
+    int j = 0, posicaoPromovida = 2;                   // (m/2 + 0.5)-1 => Como ordem é impar soma-se 0.5 e retira-se 1 pela contagem começar no zero. 
 
     infosOrdenadas = OrdenaInfos(ordemArvore, resultado.no, resultado.posInsercao, info);
 
@@ -54,8 +47,9 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
         }
         else if(i > posicaoPromovida)
         {
-            noDireito.info[i-posicaoPromovida-1] = infosOrdenadas[i];
-            noDireito.P[i-posicaoPromovida-1] = resultado.no.P[i];
+            noDireito.info[j] = infosOrdenadas[i];
+            noDireito.P[j] = resultado.no.P[i];
+            j++;
         }
     }
 

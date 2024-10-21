@@ -57,7 +57,6 @@ int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
     if(ChecarIntegridadeArquivo(arqArvBin, nomeArq) == -1) return -1;
 
     fseek(arqArvBin, offset, SEEK_SET);
-    printf("OFFSET: %d || CURRENT POSITION: %ld\n", offset, ftell(arqArvBin));
     fwrite(&no.folha, sizeof(char), 1, arqArvBin);
     fwrite(&no.nroChavesNo, sizeof(int), 1, arqArvBin);
     fwrite(&no.RRNdoNo, sizeof(int), 1, arqArvBin);
@@ -70,7 +69,6 @@ int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
     }
 
     fwrite(&no.P[i], sizeof(int), 1,  arqArvBin);
-    printf("OFFSET: %d || FINAL POSITION: %ld\n", offset, ftell(arqArvBin));
     fclose(arqArvBin);
 
 
@@ -152,20 +150,23 @@ NoArvBin AlterarNo(NoArvBin no, char folha, int nroChavesNo, int rrnNo)
 NoArvBin OrdenaNo(NoArvBin noOriginal, int posInsercao, RegistroInfo info)
 {
     NoArvBin noFinal = noOriginal;
-
-
-    noFinal.info = OrdenaInfos(noOriginal.nroChavesNo, noOriginal, posInsercao, info);
-    //for(int i = 0; i < noFinal.nroChavesNo; i++)
-        //printf("QTDE NO: %d || CHAVES: %ld\n", noFinal.nroChavesNo, noFinal.info[i].C);
+    noFinal.info = OrdenaInfos(tamCPR, noOriginal, posInsercao, info);
     return noFinal;
 }
 
 RegistroInfo* OrdenaInfos(int size, NoArvBin no, int posInsercao, RegistroInfo info)
 {
+    int i;
     RegistroInfo *infosOrdenadas;    
     infosOrdenadas =  calloc(size, sizeof(RegistroInfo));
 
-    for(int i = 0; i < size; i++)
+    for(i = 0; i < size; i++)
+    {
+        infosOrdenadas[i].C = -1;
+        infosOrdenadas[i].PR = -1;
+    }
+
+    for(i = 0; i < (no.nroChavesNo+1); i++)
     {
         if(i < posInsercao)
         {

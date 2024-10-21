@@ -209,7 +209,6 @@ int InserirRegistrosAdap(char *nomeArq, RegDados registro)
     if(cabecalho.status == '0')                         // Caso o cabeçalho indique inconsistência no arquivo, emite mensagem de erro
     {
         printf("Erro de abertura do arquivo\n");
-        //binarioNaTela(nomeArq);
         return -1;
     }
 
@@ -230,8 +229,8 @@ int InserirRegistrosAdap(char *nomeArq, RegDados registro)
     {
         fseek(arquivo, 1600+160*topo, SEEK_SET);    // Posiciona o cursor no topo
         registro2 = lerRegistro(arquivo, nomeArq);            // Lê o registro do topo
+        rrn = topo;
         topo = registro2.encadeamento;               // Atauliza o topo para o encadeamento do registro a ser substituído
-
         if(registro2.removido == '1')                // Confirma que o registro havia sido removido
         {
             fseek(arquivo, -5, SEEK_CUR);           // Reposiciona o cursor 
