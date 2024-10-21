@@ -257,6 +257,7 @@ int InserirRegistrosAdap(char *nomeArq, RegDados registro)
     fclose(arquivo);
     
     //binarioNaTela(nomeArq);
+    if(cabecalho.topo == -1) return rrn-1;
     return rrn;
 }
 
