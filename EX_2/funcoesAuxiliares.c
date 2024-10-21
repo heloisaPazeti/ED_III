@@ -10,6 +10,7 @@ CabecalhoArvBin LerCabecalhoArvore(char *arquivo)
 
     if (ChecarIntegridadeArquivo(arqBin, arquivo) < 0) return cabecalho;
     
+    fseek(arqBin, 0, SEEK_SET);
     fread(&cabecalho.status, sizeof(char), 1, arqBin);
     fread(&cabecalho.noRaiz, sizeof(int), 1, arqBin);
     fread(&cabecalho.RRNproxNo, sizeof(int), 1, arqBin);
@@ -49,16 +50,23 @@ NoArvBin LerNoArvore(char *arquivo, int rrn)
 
 int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
 {
-    int i, offset = rrn*tamNo + tamCabecalhoArvore;
-    FILE *arqArvBin = fopen(nomeArq, "wb+");
+    int i;
+    long int offset = (rrn*tamNo) + tamCabecalhoArvore;
+    FILE *arqArvBin;
+    arqArvBin = fopen(nomeArq, "wb");
     if(ChecarIntegridadeArquivo(arqArvBin, nomeArq) == -1) return -1;
 
+    fclose(arqArvBin);
+    CabecalhoArvBin cabecalho = LerCabecalhoArvore(nomeArq);
+    printf("NO RAIZ: %d\n", cabecalho.noRaiz);
+
     fseek(arqArvBin, offset, SEEK_SET);
+    printf("OFFSET: %ld || CURRENT POSITION: %ld\n", offset, ftell(arqArvBin));
     fwrite(&no.folha, sizeof(char), 1, arqArvBin);
     fwrite(&no.nroChavesNo, sizeof(int), 1, arqArvBin);
     fwrite(&no.RRNdoNo, sizeof(int), 1, arqArvBin);
 
-    for (i = 0; i < no.nroChavesNo; i++)        
+    for (i = 0; i < tamCPR; i++)        
     {
         fwrite(&no.P[i], sizeof(int), 1,  arqArvBin);
         fwrite(&no.info[i].C, sizeof(long), 1,  arqArvBin);
@@ -66,6 +74,8 @@ int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
     }
 
     fwrite(&no.P[i], sizeof(int), 1,  arqArvBin);
+    fclose(arqArvBin);
+
     return 0;
 }
 
@@ -116,6 +126,7 @@ int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq)
 
 //////////////////////////////////////////////////////// ALTERAÇÕES
 
+
 int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo)
 {
     FILE *arq = fopen(nomeArq, "wb+");
@@ -144,26 +155,37 @@ NoArvBin OrdenaNo(NoArvBin noOriginal, int posInsercao, RegistroInfo info)
 {
     NoArvBin noFinal = noOriginal;
 
+
     noFinal.info = OrdenaInfos(noOriginal.nroChavesNo, noOriginal, posInsercao, info);
+    //for(int i = 0; i < noFinal.nroChavesNo; i++)
+        //printf("QTDE NO: %d || CHAVES: %ld\n", noFinal.nroChavesNo, noFinal.info[i].C);
     return noFinal;
 }
 
 RegistroInfo* OrdenaInfos(int size, NoArvBin no, int posInsercao, RegistroInfo info)
 {
-    RegistroInfo *infosOrdenadas;
-    
+    RegistroInfo *infosOrdenadas;    
     infosOrdenadas =  calloc(size, sizeof(RegistroInfo));
-    infosOrdenadas = no.info;
 
-    infosOrdenadas[posInsercao].C = info.C;
-    infosOrdenadas[posInsercao].PR = info.PR;
-
-    for(int i = posInsercao+1; i < size; i++)
+    for(int i = 0; i < size; i++)
     {
-        infosOrdenadas[i].C = no.info[i-1].C;
-        infosOrdenadas[i].PR = no.info[i-1].PR;
+        if(i < posInsercao)
+        {
+            infosOrdenadas[i].C = no.info[i].C;
+            infosOrdenadas[i].PR = no.info[i].PR;       
+        }
+        else if(i == posInsercao)
+        {
+            infosOrdenadas[i].C = info.C;
+            infosOrdenadas[i].PR = info.PR;       
+        }
+        else
+        {
+            infosOrdenadas[i].C = no.info[i-1].C;
+            infosOrdenadas[i].PR = no.info[i-1].PR;  
+        }
     }
-
+    
     return infosOrdenadas;
 }
 

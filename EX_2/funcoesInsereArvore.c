@@ -22,17 +22,10 @@ int InserirArvoreVazia(char *nomeArqArvore, char *chave, int pr)
 int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info)
 {
     NoArvBin no;
-
-    for(int i = 0; i < resultado.no.nroChavesNo; i++)
-        printf("CHAVES: %ld\n", resultado.no.info[i].C);
-
     no = OrdenaNo(resultado.no, resultado.posInsercao, info);
-    
-    for(int i = 0; i < no.nroChavesNo; i++)
-        printf("CHAVE: %ld\n", no.info[i].C);
 
-    //if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
 
+    if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
     return 0;
 }
 

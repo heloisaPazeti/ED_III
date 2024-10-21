@@ -66,6 +66,8 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
     char *chave;
     CabecalhoArvBin cabecalho;
 
+    //binarioNaTela(nomeArqArvore);
+
 
     cabecalho = LerCabecalhoArvore(nomeArqArvore);
     if(cabecalho.status == 1) return -1;
@@ -81,6 +83,7 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
         
         rrn = InserirRegistrosAdap(nomeArq, registro);
         resultado = BuscarNoArvore(nomeArqArvore, converteNome(registro.nome));
+
         
         if(resultado.pos != -1) continue;                      // Encontrou já na árvore
         resultado.no.nroChavesNo++;
@@ -96,10 +99,13 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
                 retorno = InserirNoComOverflow(nomeArqArvore, resultado, info);                      
             else                                                            // Há espaço no nó
                 retorno = InserirNoSemOverflow(nomeArqArvore, resultado, info);
+        
         }
+
+        //break;  // PRA FAZER APENAS UMA VEZ -> RETIRAR DEPOIS
     }
 
-    if (AlterarCabecalho(nomeArqArvore, '1', 0, 1) == -1) return -1;
+    //if (AlterarCabecalho(nomeArqArvore, '1', 0, 1) == -1) return -1;
 
     binarioNaTela(nomeArqArvore);
     return retorno;
