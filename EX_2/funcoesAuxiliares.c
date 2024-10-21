@@ -53,11 +53,11 @@ int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
     int i;
     long int offset = (rrn*tamNo) + tamCabecalhoArvore;
     FILE *arqArvBin;
-    arqArvBin = fopen(nomeArq, "ab+");
+    arqArvBin = fopen(nomeArq, "rb+");
     if(ChecarIntegridadeArquivo(arqArvBin, nomeArq) == -1) return -1;
 
     fseek(arqArvBin, offset, SEEK_SET);
-    printf("OFFSET: %ld || CURRENT POSITION: %ld\n", offset, ftell(arqArvBin));
+    printf("OFFSET: %d || CURRENT POSITION: %ld\n", offset, ftell(arqArvBin));
     fwrite(&no.folha, sizeof(char), 1, arqArvBin);
     fwrite(&no.nroChavesNo, sizeof(int), 1, arqArvBin);
     fwrite(&no.RRNdoNo, sizeof(int), 1, arqArvBin);
@@ -70,7 +70,7 @@ int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
     }
 
     fwrite(&no.P[i], sizeof(int), 1,  arqArvBin);
-    printf("OFFSET: %ld || FINAL POSITION: %ld\n", offset, ftell(arqArvBin));
+    printf("OFFSET: %d || FINAL POSITION: %ld\n", offset, ftell(arqArvBin));
     fclose(arqArvBin);
 
 

@@ -24,6 +24,15 @@ int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
     NoArvBin no;
     no = OrdenaNo(resultado.no, resultado.posInsercao, info);
     if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
+
+    for(int i = 0; i < no.nroChavesNo; i++)
+    {
+        printf("CHAVE[%d]: %ld -> ", i, no.info[i].C);
+    }
+
+    printf("\n");
+
+
     return 0;
 }
 
