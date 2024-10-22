@@ -70,7 +70,9 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
     cabecalho = LerCabecalhoArvore(nomeArqArvore);
     if(cabecalho.status == 1) return -1;
     scanf("%d", &n);
-    
+
+    printf("PROX RRN: %d\n", cabecalho.RRNproxNo);
+
     for(i=0; i<n; i++)
     {
         RegDados registro = lerTeclado();

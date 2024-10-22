@@ -73,9 +73,6 @@ typedef struct _noArvBin
 
     int *P;
     RegistroInfo *info;
-
-    //int P[ordemArvore];
-    //RegistroInfo info[tamCPR];
     
 } NoArvBin;
 
@@ -97,11 +94,6 @@ RegDados IniciarRegistroDados(void);
 
 CabecalhoArvBin CriarCabecalhoArvBin();
 NoArvBin CriarNo();
-
-////////////////////////////////////////////////////// DESTRUIDORES
-
-void liberaNo(NoArvBin no);
-NoPos criarNoPos();
 
 #endif
 
