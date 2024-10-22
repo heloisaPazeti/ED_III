@@ -113,7 +113,6 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
         
         resultado.noAnt.P[novaPosicao + 1] = noDireito.RRNdoNo;
 
-        liberaNo(noTemp);
 
        /////////////////
        //FREE(NOTEMP);|| => Botar aqui por favor

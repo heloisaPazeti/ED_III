@@ -83,7 +83,6 @@ NoArvBin CriarNo()
 //////////////////////////////////////////////////////// DESTRUIDORES
 
 /*
-*/
 void liberaNo(NoArvBin no)
 {
     free(no.P);
@@ -109,3 +108,4 @@ NoPos criarNoPos()
 
     return noPos;
 }
+*/
