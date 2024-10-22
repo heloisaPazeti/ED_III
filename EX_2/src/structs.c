@@ -79,3 +79,30 @@ NoArvBin CriarNo()
 
     return newNo;
 }
+
+void liberaNo(NoArvBin *no)
+{
+    free(no->P);
+    free(no->info);
+    free(no);
+}
+
+NoPos criarNoPos()
+{
+    NoPos noPos;
+    NoArvBin no = CriarNo();
+    NoArvBin noAnt = CriarNo();
+
+    noPos.no = no;
+    noPos.noAnt = noAnt;
+    noPos.pos = -1;
+    noPos.posInsercao = -1;
+
+    free(no.P);
+    free(no.info);
+    
+    free(noAnt.P);
+    free(noAnt.info);
+
+    return noPos;
+}
