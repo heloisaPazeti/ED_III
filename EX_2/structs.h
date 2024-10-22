@@ -11,12 +11,11 @@
 #define cabecalhoFixo 21
 
 //////////////////////////////////////////////////////// TAMANHOS ARVORE
-#define tamCabecalho 93
+#define tamCabecalhoArvore 93
 #define tamNo 93
 
-#define tamP 5
+#define ordemArvore 5
 #define tamCPR 4
-
 //////////////////////////////////////////////////////// STRUCTS REGISTROS
 
 typedef struct _cabecalho
@@ -55,9 +54,16 @@ typedef struct _cabecalhoArvBin
     char status;
     int  noRaiz;
     int  RRNproxNo;
-    char lixo[83];
+    char lixo[84];
 
 } CabecalhoArvBin;
+
+typedef struct _registroInfo
+{
+    long int C;
+    long int PR;
+
+} RegistroInfo;
 
 typedef struct _noArvBin
 {
@@ -66,16 +72,16 @@ typedef struct _noArvBin
     int RRNdoNo;
 
     int *P;
-    long int *C;
-    long int *PR;
-
+    RegistroInfo *info;
+    
 } NoArvBin;
 
 typedef struct _noPos
 {
-    NoArvBin no;
-    int pos;
-    int posAnt;
+    NoArvBin no;        // No em que foi encontrado / deveria estar
+    NoArvBin noAnt;     // No anterior para insercao com overflow
+    int pos;            // Posição i do no em que foi encontrado
+    int posInsercao;    // Posição i do no que deveria estar
 
 } NoPos;
 

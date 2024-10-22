@@ -50,7 +50,7 @@ CabecalhoArvBin CriarCabecalhoArvBin()
     newCabecalho.noRaiz = -1;
     newCabecalho.RRNproxNo = 0;
 
-    for (int i = 0; i < 83; i++)
+    for (int i = 0; i < 84; i++)
         newCabecalho.lixo[i] = '$';
 
     return newCabecalho;
@@ -62,12 +62,20 @@ NoArvBin CriarNo()
     int i;
 
     newNo.folha = '1';
-    newNo.nroChavesNo = 1;
+    newNo.nroChavesNo = 0;
     newNo.RRNdoNo = -1;
 
-    newNo.P = calloc(tamP, sizeof(int));
-    newNo.C = calloc(tamCPR, 8);
-    newNo.PR = calloc(tamCPR, 8);
+    newNo.P = calloc(ordemArvore, sizeof(int));
+    newNo.info = calloc(tamCPR, sizeof(RegistroInfo));
+
+    for(i = 0; i < tamCPR; i++)
+    {
+        newNo.P[i] = -1;
+        newNo.info[i].C = -1;
+        newNo.info[i].PR = -1;
+    }
+
+    newNo.P[i] = -1;
 
     return newNo;
 }
