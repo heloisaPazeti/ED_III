@@ -11,14 +11,13 @@
 int main() 
 {
     int n;
-    char nomeArq[15];
-    char nomeArqArvore[15];
+    char nomeArq[50];
+    char nomeArqArvore[50];
 
     scanf("%d %s %s", &n, nomeArq, nomeArqArvore);
 
     switch (n)
     {
-        
         case 7:
             CriarArvore(nomeArq, nomeArqArvore);
             break;
