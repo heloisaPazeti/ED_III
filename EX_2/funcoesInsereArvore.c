@@ -24,16 +24,7 @@ int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
     NoArvBin no = CriarNo();
     //resultado.no.nroChavesNo++;
 
-    printf("NO SIZE: %d || INFO TO ADD: %ld\n", resultado.no.nroChavesNo, info.C);
-
     no = OrdenaNo(resultado.no, resultado.posInsercao, info);
-
-    printf("[INSERCAO SEM OVERFLOW] >>>> NÓ ORGANIZADO >>>>>");
-    for(int i = 0; i < tamCPR; i++)
-        printf("C[%d]: %ld || ", i, no.info[i].C);
-
-    printf("\n\n");
-
     
     if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
     return 0;
@@ -49,21 +40,6 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
     int novoProxRRN = cabecalho.RRNproxNo;
 
     infosOrdenadas = OrdenaInfos(ordemArvore, resultado.no, resultado.posInsercao, info);
-    
-    /*
-    */
-    printf("[NOVO INSERE COM OVERFLOW] >>>> NÓ INICAL >>>> ");
-    for(int i = 0; i < tamCPR; i++)
-        printf("C[%d]: %ld || ", i, resultado.no.info[i].C);
-    printf("\n");
-
-    printf("INFO ADICIONADA >>>>>> %ld\n", info.C);
-
-
-    printf("INFOS ORDENADAS >>>> ");
-    for(int i = 0; i < ordemArvore; i++)
-        printf("C[%d]: %ld || ", i, infosOrdenadas[i].C);
-    printf("\n\n");
 
     for(int i = 0; i < ordemArvore; i++)
     {
@@ -112,16 +88,6 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
             resultado.noAnt.P[i] = noTemp.P[i-1]; 
         
         resultado.noAnt.P[novaPosicao + 1] = noDireito.RRNdoNo;
-        /*
-        for(i = 0; i < ordemArvore; i++)
-            printf("EM NO TEMP P[%d] >> RRN: %d|| ", i, noTemp.P[i]);
-        printf("\n\n");
-
-
-        for(i = 0; i < ordemArvore; i++)
-            printf("EM P[%d] >> RRN: %d|| ", i, resultado.noAnt.P[i]);
-        printf("\n\n");
-        */
 
        /////////////////
        //FREE(NOTEMP);|| => Botar aqui por favor
@@ -134,6 +100,8 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
 
     EscreveNo(nomeArqArvore, noEsquerdo, noEsquerdo.RRNdoNo);
     EscreveNo(nomeArqArvore, noDireito, noDireito.RRNdoNo);
+
+    return 0;
 }
 
 int PromoveChave(char *nomeArqArvore, int posInsercao, RegistroInfo promovido, NoArvBin noPromocao)
