@@ -37,7 +37,6 @@ NoPos BuscarNoArvore(char *arquivo, long int chave)
         {
             if (no.info[i].C == chave)     // Se encontrou
             {
-                //noPos.no = no;                     // Seleciona o no
                 noPos.pos = i;                      // Seleciona a pos
                 break;
             }
@@ -61,20 +60,6 @@ NoPos BuscarNoArvore(char *arquivo, long int chave)
             noPos.posInsercao = i;
         }
     }
-
-    /*
-    printf(">>>>>>>>> CHAVE PROCURADA: %ld || QUANTIDADE DE NÓS: %d\n\n", chave, noPos.no.nroChavesNo);
-
-    for(int i = 0; i < noPos.no.nroChavesNo; i++)
-        printf("CHAVE NO NÓ[%d]: %ld || ", i, noPos.no.info[i].C);
-
-    printf("\n\n");
-
-    for(i = 0; i < noPos.noAnt.nroChavesNo; i++)
-        printf("CHAVE ANTERIOR[%d]: %ld || ", i, noPos.noAnt.info[i].C);
-
-    printf("\n\n");
-    */
 
     return noPos;
 }

@@ -23,18 +23,21 @@ int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
 {
     NoArvBin no = CriarNo();
     //resultado.no.nroChavesNo++;
-    no = OrdenaNo(resultado.no, resultado.posInsercao, info);
-    if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
 
+    no = OrdenaNo(resultado.no, resultado.posInsercao, info);
+    
+    if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1) return -1;
     return 0;
 }
 
 int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info)
 {
+    CabecalhoArvBin cabecalho = LerCabecalhoArvore(nomeArqArvore);
     RegistroInfo *infosOrdenadas;
     NoArvBin noEsquerdo = CriarNo();
     NoArvBin noDireito = CriarNo();
     int j = 0, posicaoPromovida = 2;                   // (m/2 + 0.5)-1 => Como ordem é impar soma-se 0.5 e retira-se 1 pela contagem começar no zero. 
+    int novoProxRRN = cabecalho.RRNproxNo;
 
     infosOrdenadas = OrdenaInfos(ordemArvore, resultado.no, resultado.posInsercao, info);
 
@@ -54,46 +57,63 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
     }
 
     noEsquerdo = AlterarNo(noEsquerdo, resultado.no.folha, posicaoPromovida, resultado.no.RRNdoNo);
-    noDireito = AlterarNo(noDireito, resultado.no.folha, posicaoPromovida, LerCabecalhoArvore(nomeArqArvore).RRNproxNo);
+    noDireito = AlterarNo(noDireito, resultado.no.folha, posicaoPromovida, novoProxRRN);
+    novoProxRRN++;
 
+    int novaPosicao = EncontraPosicao(resultado.noAnt, resultado.no.info[posicaoPromovida]);
     if(resultado.noAnt.RRNdoNo <= -1)                           // Overflow na Raiz
     {
         NoArvBin novaRaiz = CriarNo();
 
-        novaRaiz = AlterarNo(novaRaiz, 0, 1, LerCabecalhoArvore(nomeArqArvore).RRNproxNo);
+        novaRaiz = AlterarNo(novaRaiz, 0, 1, cabecalho.RRNproxNo);
         novaRaiz.P[0] = noEsquerdo.RRNdoNo;
         novaRaiz.P[1] = noDireito.RRNdoNo;
-        AlterarCabecalho(nomeArqArvore, 1, novaRaiz.RRNdoNo, novaRaiz.RRNdoNo++);
 
+        cabecalho.noRaiz = novaRaiz.RRNdoNo;
+        novoProxRRN = ++novaRaiz.RRNdoNo;
+
+        novaPosicao = 0;
         resultado.noAnt = novaRaiz;
     }
     else
     {
-        int novaPosicao = EncontraPosicao(resultado.noAnt, resultado.no.info[posicaoPromovida]);
+        NoArvBin noTemp = CriarNo();
+        int i;
         resultado.noAnt.nroChavesNo++;
 
-        for(int i = novaPosicao+2; i < resultado.noAnt.nroChavesNo; i++)
-            resultado.noAnt.P[i] = resultado.noAnt.P[i-1]; 
+        for(i = 0; i < ordemArvore; i++)
+            noTemp.P[i] = resultado.noAnt.P[i];
+        
+        for(i = novaPosicao+2; i < ordemArvore; i++)
+            resultado.noAnt.P[i] = noTemp.P[i-1]; 
+        
+        resultado.noAnt.P[novaPosicao + 1] = noDireito.RRNdoNo;
 
-        //resultado.noAnt.P[novaPosicao] = noEsquerdo.RRNdoNo;
-        resultado.noAnt.P[novaPosicao++] = noDireito.RRNdoNo;
+       /////////////////
+       //FREE(NOTEMP);|| => Botar aqui por favor
+       /////////////////
+
     }
     
-    PromoveChave(nomeArqArvore, resultado.no.info[posicaoPromovida], resultado.noAnt);
-
+    AlterarCabecalho(nomeArqArvore, '1', cabecalho.noRaiz, novoProxRRN);
+    PromoveChave(nomeArqArvore, novaPosicao, infosOrdenadas[posicaoPromovida], resultado.noAnt);
 
     EscreveNo(nomeArqArvore, noEsquerdo, noEsquerdo.RRNdoNo);
     EscreveNo(nomeArqArvore, noDireito, noDireito.RRNdoNo);
 
+    return 0;
 }
 
-int PromoveChave(char *nomeArqArvore, RegistroInfo promovido, NoArvBin noPromocao)
+int PromoveChave(char *nomeArqArvore, int posInsercao, RegistroInfo promovido, NoArvBin noPromocao)
 {
-    int posInsercao = EncontraPosicao(noPromocao, promovido);
+    //int posInsercao = EncontraPosicao(noPromocao, promovido);
     NoPos resultado = BuscarNoArvore(nomeArqArvore, noPromocao.info[0].C);
+    resultado.no = noPromocao;
     resultado.pos= -1;
     resultado.posInsercao = posInsercao;
-    if(noPromocao.nroChavesNo >= tamCPR)                                    // Ocorre overflow na promocao
+    //resultado.no.nroChavesNo++;
+
+    if(noPromocao.nroChavesNo > tamCPR)                                    // Ocorre overflow na promocao
     {
         if(resultado.noAnt.RRNdoNo <= -1)
         {
@@ -104,11 +124,7 @@ int PromoveChave(char *nomeArqArvore, RegistroInfo promovido, NoArvBin noPromoca
         InserirNoComOverflow(nomeArqArvore, resultado, promovido);
     }
     else                                                                    // Não ocorre overflow
-    {
         InserirNoSemOverflow(nomeArqArvore, resultado, promovido);
-        //NoArvBin noOrdenado = OrdenaNo(noPromocao, posInsercao, promovido);
-        //if (EscreveNo(nomeArqArvore, noOrdenado, noOrdenado.RRNdoNo) == -1) return -1;
-    }
 
     return 0;
 }
