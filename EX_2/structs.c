@@ -65,8 +65,8 @@ NoArvBin CriarNo()
     newNo.nroChavesNo = 0;
     newNo.RRNdoNo = -1;
 
-    newNo.P = calloc(ordemArvore, sizeof(int));
-    newNo.info = calloc(tamCPR, sizeof(RegistroInfo));
+    //newNo.P = calloc(ordemArvore, sizeof(int));
+    //newNo.info = calloc(tamCPR, sizeof(RegistroInfo));
 
     for(i = 0; i < tamCPR; i++)
     {
@@ -78,4 +78,34 @@ NoArvBin CriarNo()
     newNo.P[i] = -1;
 
     return newNo;
+}
+
+//////////////////////////////////////////////////////// DESTRUIDORES
+
+/*
+*/
+void liberaNo(NoArvBin no)
+{
+    free(no.P);
+    free(no.info);
+}
+
+NoPos criarNoPos()
+{
+    NoPos noPos;
+    NoArvBin no = CriarNo();
+    NoArvBin noAnt = CriarNo();
+
+    noPos.no = no;
+    noPos.noAnt = noAnt;
+    noPos.pos = -1;
+    noPos.posInsercao = -1;
+
+    free(no.P);
+    free(no.info);
+    
+    free(noAnt.P);
+    free(noAnt.info);
+
+    return noPos;
 }

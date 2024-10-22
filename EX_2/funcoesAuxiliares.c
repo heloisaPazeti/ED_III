@@ -157,7 +157,7 @@ NoArvBin OrdenaNo(NoArvBin noOriginal, int posInsercao, RegistroInfo info)
 RegistroInfo* OrdenaInfos(int size, NoArvBin no, int posInsercao, RegistroInfo info)
 {
     int i;
-    RegistroInfo *infosOrdenadas;    
+    RegistroInfo *infosOrdenadas;
     infosOrdenadas =  calloc(size, sizeof(RegistroInfo));
 
     for(i = 0; i < size; i++)

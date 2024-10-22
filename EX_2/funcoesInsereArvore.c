@@ -112,16 +112,8 @@ int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info
             resultado.noAnt.P[i] = noTemp.P[i-1]; 
         
         resultado.noAnt.P[novaPosicao + 1] = noDireito.RRNdoNo;
-        /*
-        for(i = 0; i < ordemArvore; i++)
-            printf("EM NO TEMP P[%d] >> RRN: %d|| ", i, noTemp.P[i]);
-        printf("\n\n");
 
-
-        for(i = 0; i < ordemArvore; i++)
-            printf("EM P[%d] >> RRN: %d|| ", i, resultado.noAnt.P[i]);
-        printf("\n\n");
-        */
+        liberaNo(noTemp);
 
        /////////////////
        //FREE(NOTEMP);|| => Botar aqui por favor
