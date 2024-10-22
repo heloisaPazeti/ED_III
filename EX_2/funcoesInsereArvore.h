@@ -10,6 +10,6 @@ int InserirArvoreVazia(char *nomeArqArvore, char *chave, int pr);
 int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info);
 int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info);
 
-int PromoveChave(char *nomeArqArvore, RegistroInfo promovido, NoArvBin noPromocao);
+int PromoveChave(char *nomeArqArvore, int posInsercao, RegistroInfo promovido, NoArvBin noPromocao);
 
 #endif

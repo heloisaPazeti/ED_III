@@ -71,6 +71,8 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
     if(cabecalho.status == 1) return -1;
     scanf("%d", &n);
 
+    printf("PROX RRN: %d\n", cabecalho.RRNproxNo);
+
     for(i=0; i<n; i++)
     {
         RegDados registro = lerTeclado();
@@ -87,12 +89,9 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
             RegistroInfo info;
             info.C = converteNome(registro.nome);
             info.PR = (rrn*tamRegistro) + tamTotalCabecalho;
-            //printf("CHAVE: %s || OFFSET: %d || RRN NO: %d || POSICAO INSERCAO: %d\n",registro.nome, (rrn*tamRegistro + 1600), resultado.no.RRNdoNo, resultado.posInsercao);
-            if(resultado.no.nroChavesNo > tamCPR) 
-            {
-                printf("OVERFLOW\n");
-                retorno = InserirNoComOverflow(nomeArqArvore, resultado, info);                      
-            }                         // Ocorre overflow do nó 
+            
+            if(resultado.no.nroChavesNo > tamCPR)                                // Ocorre overflow do nó 
+                retorno = InserirNoComOverflow(nomeArqArvore, resultado, info);
             else 
                 retorno = InserirNoSemOverflow(nomeArqArvore, resultado, info);
         }

@@ -125,7 +125,7 @@ int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq)
 
 int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo)
 {
-    FILE *arq = fopen(nomeArq, "wb+");
+    FILE *arq = fopen(nomeArq, "rb+");
 
     if(ChecarIntegridadeArquivo(arq, nomeArq) == -1) return -1;
 
