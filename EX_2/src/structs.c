@@ -80,14 +80,23 @@ NoArvBin CriarNo()
     return newNo;
 }
 
-void liberaNo(NoArvBin *no)
+void liberaNo(NoArvBin no)
 {
-    free(no->P);
-    free(no->info);
-    free(no);
+    free(no.P);
+    free(no.info);
+    //free(no);
 }
 
-NoPos criarNoPos()
+void liberaNoPos(NoPos *noPos)
+{
+    liberaNo(noPos->no);
+    liberaNo(noPos->noAnt);
+
+    free(noPos->listaRRN);
+    //free(noPos);
+}
+
+NoPos CriarNoPos()
 {
     NoPos noPos;
     NoArvBin no = CriarNo();
@@ -98,11 +107,16 @@ NoPos criarNoPos()
     noPos.pos = -1;
     noPos.posInsercao = -1;
 
+    noPos.tamListaRRN = 0;
+    noPos.listaRRN = calloc(50, sizeof(int));
+
+    /*
     free(no.P);
     free(no.info);
     
     free(noAnt.P);
     free(noAnt.info);
+    */
 
     return noPos;
 }

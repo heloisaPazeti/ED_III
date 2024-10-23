@@ -34,7 +34,7 @@ NoArvBin LerNoArvore(char *arquivo, int rrn)
     fread(&no.nroChavesNo, sizeof(int), 1, arqBin);
     fread(&no.RRNdoNo, sizeof(int), 1, arqBin);
 
-    for (i = 0; i < no.nroChavesNo; i++)        // Le todos os Pi, Ci, PRi
+    for (i = 0; i < tamCPR; i++)        // Le todos os Pi, Ci, PRi
     {
         fread(&no.P[i], sizeof(int), 1, arqBin);
         fread(&no.info[i].C, sizeof(long), 1, arqBin);
@@ -51,7 +51,7 @@ NoArvBin LerNoArvore(char *arquivo, int rrn)
 int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
 {
     int i;
-    long int offset = (rrn*tamNo) + tamCabecalhoArvore;
+    int offset = (rrn*tamNo) + tamCabecalhoArvore;
     FILE *arqArvBin;
     arqArvBin = fopen(nomeArq, "rb+");
     if(ChecarIntegridadeArquivo(arqArvBin, nomeArq) == -1) return -1;
@@ -126,12 +126,17 @@ int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq)
 int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo)
 {
     FILE *arq = fopen(nomeArq, "rb+");
+    char c = '$';
 
     if(ChecarIntegridadeArquivo(arq, nomeArq) == -1) return -1;
 
     fwrite(&status, sizeof(char), 1, arq);
     fwrite(&noRaiz, sizeof(int), 1, arq);
     fwrite(&rrnProxNo, sizeof(int), 1, arq);
+
+    for(int i = 0; i < 84; i++)
+        fwrite(&c, sizeof(char), 1, arq);
+
     fclose(arq);
     return 0;
 }
@@ -196,5 +201,11 @@ int EncontraPosicao(NoArvBin no, RegistroInfo info)
         if(no.info[i].C > info.C) return i;
     
     return no.nroChavesNo;
+}
+
+void LiberaNo(NoArvBin no)
+{
+    free(no.info);
+    free(no.P);
 }
 

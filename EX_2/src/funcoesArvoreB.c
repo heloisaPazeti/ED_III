@@ -7,8 +7,92 @@
 
 int CriarArvore(char *nomeArq, char *nomeArqArvore)
 {
+    RegDados registro;
+    int retorno, rrn, nroReg, regRem;
+    long int offset;
+    CabecalhoArvBin cabecalho;
+    NoPos resultado;
+    FILE *arqArvBin;
+    FILE *arqBin;
 
+    arqArvBin = fopen(nomeArqArvore, "wb+");        // Cria o arquivo da árvore
+    fclose(arqArvBin);
+
+
+    cabecalho = CriarCabecalhoArvBin();             // Cria o cabeçalho da árvore 
+    cabecalho.status = '1';                         // Atualiza o status para 1 durante a manipulação do arquivo
+    //EscreveCabecalho(nomeArqArvore, cabecalho);
+    AlterarCabecalho(nomeArqArvore, '1', cabecalho.noRaiz, cabecalho.RRNproxNo);
+
+    nroReg = 0;                                     // O nro inicial de registros é 0, bem como o nro de registros apagados
+    regRem = 0;
+    arqBin = fopen(nomeArq, "rb");                  // Abre o arquivo binário para leitura
+    
+    int qtdeReg = 0;
+    //(nroReg - regRem) < 25
+    while(1)                                        //  Percorre o arquivo binário e acrescenta os dados à árvore
+    {
+        offset = 1600+(nroReg*160);                   // Calcula o offset de cada registro
+        //printf("OFFSET: %ld\n", offset);
+
+        registro = IniciarRegistroDados();          // Inicializa o registro de dados
+        fseek(arqBin, offset, SEEK_SET);            // Posiciona o cursor
+        registro = lerRegistro(arqBin, nomeArq);    // Lê o registro
+        
+        if(registro.removido == '2')                           // Se chegou ao fim do arquivo, sai do loop
+            break;
+        if(registro.removido == '1')                           // Se o registro foi removido, aumenta o nro de registros removidos
+            regRem++;
+        else if(registro.removido == '0')                       // Se o registro não foi removido, busca o registro na árvore
+        {
+            //printf("CHAVE INSERCAO: %ld\n", converteNome(registro.nome));
+            resultado = BuscarNoArvore(nomeArqArvore, converteNome(registro.nome));         // Encontra a posição do nó na árvore
+            /*
+            printf("====================================== NOVA INSERCAO: %ld ======================================\n", converteNome(registro.nome));
+            printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ONDE VAI INSERIR => RRN: %d\n", resultado.no.RRNdoNo);
+            for(int h = 0; h < tamCPR; h++)
+                printf("C[%d]: %ld -> P[%d]: %d || ", h, resultado.no.info[h].C, h, resultado.no.P[h]);
+            printf("P[%d]: %d\n\n", ordemArvore, resultado.no.P[ordemArvore-1]);
+            */
+
+            if(resultado.pos <= -1)                              // Se o elemento não foi encontrado na árvore, continua
+            {                                     
+                resultado.no.nroChavesNo++;                     // Aumenta o nro de chaves no nó
+            
+                if(resultado.posInsercao == -2)                 // Insere na árvore vazia
+                    retorno = InserirArvoreVazia(nomeArqArvore, registro.nome, offset);
+                else                                            // Insere na árvore já ocupada
+                { 
+                    RegistroInfo info;
+                    info.C = converteNome(registro.nome);
+                    info.PR = offset;
+                    
+                    if(resultado.no.nroChavesNo > tamCPR)       // Ocorre overflow do nó
+                    {
+                        //printf("OVERFLOW\n");
+                        InserirNoComOverflow(nomeArqArvore, resultado, info);
+                    }
+                    else                
+                    {
+                        //printf("SEM OVERFLOW\n");
+                        InserirNoSemOverflow(nomeArqArvore, resultado, info);
+                    }                        // Não ocorre overflow do nó
+                }
+            }
+
+            liberaNoPos(&resultado);
+            qtdeReg++;
+        }
+        nroReg++;
+    }
+
+    fclose(arqBin);
+    //printf("%d - %d = %d\n", nroReg, regRem, qtdeReg);
+    binarioNaTela(nomeArqArvore);
+
+    return 0;
 }
+
 
 ///////////////////////////////////////////////////////////////// BUSCAR REGISTRO (8)
 
@@ -89,9 +173,9 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
             info.PR = (rrn*tamRegistro) + tamTotalCabecalho;
             
             if(resultado.no.nroChavesNo > tamCPR)                                // Ocorre overflow do nó 
-                retorno = InserirNoComOverflow(nomeArqArvore, resultado, info);
+                InserirNoComOverflow(nomeArqArvore, resultado, info);
             else 
-                retorno = InserirNoSemOverflow(nomeArqArvore, resultado, info);
+                InserirNoSemOverflow(nomeArqArvore, resultado, info);
         }
 
     }

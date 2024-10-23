@@ -26,11 +26,14 @@ RegDados lerRegistro(FILE *arqBin, char *arquivo)
         fread(&temp.tamanho, sizeof(float),1,arqBin);
         fread(&temp.unidadeMedida, sizeof(char),1,arqBin);
         fread(&temp.velocidade, sizeof(int), 1,arqBin);
+        fread(dado, sizeof(char), 142, arqBin);
+        /*
         if(fread(dado, sizeof(char), 142, arqBin)==0)      // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
         {
             temp.removido = '2';
             return temp;
         }
+        */
 
         linha = strdup(dado);                               // A string de dados (armazena os campos de tamanho variável) é duplicada
         temp.nome = strsep(&linha, "#");                    // Separação dos dados de acordo com o separador '#'

@@ -35,5 +35,7 @@ RegistroInfo* OrdenaInfos(int size, NoArvBin no, int posInsercao, RegistroInfo i
 
 int EncontraPosicao(NoArvBin no, RegistroInfo info);
 
+void LiberaNo(NoArvBin no);
+
 
 #endif

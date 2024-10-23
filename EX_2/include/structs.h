@@ -83,6 +83,9 @@ typedef struct _noPos
     int pos;            // Posição i do no em que foi encontrado
     int posInsercao;    // Posição i do no que deveria estar
 
+    int *listaRRN;
+    int tamListaRRN;
+
 } NoPos;
 
 //////////////////////////////////////////////////////// INICIALIZADORES REGISTROS
@@ -94,7 +97,11 @@ RegDados IniciarRegistroDados(void);
 
 CabecalhoArvBin CriarCabecalhoArvBin();
 NoArvBin CriarNo();
+NoPos CriarNoPos();
 
 #endif
 
 //////////////////////////////////////////////////////// DESTRUIDORES ARVORE
+
+void liberaNo(NoArvBin no);
+void liberaNoPos(NoPos *noPos);
