@@ -14,17 +14,13 @@ NoArvBin LerNoArvore(char *arquivo, int rrn);
 //////////////////////////////////////////////////////// FUNCOES DE ESCRITA
 
 int EscreveNo(char *nomeArq, NoArvBin no, int rrn);
+int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo);
 
 //////////////////////////////////////////////////////// CHECAGENS
 
 int ChecarCabecalho(CabecalhoArvBin cabecalho);
 int ChecarArvoreVazia(char *nomeArquivo, int printError);
 int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq);
-
-//////////////////////////////////////////////////////// ALTERAÇÕES
-
-int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo);
-NoArvBin AlterarNo(NoArvBin no, char folha, int nroChavesNo, int rrnNo);
 
 //////////////////////////////////////////////////////// ORDENAÇÕES
 

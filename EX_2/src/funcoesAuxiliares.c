@@ -3,61 +3,64 @@
 
 //////////////////////////////////////////////////////// FUNCOES DE LEITURA
 
+// Abre o arquivo com o cabecalho e le
 CabecalhoArvBin LerCabecalhoArvore(char *arquivo)
 {
-    CabecalhoArvBin cabecalho = CriarCabecalhoArvBin(); // Inicializa Arvore
-    FILE *arqBin = fopen(arquivo, "rb");
+    CabecalhoArvBin cabecalho = CriarCabecalhoArvBin();                         // Inicializa Arvore
+    FILE *arqBin = fopen(arquivo, "rb");                                        // Abre para leitura
 
-    if (ChecarIntegridadeArquivo(arqBin, arquivo) < 0) return cabecalho;
+    if (ChecarIntegridadeArquivo(arqBin, arquivo) < 0) return cabecalho;        // Checa se esta bem
     
-    fseek(arqBin, 0, SEEK_SET);
+    fseek(arqBin, 0, SEEK_SET);                                                 // Posiciona cursor
     fread(&cabecalho.status, sizeof(char), 1, arqBin);
     fread(&cabecalho.noRaiz, sizeof(int), 1, arqBin);
     fread(&cabecalho.RRNproxNo, sizeof(int), 1, arqBin);
     fread(cabecalho.lixo, sizeof(char), 83, arqBin);
 
     fclose(arqBin);
-    return cabecalho;
+    return cabecalho;                                                           // Retorna informacoes
 }
 
+// Le um no em um dado rrn
 NoArvBin LerNoArvore(char *arquivo, int rrn)
 {
-    NoArvBin no = CriarNo();                    // Inicializa no
-    FILE *arqBin = fopen(arquivo, "rb");
+    NoArvBin no = CriarNo();                                                    // Inicializa no
+    FILE *arqBin = fopen(arquivo, "rb");                                        // Abre para leitura
     int i;
 
     if (ChecarIntegridadeArquivo(arqBin, arquivo) < 0) return no;
         
-    fseek(arqBin, (rrn * tamNo) + tamCabecalhoArvore, SEEK_SET);
+    fseek(arqBin, (rrn * tamNo) + tamCabecalhoArvore, SEEK_SET);                // Posiciona cursor
 
     fread(&no.folha, sizeof(char), 1, arqBin);
     fread(&no.nroChavesNo, sizeof(int), 1, arqBin);
     fread(&no.RRNdoNo, sizeof(int), 1, arqBin);
 
-    for (i = 0; i < tamCPR; i++)        // Le todos os Pi, Ci, PRi
+    for (i = 0; i < tamCPR; i++)                                                // Le todos os Pi, Ci, PRi
     {
         fread(&no.P[i], sizeof(int), 1, arqBin);
         fread(&no.info[i].C, sizeof(long), 1, arqBin);
         fread(&no.info[i].PR, sizeof(long), 1, arqBin);
     }
 
-    fread(&no.P[i], sizeof(int), 1, arqBin);    // Le o ponteiro final
-
+    fread(&no.P[i], sizeof(int), 1, arqBin);                                    // Le o ponteiro final
     fclose(arqBin);
-    return no;
+    return no;                                                                  // Retorna no
 }
 
 //////////////////////////////////////////////////////// FUNCOES DE ESCRITA
 
+// Escreve um no no arquivo
 int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
 {
-    int i;
-    int offset = (rrn*tamNo) + tamCabecalhoArvore;
     FILE *arqArvBin;
-    arqArvBin = fopen(nomeArq, "rb+");
+    int i;
+    int offset = (rrn*tamNo) + tamCabecalhoArvore;                              // Offset passado
+    arqArvBin = fopen(nomeArq, "rb+");                                          // Arquivo para leitura e escrita
+
     if(ChecarIntegridadeArquivo(arqArvBin, nomeArq) == -1) return -1;
 
-    fseek(arqArvBin, offset, SEEK_SET);
+    fseek(arqArvBin, offset, SEEK_SET);                                         // Posiciona cursor
     fwrite(&no.folha, sizeof(char), 1, arqArvBin);
     fwrite(&no.nroChavesNo, sizeof(int), 1, arqArvBin);
     fwrite(&no.RRNdoNo, sizeof(int), 1, arqArvBin);
@@ -71,8 +74,25 @@ int EscreveNo(char *nomeArq, NoArvBin no, int rrn)
 
     fwrite(&no.P[i], sizeof(int), 1,  arqArvBin);
     fclose(arqArvBin);
+    return 0;
+}
 
+// Escreve no cabecalho
+int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo)
+{
+    FILE *arq = fopen(nomeArq, "rb+");
+    char c = '$';
 
+    if(ChecarIntegridadeArquivo(arq, nomeArq) == -1) return -1;
+
+    fwrite(&status, sizeof(char), 1, arq);
+    fwrite(&noRaiz, sizeof(int), 1, arq);
+    fwrite(&rrnProxNo, sizeof(int), 1, arq);
+
+    for(int i = 0; i < 84; i++)
+        fwrite(&c, sizeof(char), 1, arq);
+
+    fclose(arq);
     return 0;
 }
 
@@ -120,68 +140,39 @@ int ChecarIntegridadeArquivo(FILE *arquivo, char *nomeArq)
     return 0;
 }
 
-
-//////////////////////////////////////////////////////// ALTERAÇÕES
-
-
-int AlterarCabecalho(char *nomeArq, char status, int noRaiz, int rrnProxNo)
-{
-    FILE *arq = fopen(nomeArq, "rb+");
-    char c = '$';
-
-    if(ChecarIntegridadeArquivo(arq, nomeArq) == -1) return -1;
-
-    fwrite(&status, sizeof(char), 1, arq);
-    fwrite(&noRaiz, sizeof(int), 1, arq);
-    fwrite(&rrnProxNo, sizeof(int), 1, arq);
-
-    for(int i = 0; i < 84; i++)
-        fwrite(&c, sizeof(char), 1, arq);
-
-    fclose(arq);
-    return 0;
-}
-
-NoArvBin AlterarNo(NoArvBin no, char folha, int nroChavesNo, int rrnNo)
-{
-    no.folha = folha;
-    no.nroChavesNo = nroChavesNo;
-    no.RRNdoNo = rrnNo;
-
-    return no;
-}
-
 //////////////////////////////////////////////////////// ORDENAÇÕES
 
+// Ordena um vetor de informacoes de acordo com a chave
+// Ordena um vetor de ponteiros passados por referencia
 RegistroInfo* OrdenaInfos(NoArvBin no, int posInsercao, RegistroInfo info, int P, int *pOrdenado)
 {
     int i;
     RegistroInfo *infosOrdenadas;    
     infosOrdenadas =  calloc(ordemArvore, sizeof(RegistroInfo));
 
-    for(i = 0; i < ordemArvore; i++)
+    for(i = 0; i < ordemArvore; i++)                                // Inicializa como -1
     {
         infosOrdenadas[i].C = -1;
         infosOrdenadas[i].PR = -1;
     }
 
-    pOrdenado[0] = no.P[0];
+    pOrdenado[0] = no.P[0];                                         // Seta o primeiro ponteirp
 
-    for(i = 0; i < ordemArvore; i++)
+    for(i = 0; i < ordemArvore; i++)                                // Ordena informacoes + ponteiros
     {
-        if(i < posInsercao)
+        if(i < posInsercao)                                         // Antes da posicao de insercao apenas copia
         {
             infosOrdenadas[i].C = no.info[i].C;
             infosOrdenadas[i].PR = no.info[i].PR;
             pOrdenado[i+1] = no.P[i+1];       
         }
-        else if(i == posInsercao)
+        else if(i == posInsercao)                                   // Na posicao de insercao adiciona novo
         {
             infosOrdenadas[i].C = info.C;
             infosOrdenadas[i].PR = info.PR;
             pOrdenado[i+1] = P;       
         }
-        else
+        else                                                        // Os seguintes sao deslocados
         {
             infosOrdenadas[i].C = no.info[i-1].C;
             infosOrdenadas[i].PR = no.info[i-1].PR;  
@@ -194,33 +185,12 @@ RegistroInfo* OrdenaInfos(NoArvBin no, int posInsercao, RegistroInfo info, int P
 
 //////////////////////////////////////////////////////// POSIÇÃO
 
+// Encontra a posicao de uma chave num dado no
 int EncontraPosicao(NoArvBin no, RegistroInfo info)
 {
     for(int i = 0; i < no.nroChavesNo; i++)
         if(no.info[i].C > info.C) return i;
     
     return no.nroChavesNo;
-}
-
-void LiberaNo(NoArvBin *no)
-{
-    free(no->info);
-    free(no->P);
-}
-
-void LiberaRegistro(RegDados *registro)
-{
-    if(registro->alimento)
-        free(registro->alimento);
-    if(registro->dieta)
-        free(registro->dieta);
-    if(registro->especie)
-        free(registro->especie);
-    if(registro->nome)
-        free(registro->nome);
-    if(registro->habitat)
-        free(registro->habitat);
-    if(registro->tipo)
-        free(registro->tipo);
 }
 
