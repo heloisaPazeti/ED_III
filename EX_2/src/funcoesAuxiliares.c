@@ -42,6 +42,7 @@ NoArvBin LerNoArvore(char *arquivo, int rrn)
     }
 
     fread(&no.P[i], sizeof(int), 1, arqBin);    // Le o ponteiro final
+
     fclose(arqBin);
     return no;
 }
@@ -201,9 +202,25 @@ int EncontraPosicao(NoArvBin no, RegistroInfo info)
     return no.nroChavesNo;
 }
 
-void LiberaNo(NoArvBin no)
+void LiberaNo(NoArvBin *no)
 {
-    free(no.info);
-    free(no.P);
+    free(no->info);
+    free(no->P);
+}
+
+void LiberaRegistro(RegDados *registro)
+{
+    if(registro->alimento)
+        free(registro->alimento);
+    if(registro->dieta)
+        free(registro->dieta);
+    if(registro->especie)
+        free(registro->especie);
+    if(registro->nome)
+        free(registro->nome);
+    if(registro->habitat)
+        free(registro->habitat);
+    if(registro->tipo)
+        free(registro->tipo);
 }
 

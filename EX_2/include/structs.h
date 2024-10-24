@@ -103,5 +103,4 @@ NoPos CriarNoPos();
 
 //////////////////////////////////////////////////////// DESTRUIDORES ARVORE
 
-void liberaNo(NoArvBin no);
-void liberaNoPos(NoPos *noPos);
+// void liberaNoPos(NoPos *noPos);

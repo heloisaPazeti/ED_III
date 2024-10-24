@@ -8,7 +8,7 @@
 int CriarArvore(char *nomeArq, char *nomeArqArvore)
 {
     RegDados registro;
-    int retorno, rrn, nroReg, regRem;
+    int retorno, rrn, nroReg;
     long int offset;
     CabecalhoArvBin cabecalho;
     NoPos resultado;
@@ -24,31 +24,27 @@ int CriarArvore(char *nomeArq, char *nomeArqArvore)
     AlterarCabecalho(nomeArqArvore, '1', cabecalho.noRaiz, cabecalho.RRNproxNo);
 
     nroReg = 0;                                     // O nro inicial de registros é 0, bem como o nro de registros apagados
-    regRem = 0;
+
     arqBin = fopen(nomeArq, "rb");                  // Abre o arquivo binário para leitura
     
-    int qtdeReg = 0;
     registro.removido = '0';
-    //(nroReg - regRem) < 25
-    while(registro.removido != '2')                                        //  Percorre o arquivo binário e acrescenta os dados à árvore
+    while(1)                                        //  Percorre o arquivo binário e acrescenta os dados à árvore
     {
         offset = 1600+(nroReg*160);                 // Calcula o offset de cada registro
-        //printf("OFFSET: %ld\n", offset);
 
         registro = IniciarRegistroDados();          // Inicializa o registro de dados
         fseek(arqBin, offset, SEEK_SET);            // Posiciona o cursor
+        
         registro = lerRegistro(arqBin, nomeArq);    // Lê o registro
         
-        if(registro.removido == '1')                           // Se o registro foi removido, aumenta o nro de registros removidos
-            regRem++;
-        else if(registro.removido == '0')                       // Se o registro não foi removido, busca o registro na árvore
+        if(registro.removido == '2')
+            break;
+        if(registro.removido == '0')                       // Se o registro não foi removido, busca o registro na árvore
         {
             resultado = BuscarNoArvore(nomeArqArvore, converteNome(registro.nome));         // Encontra a posição do nó na árvore
-
+            CabecalhoArvBin cabecalho = LerCabecalhoArvore(nomeArqArvore);
             if(resultado.pos <= -1)                              // Se o elemento não foi encontrado na árvore, continua
-            {                                     
-                //resultado.no.nroChavesNo++;                     // Aumenta o nro de chaves no nó
-            
+            {                                    
                 RegistroInfo info;
                 info.C = converteNome(registro.nome);
                 info.PR = offset;
@@ -57,26 +53,24 @@ int CriarArvore(char *nomeArq, char *nomeArqArvore)
                     InserirArvoreVazia(nomeArqArvore, info);
                 else                                            // Insere na árvore já ocupada
                 { 
-                    
-                    if(resultado.no.nroChavesNo >= tamCPR)       // Ocorre overflow do nó
+                    if(resultado.no.nroChavesNo == tamCPR)       // Ocorre overflow do nó
                     {
                         InserirNoComOverflow(nomeArqArvore, resultado, info, -1);
                     }
-                    else                
+                    else if(resultado.no.nroChavesNo < tamCPR)                          // Não ocorre overflow do nó
                     {
-                        InserirNoSemOverflow(nomeArqArvore, resultado.no, resultado.posInsercao, -1, info);
-                    }                        // Não ocorre overflow do nó
+                        InserirNoSemOverflow(nomeArqArvore, resultado.no, -1, resultado.posInsercao, info);
+                    }  
+         
                 }
-            }
 
-            //liberaNoPos(&resultado);
-            qtdeReg++;
+            }
         }
         nroReg++;
+        
     }
 
     fclose(arqBin);
-    //printf("%d - %d = %d\n", nroReg, regRem, qtdeReg);
     binarioNaTela(nomeArqArvore);
 
     return 0;
@@ -151,7 +145,7 @@ int AdicionarRegistroArvore(char *nomeArq, char *nomeArqArvore)
         resultado = BuscarNoArvore(nomeArqArvore, converteNome(registro.nome));
         
         if(resultado.pos != -1) continue;                      // Encontrou já na árvore
-        resultado.no.nroChavesNo++;
+        //resultado.no.nroChavesNo++;
 
         RegistroInfo info;
         info.C = converteNome(registro.nome);

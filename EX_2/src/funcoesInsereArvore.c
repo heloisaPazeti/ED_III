@@ -16,17 +16,14 @@ void InserirArvoreVazia(char *nomeArqArvore, RegistroInfo info)
 
     AlterarCabecalho(nomeArqArvore, '1', 0, 1);
     EscreveNo(nomeArqArvore, no, 0);
+
 }
 
-void InserirNoSemOverflow(char *nomeArqArvore, NoArvBin no, int P, int posInsercao, RegistroInfo info)
+int InserirNoSemOverflow(char *nomeArqArvore, NoArvBin no, int P, int posInsercao, RegistroInfo info)
 {
-    //NoArvBin no = CriarNo();
-    //no.nroChavesNo++;
 
-    //int aux[6];
-    //no.info = OrdenaInfos(no, posInsercao, info, P, aux);
-
-    for(int i = no.nroChavesNo; i > posInsercao; i--){
+    for(int i = no.nroChavesNo; i > posInsercao; i--)
+    {
         no.info[i] = no.info[i-1];
         no.P[i+1] = no.P[i];
     }
@@ -37,11 +34,13 @@ void InserirNoSemOverflow(char *nomeArqArvore, NoArvBin no, int P, int posInserc
 
     if(EscreveNo(nomeArqArvore, no, no.RRNdoNo) == -1)
         printf("ERRO: INSERIR SEM OVERFLOW -> ESCREVE NO\n");
+
+    return 0;
 }
 
-void InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info, int noDireita) {
+int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info, int noDireita) {
 
-    CabecalhoArvBin cabecalho = LerCabecalhoArvore(nomeArqArvore); 
+    CabecalhoArvBin cabecalho = CriarCabecalhoArvBin(); 
     NoArvBin noEsquerdo = CriarNo();
     NoArvBin noDireito = CriarNo();
     RegistroInfo infoPromovida;
@@ -49,6 +48,8 @@ void InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo inf
     RegistroInfo infosOrdenadas[5];
     int pOrdenados[6];
     int i;
+
+    cabecalho = LerCabecalhoArvore(nomeArqArvore);
 
     pOrdenados[0] = resultado.no.P[0];
     
@@ -66,15 +67,8 @@ void InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo inf
         pOrdenados[i+1] = resultado.no.P[i];
     }
 
-    // int pOrdenado[6] = {-1,-1,-1,-1,-1,-1};
-    // for(int i=0; i<5; i++)
-    //     pOrdenado[i] = resultado.no.P[i];
-    // RegistroInfo *infosOrdenadas = OrdenaInfos(resultado.no, resultado.posInsercao, info, noDireita, pOrdenado);
-
-
 
     ///////////////////////////////////////// ADICIONANDO NOS A ESQUERDA E DIREITA
-
     noEsquerdo.info[0] = infosOrdenadas[0];
     noEsquerdo.info[1] = infosOrdenadas[1];
     noEsquerdo.P[0] = pOrdenados[0];
@@ -82,6 +76,7 @@ void InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo inf
     noEsquerdo.P[2] = pOrdenados[2];
     noEsquerdo.nroChavesNo = 2;
     noEsquerdo.folha = resultado.no.folha;
+    noEsquerdo.RRNdoNo = resultado.no.RRNdoNo;
 
     noDireito.info[0] = infosOrdenadas[3];
     noDireito.info[1] = infosOrdenadas[4];
@@ -95,11 +90,13 @@ void InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo inf
     EscreveNo(nomeArqArvore, noEsquerdo, noEsquerdo.RRNdoNo);
     EscreveNo(nomeArqArvore, noDireito, noDireito.RRNdoNo);
 
-    // PARTE DOS P
 
     ///////////////////////////////////////// PROMOCAO
 
     infoPromovida = infosOrdenadas[2];
+
+    //printf("RRN NO ANT: %d\n", resultado.noAnt.RRNdoNo);
+    //printf("RRN NO ANT: %d\n", resultado.noAnt.RRNdoNo);
 
     if(resultado.noAnt.RRNdoNo == -1)       // SEM NO ANTERIOR
     {
@@ -107,20 +104,28 @@ void InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo inf
 
         noRaiz.RRNdoNo = cabecalho.RRNproxNo++;
         noRaiz.folha = '0';
+        noRaiz.nroChavesNo = 1;
         noRaiz.info[0] = infoPromovida;
         noRaiz.P[0] = noEsquerdo.RRNdoNo;
         noRaiz.P[1] = noDireito.RRNdoNo;
+        EscreveNo(nomeArqArvore, noRaiz, noRaiz.RRNdoNo);
+        AlterarCabecalho(nomeArqArvore, '1', noRaiz.RRNdoNo, cabecalho.RRNproxNo);
+        return 0;
     }
-    else if(resultado.noAnt.nroChavesNo < tamCPR)
+    else if(resultado.noAnt.nroChavesNo < tamCPR)       // No anterior sem overflow
     {
         int posicao = EncontraPosicao(resultado.noAnt, infoPromovida);
         InserirNoSemOverflow(nomeArqArvore, resultado.noAnt, noDireito.RRNdoNo, posicao, infoPromovida);
+        AlterarCabecalho(nomeArqArvore, '1', cabecalho.noRaiz, cabecalho.RRNproxNo);
     }
-    else 
+    else                                                // No anterior com overflow
     {
         resultado = BuscarNoArvore(nomeArqArvore, resultado.noAnt.info[0].C);
         resultado.posInsercao = EncontraPosicao(resultado.no, infoPromovida);
         resultado.pos = -1;
+        AlterarCabecalho(nomeArqArvore, '1', cabecalho.noRaiz, cabecalho.RRNproxNo);
         InserirNoComOverflow(nomeArqArvore, resultado, infoPromovida, noDireito.RRNdoNo);
     }
+
+    return 0;
 }
