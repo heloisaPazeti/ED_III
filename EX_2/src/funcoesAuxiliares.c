@@ -152,41 +152,39 @@ NoArvBin AlterarNo(NoArvBin no, char folha, int nroChavesNo, int rrnNo)
 
 //////////////////////////////////////////////////////// ORDENAÇÕES
 
-NoArvBin OrdenaNo(NoArvBin noOriginal, int posInsercao, RegistroInfo info)
-{
-    NoArvBin noFinal = noOriginal;
-    noFinal.info = OrdenaInfos(tamCPR, noOriginal, posInsercao, info);
-    return noFinal;
-}
-
-RegistroInfo* OrdenaInfos(int size, NoArvBin no, int posInsercao, RegistroInfo info)
+RegistroInfo* OrdenaInfos(NoArvBin no, int posInsercao, RegistroInfo info, int P, int *pOrdenado)
 {
     int i;
     RegistroInfo *infosOrdenadas;    
-    infosOrdenadas =  calloc(size, sizeof(RegistroInfo));
+    infosOrdenadas =  calloc(ordemArvore, sizeof(RegistroInfo));
 
-    for(i = 0; i < size; i++)
+    for(i = 0; i < ordemArvore; i++)
     {
         infosOrdenadas[i].C = -1;
         infosOrdenadas[i].PR = -1;
     }
 
-    for(i = 0; i < (no.nroChavesNo); i++)
+    pOrdenado[0] = no.P[0];
+
+    for(i = 0; i < ordemArvore; i++)
     {
         if(i < posInsercao)
         {
             infosOrdenadas[i].C = no.info[i].C;
-            infosOrdenadas[i].PR = no.info[i].PR;       
+            infosOrdenadas[i].PR = no.info[i].PR;
+            pOrdenado[i+1] = no.P[i+1];       
         }
         else if(i == posInsercao)
         {
             infosOrdenadas[i].C = info.C;
-            infosOrdenadas[i].PR = info.PR;       
+            infosOrdenadas[i].PR = info.PR;
+            pOrdenado[i+1] = P;       
         }
         else
         {
             infosOrdenadas[i].C = no.info[i-1].C;
             infosOrdenadas[i].PR = no.info[i-1].PR;  
+            pOrdenado[i+1] = no.P[i];
         }
     }
     

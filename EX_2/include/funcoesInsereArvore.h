@@ -6,11 +6,10 @@
 
 //////////////////////////////////////////////////////// FUNCOES DE INSERCAO
 
-int InserirArvoreVazia(char *nomeArqArvore, char *chave, int pr);
-NoPos InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info);
+void InserirArvoreVazia(char *nomeArqArvore, RegistroInfo info);
+void InserirNoSemOverflow(char *nomeArqArvore, NoArvBin no, int P, int posInsercao, RegistroInfo info);
 //int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info);
 //int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info, int tamListaRRN);
-int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info);
-NoPos PromoveChave(char *nomeArqArvore, int posInsercao, RegistroInfo promovido, NoArvBin noPromocao);
+void InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info, int noDireita);
 
 #endif

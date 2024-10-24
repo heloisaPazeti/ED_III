@@ -28,8 +28,7 @@ NoArvBin AlterarNo(NoArvBin no, char folha, int nroChavesNo, int rrnNo);
 
 //////////////////////////////////////////////////////// ORDENAÇÕES
 
-NoArvBin OrdenaNo(NoArvBin noOriginal, int posInsercao, RegistroInfo info);
-RegistroInfo* OrdenaInfos(int size, NoArvBin no, int posInsercao, RegistroInfo info);
+RegistroInfo* OrdenaInfos(NoArvBin no, int posInsercao, RegistroInfo info, int P, int *pOrdenado);
 
 //////////////////////////////////////////////////////// POSIÇÃO
 
