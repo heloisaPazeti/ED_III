@@ -1,3 +1,6 @@
+#ifndef FUNCOESAUXILIARES_H
+#define FUNCOESAUXILIARES_H
+
 #include "structs.h"
 
 // ========================================================================
@@ -6,3 +9,5 @@
 
 RegDados lerRegistro(FILE *arquivo);
 RegCabecalho lerCabecalho(FILE *arquivo);
+
+#endif

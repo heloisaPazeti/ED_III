@@ -1,3 +1,6 @@
+#ifndef STRUCTS_H
+#define STRUCTS_H
+
 #include <string>
 #include <iostream>
 #include <set>
@@ -41,6 +44,14 @@ typedef struct _cabecalho
 // =========================== CLASSES DO GRAFO ===========================
 // ========================================================================
 
+
+class Presa
+{
+    public:
+        std::string nome;
+        int populacao;
+};
+
 class Vertice
 {
     private: 
@@ -55,9 +66,5 @@ class Vertice
         std::set<Presa> vetorPresa;
 };
 
-class Presa
-{
-    public:
-        std::string nome;
-        int populacao;
-};
+
+#endif

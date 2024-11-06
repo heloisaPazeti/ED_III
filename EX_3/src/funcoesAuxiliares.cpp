@@ -43,6 +43,8 @@ RegDados lerRegistro(FILE *arquivo)
 
         return temp;
     }
+
+    return fim;
 }
 
 RegCabecalho LerCabecalho(FILE *arquivo) 

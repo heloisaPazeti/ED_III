@@ -1,6 +1,6 @@
-#include "include/funcoes.h"
-#include "include/structs.h"
-#include "include/funcoesAuxiliares.h"
+#include "funcoes.h"
+#include "structs.h"
+#include "funcoesAuxiliares.h"
 
 // ========================================================================
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
