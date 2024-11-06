@@ -1,6 +1,10 @@
 #include "structs.h"
 #include <string.h>
 
+// ========================================================================
+// ========================= FUNCOES DE LEITURA ===========================
+// ========================================================================
+
 RegDados lerRegistro(FILE *arquivo)
 {
     RegDados temp, fim;
@@ -39,4 +43,29 @@ RegDados lerRegistro(FILE *arquivo)
 
         return temp;
     }
+}
+
+RegCabecalho LerCabecalho(FILE *arquivo) 
+{
+    RegCabecalho cabecalho;
+
+    if (arquivo == NULL)
+    {
+        printf("Falha no processamento do arquivo [Arq. CSV == NULL]\n");
+        cabecalho.status = '2';
+        return cabecalho;
+    }
+
+    fseek(arquivo, 0, SEEK_SET);
+
+    fread(&cabecalho.status, sizeof(char),1,arquivo);
+    fread(&cabecalho.topo, sizeof(int),1,arquivo);
+    fread(&cabecalho.proxRRN, sizeof(int),1,arquivo);
+    fread(&cabecalho.nroRegRem, sizeof(int),1,arquivo);
+    fread(&cabecalho.nroPagDisco, sizeof(int),1,arquivo);
+    fread(&cabecalho.qttCompacta, sizeof(int),1,arquivo);
+
+    fseek(arquivo, 1600, SEEK_SET);
+
+    return cabecalho;
 }
