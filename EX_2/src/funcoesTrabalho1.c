@@ -1,11 +1,15 @@
-#include "funcoesTrabalho1.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include "structs.h"
 
 //////////////////////////////////////////////////////// LEITURA
 
 RegDados lerRegistro(FILE *arqBin, char *arquivo)
 {
-    RegDados temp, fim;
+    RegDados temp;
     char dado[142], *linha;
+
+    // linha = calloc(142, sizeof(char));
 
     if(ChecarIntegridadeArquivo(arqBin, arquivo) < 0) return temp;
 
@@ -19,22 +23,20 @@ RegDados lerRegistro(FILE *arqBin, char *arquivo)
         fread(&temp.encadeamento, sizeof(int),1,arqBin);
         return temp;
     }
-    if(temp.removido != '1')                                // Caso o campo não tenha sido removido, a leitura dos campos é finalizada
+    if(temp.removido =='0')                                // Caso o campo não tenha sido removido, a leitura dos campos é finalizada
     {
         fread(&temp.encadeamento, sizeof(int),1,arqBin);
         fread(&temp.populacao, sizeof(int),1,arqBin);
         fread(&temp.tamanho, sizeof(float),1,arqBin);
         fread(&temp.unidadeMedida, sizeof(char),1,arqBin);
         fread(&temp.velocidade, sizeof(int), 1,arqBin);
-        fread(dado, sizeof(char), 142, arqBin);
-        /*
+    
         if(fread(dado, sizeof(char), 142, arqBin)==0)      // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
         {
             temp.removido = '2';
             return temp;
         }
-        */
-
+    
         linha = strdup(dado);                               // A string de dados (armazena os campos de tamanho variável) é duplicada
         temp.nome = strsep(&linha, "#");                    // Separação dos dados de acordo com o separador '#'
         temp.especie = strsep(&linha, "#");
@@ -42,6 +44,7 @@ RegDados lerRegistro(FILE *arqBin, char *arquivo)
         temp.tipo = strsep(&linha, "#");
         temp.dieta = strsep(&linha, "#");
         temp.alimento = strsep(&linha, "#");
+
 
         return temp;
     }

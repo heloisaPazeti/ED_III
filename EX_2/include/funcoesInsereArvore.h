@@ -7,9 +7,9 @@
 //////////////////////////////////////////////////////// FUNCOES DE INSERCAO
 
 void InserirArvoreVazia(char *nomeArqArvore, RegistroInfo info);
-void InserirNoSemOverflow(char *nomeArqArvore, NoArvBin no, int P, int posInsercao, RegistroInfo info);
+int InserirNoSemOverflow(char *nomeArqArvore, NoArvBin no, int P, int posInsercao, RegistroInfo info);
 //int InserirNoSemOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info);
 //int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info, int tamListaRRN);
-void InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info, int noDireita);
+int InserirNoComOverflow(char *nomeArqArvore, NoPos resultado, RegistroInfo info, int noDireita);
 
 #endif

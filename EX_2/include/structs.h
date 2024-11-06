@@ -83,8 +83,8 @@ typedef struct _noPos
     int pos;            // Posição i do no em que foi encontrado
     int posInsercao;    // Posição i do no que deveria estar
 
-    int *listaRRN;
-    int tamListaRRN;
+    //int *listaRRN;
+    //int tamListaRRN;
 
 } NoPos;
 
@@ -103,5 +103,4 @@ NoPos CriarNoPos();
 
 //////////////////////////////////////////////////////// DESTRUIDORES ARVORE
 
-void liberaNo(NoArvBin no);
-void liberaNoPos(NoPos *noPos);
+// void liberaNoPos(NoPos *noPos);

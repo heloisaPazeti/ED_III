@@ -42,6 +42,7 @@ RegDados IniciarRegistroDados()
 
 //////////////////////////////////////////////////////// INICIALIZADORES ARVORES
 
+// Inicializa um cabecalho da arvore binaria com valores padroes
 CabecalhoArvBin CriarCabecalhoArvBin()
 {
     CabecalhoArvBin newCabecalho;
@@ -56,6 +57,7 @@ CabecalhoArvBin CriarCabecalhoArvBin()
     return newCabecalho;
 }
 
+// Inicializa um no com valores padroes
 NoArvBin CriarNo()
 {
     NoArvBin newNo;
@@ -80,22 +82,6 @@ NoArvBin CriarNo()
     return newNo;
 }
 
-void liberaNo(NoArvBin no)
-{
-    free(no.P);
-    free(no.info);
-    //free(no);
-}
-
-void liberaNoPos(NoPos *noPos)
-{
-    liberaNo(noPos->no);
-    liberaNo(noPos->noAnt);
-
-    free(noPos->listaRRN);
-    //free(noPos);
-}
-
 NoPos CriarNoPos()
 {
     NoPos noPos;
@@ -107,16 +93,6 @@ NoPos CriarNoPos()
     noPos.pos = -1;
     noPos.posInsercao = -1;
 
-    noPos.tamListaRRN = 0;
-    noPos.listaRRN = calloc(50, sizeof(int));
-
-    /*
-    free(no.P);
-    free(no.info);
-    
-    free(noAnt.P);
-    free(noAnt.info);
-    */
-
     return noPos;
 }
+
