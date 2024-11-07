@@ -12,10 +12,12 @@ int CriarGrafo(char* nomeArq)
     RegDados dado;
 
     arquivo = fopen(nomeArq, "rb");
+    dado = InicializarRegistro(dado);
 
+    fseek(arquivo, 1600, SEEK_SET);
     while(dado.removido != '2')
     {
-        dado = lerRegistro(arquivo);
+        dado = LerRegistro(arquivo);
     }
     return 0;
 }

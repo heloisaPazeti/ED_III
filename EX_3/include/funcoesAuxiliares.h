@@ -4,5 +4,7 @@
 // ========================= FUNCOES DE LEITURA ===========================
 // ========================================================================
 
-RegDados lerRegistro(FILE *arquivo);
-RegCabecalho lerCabecalho(FILE *arquivo);
+RegDados LerRegistro(FILE *arquivo);
+RegCabecalho LerCabecalho(FILE *arquivo);
+
+RegDados InicializarRegistro(RegDados registro);

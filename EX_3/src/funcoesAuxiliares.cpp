@@ -5,10 +5,12 @@
 // ========================= FUNCOES DE LEITURA ===========================
 // ========================================================================
 
-RegDados lerRegistro(FILE *arquivo)
+RegDados LerRegistro(FILE *arquivo)
 {
-    RegDados temp, fim;
+    RegDados temp;
     char dado[142], *linha;
+    
+    temp = InicializarRegistro(temp);
     
     if(fread(&temp.removido, sizeof(char),1,arquivo)==0)    // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
     {
@@ -68,4 +70,21 @@ RegCabecalho LerCabecalho(FILE *arquivo)
     fseek(arquivo, 1600, SEEK_SET);
 
     return cabecalho;
+}
+
+RegDados InicializarRegistro(RegDados registro)
+{
+    registro.removido = '0';
+    registro.encadeamento = -1;
+    registro.populacao = 0;
+    registro.tamanho = 0;
+    registro.unidadeMedida = ' ';
+    registro.alimento = (char*)calloc(160, sizeof(char));
+    registro.dieta = (char*)calloc(160, sizeof(char));
+    registro.especie = (char*)calloc(160, sizeof(char));
+    registro.habitat = (char*)calloc(160, sizeof(char));
+    registro.nome = (char*)calloc(160, sizeof(char));
+    registro.tipo = (char*)calloc(160, sizeof(char));
+
+    return registro;
 }
