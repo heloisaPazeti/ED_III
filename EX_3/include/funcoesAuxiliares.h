@@ -1,3 +1,6 @@
+#ifndef FUNCOESAUXILIARES_H
+#define FUNCOESAUXILIARES_H
+
 #include "structs.h"
 
 // ========================================================================

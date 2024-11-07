@@ -1,12 +1,12 @@
 all: lib main
 
 lib:
-	gcc -c ./src/funcoes.cpp -I ./include -o ./obj/funcoes.o
-	gcc -c ./src/funcoesAuxiliares.cpp -I ./include -o ./obj/funcoesAuxiliares.o
-	gcc -c ./src/structs.c -I ./include -o ./obj/structs.o
+	g++ -c ./src/funcoes.cpp -I ./include -o ./obj/funcoes.o
+	g++ -c ./src/funcoesAuxiliares.cpp -I ./include -o ./obj/funcoesAuxiliares.o
+	g++ -c ./src/structs.cpp -I ./include -o ./obj/structs.o
 
 main:
-	gcc ./main.c ./obj/*.o -I ./include -o ./bin/programa
+	g++ ./main.cpp ./obj/*.o -I ./include -o ./bin/programa
 
 clean:
 	rm ./bin/* ./obj/*

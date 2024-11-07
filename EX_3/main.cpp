@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <stdio.h>
-#include "include/funcoes.h"
+#include "funcoes.h"
 
 int main()
 {
@@ -22,5 +22,8 @@ int main()
         // case 12:
         // case 13:
         // case 14:
+
+        default:
+            std::cout << "Opcao invalida!\n" << std::endl;
     }
 }
