@@ -57,6 +57,16 @@ class Presa
             _populacaoPredador = populacao;
         }
 
+        std::string Nome()
+        {
+            return _nome;
+        }
+
+        int Populacao()
+        {
+            return _populacaoPredador;
+        }
+
     friend bool operator<(const Presa p1, const Presa p2) {return p1._nome < p2._nome;}
 };
 
@@ -72,6 +82,7 @@ class Vertice
         int _grauSaida;
         int _grau;
         std::set<Presa> _vetorPresa;
+        std::set<Presa>::iterator _it;
     public:
         Vertice(char* nome, char* especie, char* habitat, char* dieta, char* tipo)
         {
@@ -99,22 +110,31 @@ class Vertice
 
         void InserirPresa(std::string nome, int populacao)
         {
+            std::pair<std::set<Presa>::iterator, bool> par;
             Presa presa(nome, populacao);
-            _vetorPresa.insert(presa);
+            par = _vetorPresa.insert(presa);
+            _it = par.first;
         }
 
-        std::string Nome()
+        std::string Nome() const
         {
             return _nome;
         }
 
         void MostrarVertice()
         {
-            std::cout <<  _nome << std::endl;
-            std::cout <<  _especie << std::endl;
-            std::cout <<  _habitat << std::endl;
-            std::cout <<  _dieta << std::endl;
+            std::set<Presa>::iterator it;
+            for(it = _vetorPresa.begin(); it!=_vetorPresa.end(); it++)
+            {
+                Presa ans = *it;
+                if(ans.Populacao()!=-1)
+                    std::cout <<  _nome << " " << _especie << " " << _habitat << " " << _dieta << " " << _tipo << " " << _grauEntrada 
+                    << " " << _grauSaida << " " << _grau << " " << ans.Nome() << " " << ans.Populacao() <<  std::endl;
+            }
+            
         }
+
+        friend bool operator==(const Vertice v1, const Vertice v2) {return v1.Nome() == v2.Nome();}
 
         friend bool operator<(const Vertice v1, const Vertice v2) {return v1._nome < v2._nome;}
 };

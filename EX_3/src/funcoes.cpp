@@ -6,11 +6,6 @@
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
 // ========================================================================
 
-bool Comparar(Vertice a, Vertice b) 
-{
-    return a.Nome() < b.Nome();
-}
-
 int CriarGrafo(std::string nomeArq)
 {
     FILE *arquivo;
@@ -21,7 +16,7 @@ int CriarGrafo(std::string nomeArq)
 
     arquivo = fopen(nomeArq.c_str(), "rb");
 
-    dado = InicializarRegistro(dado);
+    dado = InicializarRegistro();
 
     fseek(arquivo, 1600, 0);
 
@@ -30,7 +25,6 @@ int CriarGrafo(std::string nomeArq)
         dado = LerRegistro(arquivo);
         
         Vertice novoVertice(dado.nome, dado.especie, dado.habitat, dado.dieta, dado.tipo);
-        novoVertice.MostrarVertice();
         it = vetorVertices.find(novoVertice);
 
         if(it!=vetorVertices.end())   // Se o vértice já existe
@@ -51,21 +45,18 @@ int CriarGrafo(std::string nomeArq)
 
     fseek(arquivo, 1600, 0);
 
+    dado = InicializarRegistro();
+
     while(dado.removido != '2')
     {
         dado = LerRegistro(arquivo);
-        
-        Vertice novoVertice(dado.nome, dado.especie, dado.habitat, dado.dieta, dado.tipo);
         Vertice alimento(dado.alimento, dado.especie, dado.habitat, dado.dieta, dado.tipo);
-
-        novoVertice.MostrarVertice();
         it = vetorVertices.find(alimento);
 
         if(it!=vetorVertices.end())   // Se o vértice já existe
-        {
+        {   
             Vertice aux = *it;
-            aux.InserirPresa(dado.especie, dado.populacao);
-            aux.AumentarGrauSaida();
+            aux.AumentarGrauEntrada();
 
             vetorVertices.erase(*it);
             vetorVertices.insert(aux);
@@ -73,6 +64,8 @@ int CriarGrafo(std::string nomeArq)
     } 
 
     fclose(arquivo);
+
+    MostrarGrafo(vetorVertices);
 
     return 0;
 }

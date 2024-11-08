@@ -11,7 +11,7 @@ RegDados LerRegistro(FILE *arquivo)
     RegDados temp;
     char dado[142], *linha;
     
-    temp = InicializarRegistro(temp);
+    temp = InicializarRegistro();
     
     if(fread(&temp.removido, sizeof(char),1,arquivo)==0)    // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
     {
@@ -45,8 +45,6 @@ RegDados LerRegistro(FILE *arquivo)
 
     }
 
-    printf("\n\n");
-
     return temp;
 }
 
@@ -75,8 +73,10 @@ RegCabecalho LerCabecalho(FILE *arquivo)
     return cabecalho;
 }
 
-RegDados InicializarRegistro(RegDados registro)
+RegDados InicializarRegistro()
 {
+    RegDados registro;
+
     registro.removido = '0';
     registro.encadeamento = -1;
     registro.populacao = 0;
@@ -92,3 +92,14 @@ RegDados InicializarRegistro(RegDados registro)
     return registro;
 }
 
+void MostrarGrafo(std::set<Vertice> vetorVertices)
+{
+    std::set<Vertice>::iterator it;
+    
+    for(it = vetorVertices.begin(); it!=vetorVertices.end(); it++)
+    {
+        Vertice ans = *it;
+        if(ans.Nome() != "")
+            ans.MostrarVertice();
+    }
+}

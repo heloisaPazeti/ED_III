@@ -13,8 +13,8 @@ RegCabecalho LerCabecalho(FILE *arquivo);
 // ========================================================================
 // ====================== FUNCOES DE INICIALIZAÇAO ========================
 // ========================================================================
-RegDados InicializarRegistro(RegDados registro);
+RegDados InicializarRegistro();
 
-// bool Comparar(Vertice a, Vertice b);
+void MostrarGrafo(std::set<Vertice> vetorVertices);
 
 #endif

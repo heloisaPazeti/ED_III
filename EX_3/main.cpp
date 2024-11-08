@@ -18,7 +18,6 @@ int main()
     switch(n)
     {
         case 10:
-            std::cout << "aaaaaaaaaa" << std::endl;
             CriarGrafo(nomeArq);
             break;
 
