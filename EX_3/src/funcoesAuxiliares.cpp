@@ -46,7 +46,6 @@ RegDados LerRegistro(FILE *arquivo)
         return temp;
     }
 
-    return fim;
 }
 
 RegCabecalho LerCabecalho(FILE *arquivo) 
@@ -89,4 +88,9 @@ RegDados InicializarRegistro(RegDados registro)
     registro.tipo = (char*)calloc(160, sizeof(char));
 
     return registro;
+}
+
+bool Comparar(std::string a, std::string b) 
+{
+    return a < b;
 }
