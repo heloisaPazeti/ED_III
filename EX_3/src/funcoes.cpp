@@ -1,15 +1,17 @@
 #include "funcoes.h"
 #include "structs.h"
 #include "funcoesAuxiliares.h"
-#include <iostream>
-#include <string>
-#include <set>
 
 // ========================================================================
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
 // ========================================================================
 
-int CriarGrafo(char* nomeArq)
+bool Comparar(Vertice a, Vertice b) 
+{
+    return a.Nome() < b.Nome();
+}
+
+int CriarGrafo(std::string nomeArq)
 {
     FILE *arquivo;
     RegDados dado;
@@ -17,32 +19,61 @@ int CriarGrafo(char* nomeArq)
     std::set<Vertice>::iterator it;
     int tam;
 
-    arquivo = fopen(nomeArq, "rb");
+    arquivo = fopen(nomeArq.c_str(), "rb");
+
     dado = InicializarRegistro(dado);
 
-    fseek(arquivo, 1600, SEEK_SET);
+    fseek(arquivo, 1600, 0);
+
     while(dado.removido != '2')
     {
-        tam = vetorVertices.size();
         dado = LerRegistro(arquivo);
+        
         Vertice novoVertice(dado.nome, dado.especie, dado.habitat, dado.dieta, dado.tipo);
-        vetorVertices.insert(novoVertice);
+        novoVertice.MostrarVertice();
+        it = vetorVertices.find(novoVertice);
 
-        if(tam==vetorVertices.size())   // Se o tamanho continua o mesmo, o vértice já existe
+        if(it!=vetorVertices.end())   // Se o vértice já existe
         {
-            it = vetorVertices.find(novoVertice);
             Vertice aux = *it;
-            aux.InserirPresa(dado.alimento);
+            aux.InserirPresa(dado.alimento, dado.populacao);
             aux.AumentarGrauSaida();
 
-            aux.MostrarVertice();
-            // procurar presa no vetor de predadores p/ aumentar grau de entrada
+            vetorVertices.erase(*it);
+            vetorVertices.insert(aux);
         }
-        else                            // Se o tamanho muda, o vértice é novo e deve-se criar um novo set de presas
+        else                            // Se o vértice é novo, deve-se criar um novo set de presas
         {
-
+            novoVertice.InserirPresa(dado.alimento, dado.populacao);
+            vetorVertices.insert(novoVertice);
         }
     } 
+
+    fseek(arquivo, 1600, 0);
+
+    while(dado.removido != '2')
+    {
+        dado = LerRegistro(arquivo);
+        
+        Vertice novoVertice(dado.nome, dado.especie, dado.habitat, dado.dieta, dado.tipo);
+        Vertice alimento(dado.alimento, dado.especie, dado.habitat, dado.dieta, dado.tipo);
+
+        novoVertice.MostrarVertice();
+        it = vetorVertices.find(alimento);
+
+        if(it!=vetorVertices.end())   // Se o vértice já existe
+        {
+            Vertice aux = *it;
+            aux.InserirPresa(dado.especie, dado.populacao);
+            aux.AumentarGrauSaida();
+
+            vetorVertices.erase(*it);
+            vetorVertices.insert(aux);
+        }
+    } 
+
+    fclose(arquivo);
+
     return 0;
 }
 

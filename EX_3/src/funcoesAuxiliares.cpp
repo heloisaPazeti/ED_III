@@ -1,4 +1,5 @@
 #include "structs.h"
+#include "funcoesAuxiliares.h"
 #include <string.h>
 
 // ========================================================================
@@ -15,12 +16,10 @@ RegDados LerRegistro(FILE *arquivo)
     if(fread(&temp.removido, sizeof(char),1,arquivo)==0)    // Caso a leitura falhe, o campo de remoção recebe um valor logicamente inválido
     {
         temp.removido = '2';
-        return temp;
     }    
     if(temp.removido == '1')                                // Caso o registro tenha sido removido, não completa a leitura e retorna 
     {
         fread(&temp.encadeamento, sizeof(int),1,arquivo);
-        return temp;
     }
     if(temp.removido != '1')                                // Caso o campo não tenha sido removido, a leitura dos campos é finalizada
     {
@@ -43,9 +42,12 @@ RegDados LerRegistro(FILE *arquivo)
         temp.dieta = strsep(&linha, "#");
         temp.alimento = strsep(&linha, "#");
 
-        return temp;
+
     }
 
+    printf("\n\n");
+
+    return temp;
 }
 
 RegCabecalho LerCabecalho(FILE *arquivo) 
@@ -90,7 +92,3 @@ RegDados InicializarRegistro(RegDados registro)
     return registro;
 }
 
-bool Comparar(std::string a, std::string b) 
-{
-    return a < b;
-}

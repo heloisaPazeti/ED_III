@@ -15,6 +15,6 @@ RegCabecalho LerCabecalho(FILE *arquivo);
 // ========================================================================
 RegDados InicializarRegistro(RegDados registro);
 
-bool Comparar(std::string a, std::string b);
+// bool Comparar(Vertice a, Vertice b);
 
 #endif
