@@ -7,7 +7,8 @@
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
 // ========================================================================
 
-int CriarGrafo(std::string nomeArq);
+std::set<Vertice> CriarGrafo(std::string nomeArq);
+int BuscarGrafo(std::string nomeArq);
 
 // ========================================================================
 // ==================== FUNCOES DE BUSCA GRAFO (11) =======================

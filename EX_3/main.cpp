@@ -6,19 +6,27 @@
 #include <iostream>
 #include <string>
 #include <stdio.h>
+#include <set>
+#include "funcoesAuxiliares.h"
 #include "funcoes.h"
+#include "structs.h"
 
 int main()
 {
     int n;
     std::string nomeArq;
+    std::set<Vertice> vetorVertices;
     
     std::cin >> n >> nomeArq;
 
     switch(n)
     {
         case 10:
-            CriarGrafo(nomeArq);
+            vetorVertices =  CriarGrafo(nomeArq);
+            MostrarGrafo(vetorVertices);
+            break;
+        case 11:
+            BuscarGrafo(nomeArq);
             break;
 
         default:

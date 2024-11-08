@@ -17,4 +17,7 @@ RegDados InicializarRegistro();
 
 void MostrarGrafo(std::set<Vertice> vetorVertices);
 
+void scan_quote_string(char *str);
+
+
 #endif

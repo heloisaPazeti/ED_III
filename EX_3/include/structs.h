@@ -134,6 +134,16 @@ class Vertice
             
         }
 
+        std::string BuscarPresa(std::string nomePresa)
+        {
+            Presa presa(nomePresa, 0);
+            std::set<Presa>::iterator it = _vetorPresa.find(presa);
+            if(it != _vetorPresa.end())
+                return _nome;
+            else 
+                return "-1";
+        }
+
         friend bool operator==(const Vertice v1, const Vertice v2) {return v1.Nome() == v2.Nome();}
 
         friend bool operator<(const Vertice v1, const Vertice v2) {return v1._nome < v2._nome;}
