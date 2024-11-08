@@ -6,6 +6,7 @@
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
 // ========================================================================
 
+// Cria um grafo em forma de lista de adjacências a partir de dados lidos de um arquivo binário
 std::set<Vertice> CriarGrafo(std::string nomeArq)
 {
     FILE *arquivo;
@@ -14,20 +15,20 @@ std::set<Vertice> CriarGrafo(std::string nomeArq)
     std::set<Vertice>::iterator it;
     int tam;
 
-    arquivo = fopen(nomeArq.c_str(), "rb");
+    arquivo = fopen(nomeArq.c_str(), "rb");         // Abre o arquivo
 
-    dado = InicializarRegistro();
+    dado = InicializarRegistro();                   // Inicializa o registro com valores padrão
 
-    fseek(arquivo, 1600, 0);
+    fseek(arquivo, 1600, 0);                        // Posiciona o cursor
 
-    while(dado.removido != '2')
+    while(dado.removido != '2')                     // Percorre o arquivo
     {
-        dado = LerRegistro(arquivo);
+        dado = LerRegistro(arquivo);                // Lê um registro
         
-        Vertice novoVertice(dado.nome, dado.especie, dado.habitat, dado.dieta, dado.tipo);
-        it = vetorVertices.find(novoVertice);
+        Vertice novoVertice(dado.nome, dado.especie, dado.habitat, dado.dieta, dado.tipo);  // Inicializa um vértice
+        it = vetorVertices.find(novoVertice);       // Verifica se o vértice já existe
 
-        if(it!=vetorVertices.end())   // Se o vértice já existe
+        if(it!=vetorVertices.end())                 // Se o vértice já existe, atualiza os dados
         {
             Vertice aux = *it;
             aux.InserirPresa(dado.alimento, dado.populacao);
@@ -36,24 +37,24 @@ std::set<Vertice> CriarGrafo(std::string nomeArq)
             vetorVertices.erase(*it);
             vetorVertices.insert(aux);
         }
-        else                            // Se o vértice é novo, deve-se criar um novo set de presas
+        else                                        // Se o vértice não existe, ele é criado
         {
             novoVertice.InserirPresa(dado.alimento, dado.populacao);
             vetorVertices.insert(novoVertice);
         }
     } 
 
-    fseek(arquivo, 1600, 0);
+    fseek(arquivo, 1600, 0);                        // Reposiciona o cursor ao final do cabeçalho para ma nova leitura
 
-    dado = InicializarRegistro();
+    dado = InicializarRegistro();                   // Inicializa a variável de registro
 
-    while(dado.removido != '2')
+    while(dado.removido != '2')                     // Percorre o arquivo
     {
-        dado = LerRegistro(arquivo);
-        Vertice alimento(dado.alimento, dado.especie, dado.habitat, dado.dieta, dado.tipo);
-        it = vetorVertices.find(alimento);
+        dado = LerRegistro(arquivo);                // Lê um registro
+        Vertice alimento(dado.alimento, dado.especie, dado.habitat, dado.dieta, dado.tipo); // Cria um vértice com o nome do alimento do predador (as demais informações são irrelevantes e incorretas)
+        it = vetorVertices.find(alimento);          // Verifica se a presa do predador é também um predador       
 
-        if(it!=vetorVertices.end())   // Se o vértice já existe
+        if(it!=vetorVertices.end())   // Se a presa for um predador, atualiza o vértice
         {   
             Vertice aux = *it;
             aux.AumentarGrauEntrada();
@@ -72,6 +73,7 @@ std::set<Vertice> CriarGrafo(std::string nomeArq)
 // ==================== FUNCOES DE BUSCA GRAFO (11) =======================
 // ========================================================================
 
+// Busca n nomes em um grafo implementado como lista de adjacências
 int BuscarGrafo(std::string nomeArq)
 {
     int i, n;
@@ -87,17 +89,17 @@ int BuscarGrafo(std::string nomeArq)
 
     for(i=0; i<n; i++)
     {
-        scan_quote_string(nomePresa);
-        encontrados = 0;
+        scan_quote_string(nomePresa);           // Lê o nome a ser buscado
+        encontrados = 0;                        // O número de predadores encontrados inicia em 0
         std::string nome = nomePresa;
 
-        // Percorre os vértices
+        // Percorre os vértices da lista
         for(itVertice = vetorVertices.begin(); itVertice!=vetorVertices.end(); itVertice++)
         {
             Vertice ans = *itVertice;
-            nomePredador = ans.BuscarPresa(nome);
+            nomePredador = ans.BuscarPresa(nome);             // Busca o nome da presa entre as presas do predador 
 
-            if(nomePredador != "-1" && encontrados == 0)      // Encontrou a presa
+            if(nomePredador != "-1" && encontrados == 0)      // Encontrou a presa 
             {
                 std::cout << nomePresa << ": ";
                 std::cout << nomePredador;
@@ -115,7 +117,7 @@ int BuscarGrafo(std::string nomeArq)
             
         }
 
-        if(encontrados == 0)
+        if(encontrados == 0)                                // Não encontrou a presa
             std::cout << "Registro Inexistente.";
 
         std::cout << std::endl;
