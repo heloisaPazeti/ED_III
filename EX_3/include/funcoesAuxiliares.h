@@ -7,17 +7,21 @@
 // ========================= FUNCOES DE LEITURA ===========================
 // ========================================================================
 
+void scan_quote_string(char *str);
 RegDados LerRegistro(FILE *arquivo);
 RegCabecalho LerCabecalho(FILE *arquivo);
 
 // ========================================================================
 // ====================== FUNCOES DE INICIALIZAÇAO ========================
 // ========================================================================
+
 RegDados InicializarRegistro();
 
-void MostrarGrafo(std::set<Vertice> vetorVertices);
+// ========================================================================
+// ======================== FUNCOES DE IMPRESSAO ==========================
+// ========================================================================
 
-void scan_quote_string(char *str);
+void MostrarGrafo(std::set<Vertice> vetorVertices);
 
 
 #endif

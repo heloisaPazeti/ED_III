@@ -89,7 +89,7 @@ class Vertice
         std::set<Presa> _vetorPresa;
         std::set<Presa>::iterator _it;
     public:
-        Vertice(char* nome = "", char* especie = "", char* habitat = "", char* dieta = "", char* tipo = "")
+        Vertice(char* nome, char* especie, char* habitat, char* dieta, char* tipo)
         {
             _nome = nome;
             _especie = especie;
@@ -167,6 +167,19 @@ class Vertice
 
         friend bool operator==(const Vertice v1, const Vertice v2) {return v1._nome == v2._nome;}
         friend bool operator<(const Vertice v1, const Vertice v2) {return v1._nome < v2._nome;}
+
+        friend std::ostream& operator<<(std::ostream &out, const std::set<Vertice> &vetorVertices) 
+        {
+            out << "Tamanho: " << vetorVertices.size() << "\n";
+            std::set<Vertice>::iterator itVertice;
+            for(itVertice = vetorVertices.begin(); itVertice!=vetorVertices.end(); itVertice++)
+                out << (*itVertice).Nome() << ' ';
+
+            //for (Vertice const& vertice : verticeList)
+              //  out << vertice.Nome() << ' ';
+
+            return out;
+        }
 };
 
 

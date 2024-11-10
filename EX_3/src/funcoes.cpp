@@ -1,8 +1,6 @@
 #include "funcoes.h"
 #include "structs.h"
 #include "funcoesAuxiliares.h"
-#include <stack>
-#include <vector>
 
 // ========================================================================
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
@@ -148,16 +146,19 @@ int BuscarGrafo(std::string nomeArq)
     Se atingiu final da recStack -> nao tem ciclo
 
 */
-bool BuscarCiclo(std::string nomeArq) 
+int BuscarCiclo(std::string nomeArq) 
 {
-    int i;
-    Vertice v;
+    int i = 0;
     std::set<Vertice> recStack;
     std::set<Vertice> visitados;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
-    v = *vetorVertices.begin();
+
+
+    Vertice v = *vetorVertices.begin();
+    std::cout << "NOME: " << v.Nome();
     recStack.insert(v);
+    std::cout << recStack << std::endl;
 
     while(!recStack.empty())
     {
@@ -170,16 +171,23 @@ bool BuscarCiclo(std::string nomeArq)
             presa = *p;                                                 // Pega-se referência
             Vertice vTemp(presa.Nome());                                // Cria-se um vertice temporario
 
-            if(visitados.find(vTemp) != visitados.end()) return true;   // Se adjacencia já foi visitada -> tem ciclo
-            recStack.insert(recStack.begin(), vTemp);                   // Adiciona no inicio da rec stack se não estiver
+            if(visitados.find(vTemp) != visitados.end()) 
+                i++;                                                    // Se adjacencia já foi visitada -> tem ciclo
+            else
+                recStack.insert(recStack.begin(), vTemp);                   // Adiciona no inicio da rec stack se não estiver
         }
 
-        visitados.insert(v);                                            // Coloca que visitou esse vertice
+        auto pair = visitados.insert(v);                                            // Coloca que visitou esse vertice
         recStack.erase(v);                                              // Apaga esse vertice da reckStack
-        v = *recStack.begin();                                          // O vertice eh o topo da pilha
+        if(!recStack.empty())
+            v = *recStack.begin();                                      // O vertice eh o topo da pilha
+
+        std::cout << visitados << std::endl;
+        std::cout << recStack << std::endl;
     }
 
-    return false;
+    std::cout << "Quantidade de ciclos:" << i << std::endl;
+    return i;
 }
 
 // ========================================================================

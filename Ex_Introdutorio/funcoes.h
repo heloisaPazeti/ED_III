@@ -1,3 +1,6 @@
+#ifndef FUNCOES_H
+#define FUNCOES_H
+
 //////////////////////////////////////////// TAMANHO REGISTROS
 
 #define idSize 4
@@ -9,5 +12,7 @@ int registrarEspecie(char  *nomeArq);
 int relatorioEspecies(char *nomeArq);
 int buscarEspecie(char *nomeArq);
 int registrarInformacao(char *nomeArq);
+
+#endif
 
 
