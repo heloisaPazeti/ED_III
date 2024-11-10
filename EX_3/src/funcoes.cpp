@@ -1,6 +1,8 @@
 #include "funcoes.h"
 #include "structs.h"
 #include "funcoesAuxiliares.h"
+#include <stack>
+#include <vector>
 
 // ========================================================================
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
@@ -130,6 +132,77 @@ int BuscarGrafo(std::string nomeArq)
 // ========================================================================
 // ==================== FUNCOES DE CICLO GRAFO (12) =======================
 // ========================================================================
+
+bool BuscarCiclo(std::string nomeArq) 
+{
+    std::stack<Vertice> recStack;
+    std::vector<Vertice> vitados;
+    std::set<Vertice>::iterator itVertice;
+    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
+
+    // Pegar um vertice x
+        // Adicionar x na recStack (pilha)
+        // Trocar a cor de x para preto
+        // Adicionar adjacente na recStack
+
+        // Se adjacente -> cor = branco -> troca pra cinza, bota na recStack
+        // Se adjacente -> cor = cinza  -> nao faz nada
+        // Se adjacente -> cor = preta  -> adjacente esta na recStack?
+            // Sim -> tem ciclo
+
+        // Assim que acabar -> topo da pilha refaz.
+        // Se atingiu final da recStack -> nao tem ciclo
+        
+
+
+    // Supondo o grafo com as conexoes - sem ciclos
+
+    // A -> B
+    // A -> C
+    // B -> C
+
+    // A -> cor preta
+    // B -> cor cinza
+    // C -> cor cinza
+
+    // RecStack (pilha) -> [A][B][C]
+    // Prox -> [C]
+
+    // C -> cor preta
+   
+    // RecStack (pilha) -> [B]
+
+    // B -> cor preta
+    // C -> ja eh preto, mas n esta na rec stack
+
+    // fim da reck stack -> sem ciclo
+    // -------------------------------------------------
+
+    // Supondo o grafo com as conexoes - com ciclos
+
+    // A -> B
+    // A -> C
+    // B -> C
+    // C -> B
+
+    // Visitados (lista) -> [A]
+    // RecStack (pilha)  -> [B][C]
+    // Prox -> [C]
+   
+    // C -> cor preta
+    // B -> cinza -> n faz nada
+
+    // Visitados (lista) -> [A][C]
+    // RecStack (pilha)  -> [B]
+    // Prox -> [B]
+
+    // B -> cor preta
+    // C -> ja eh preto, ja foi visitado -> tem ciclo
+
+
+
+    return false;
+}
 
 // ========================================================================
 // ==================== FUNCOES DE CONEXO GRAFO (13) ======================

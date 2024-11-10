@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define branco 0
+#define cinza  1
+#define preto  2
+
 // ========================================================================
 // ========================= STRUCTS DOS REGISTROS ========================
 // ========================================================================
@@ -81,6 +85,7 @@ class Vertice
         int _grauEntrada; 
         int _grauSaida;
         int _grau;
+        int _cor;
         std::set<Presa> _vetorPresa;
         std::set<Presa>::iterator _it;
     public:
@@ -94,6 +99,7 @@ class Vertice
             _grauEntrada = 0;
             _grauSaida = 1;
             _grau = 1;
+            _cor = branco;
         }
 
         void AumentarGrauEntrada()
@@ -108,6 +114,8 @@ class Vertice
             ++_grau;
         }
 
+        std::string Nome() const { return _nome; }
+        
         void InserirPresa(std::string nome, int populacao)
         {
             std::pair<std::set<Presa>::iterator, bool> par;
@@ -116,10 +124,6 @@ class Vertice
             _it = par.first;
         }
 
-        std::string Nome() const
-        {
-            return _nome;
-        }
 
         void MostrarVertice()
         {
@@ -144,8 +148,7 @@ class Vertice
                 return "-1";
         }
 
-        friend bool operator==(const Vertice v1, const Vertice v2) {return v1.Nome() == v2.Nome();}
-
+        friend bool operator==(const Vertice v1, const Vertice v2) {return v1._nome == v2._nome;}
         friend bool operator<(const Vertice v1, const Vertice v2) {return v1._nome < v2._nome;}
 };
 
