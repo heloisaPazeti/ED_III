@@ -133,73 +133,51 @@ int BuscarGrafo(std::string nomeArq)
 // ==================== FUNCOES DE CICLO GRAFO (12) =======================
 // ========================================================================
 
+ /* == Procura se ha ciclos ou nao ==
+ 
+    Pegar um vertice x
+    Adicionar adjacentes de x na recStack
+
+    Se adjacente -> esta nos visitados (preto) -> tem ciclo
+    Se adjacente -> n esta na recStack (branco) -> adiciona na RecStack
+    Se adjacente -> esta na reckStack, mas n nos visitados (cinza) -> nao faz nada
+
+    Adicionar x nos visitados
+    Remove x da recStack
+    Assim que acabar -> topo da pilha -> refaz.
+    Se atingiu final da recStack -> nao tem ciclo
+
+*/
 bool BuscarCiclo(std::string nomeArq) 
 {
-    std::stack<Vertice> recStack;
-    std::vector<Vertice> vitados;
-    std::set<Vertice>::iterator itVertice;
+    int i;
+    Vertice v;
+    std::set<Vertice> recStack;
+    std::set<Vertice> visitados;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
-    // Pegar um vertice x
-        // Adicionar x na recStack (pilha)
-        // Trocar a cor de x para preto
-        // Adicionar adjacente na recStack
+    v = *vetorVertices.begin();
+    recStack.insert(v);
 
-        // Se adjacente -> cor = branco -> troca pra cinza, bota na recStack
-        // Se adjacente -> cor = cinza  -> nao faz nada
-        // Se adjacente -> cor = preta  -> adjacente esta na recStack?
-            // Sim -> tem ciclo
+    while(!recStack.empty())
+    {
+        Presa presa;
+        std::set<Presa>::iterator p;
+        std::set<Presa> presas = v.Adjacencias();  
 
-        // Assim que acabar -> topo da pilha refaz.
-        // Se atingiu final da recStack -> nao tem ciclo
-        
+        for(p = presas.begin(); p != presas.end(); p++)                 // Para cada presa na lista de adjacencias
+        {
+            presa = *p;                                                 // Pega-se referência
+            Vertice vTemp(presa.Nome());                                // Cria-se um vertice temporario
 
+            if(visitados.find(vTemp) != visitados.end()) return true;   // Se adjacencia já foi visitada -> tem ciclo
+            recStack.insert(recStack.begin(), vTemp);                   // Adiciona no inicio da rec stack se não estiver
+        }
 
-    // Supondo o grafo com as conexoes - sem ciclos
-
-    // A -> B
-    // A -> C
-    // B -> C
-
-    // A -> cor preta
-    // B -> cor cinza
-    // C -> cor cinza
-
-    // RecStack (pilha) -> [A][B][C]
-    // Prox -> [C]
-
-    // C -> cor preta
-   
-    // RecStack (pilha) -> [B]
-
-    // B -> cor preta
-    // C -> ja eh preto, mas n esta na rec stack
-
-    // fim da reck stack -> sem ciclo
-    // -------------------------------------------------
-
-    // Supondo o grafo com as conexoes - com ciclos
-
-    // A -> B
-    // A -> C
-    // B -> C
-    // C -> B
-
-    // Visitados (lista) -> [A]
-    // RecStack (pilha)  -> [B][C]
-    // Prox -> [C]
-   
-    // C -> cor preta
-    // B -> cinza -> n faz nada
-
-    // Visitados (lista) -> [A][C]
-    // RecStack (pilha)  -> [B]
-    // Prox -> [B]
-
-    // B -> cor preta
-    // C -> ja eh preto, ja foi visitado -> tem ciclo
-
-
+        visitados.insert(v);                                            // Coloca que visitou esse vertice
+        recStack.erase(v);                                              // Apaga esse vertice da reckStack
+        v = *recStack.begin();                                          // O vertice eh o topo da pilha
+    }
 
     return false;
 }

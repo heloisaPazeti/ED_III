@@ -55,7 +55,7 @@ class Presa
         std::string _nome;
         int _populacaoPredador;
 
-        Presa(std::string nome, int populacao)
+        Presa(std::string nome = "", int populacao = 0)
         {
             _nome = nome;
             _populacaoPredador = populacao;
@@ -89,7 +89,7 @@ class Vertice
         std::set<Presa> _vetorPresa;
         std::set<Presa>::iterator _it;
     public:
-        Vertice(char* nome, char* especie, char* habitat, char* dieta, char* tipo)
+        Vertice(char* nome = "", char* especie = "", char* habitat = "", char* dieta = "", char* tipo = "")
         {
             _nome = nome;
             _especie = especie;
@@ -99,6 +99,19 @@ class Vertice
             _grauEntrada = 0;
             _grauSaida = 1;
             _grau = 1;
+            _cor = branco;
+        }
+
+        Vertice(std::string nome)
+        {
+            _nome = nome;
+            _especie = "";
+            _habitat = "";
+            _dieta = "";
+            _tipo = "";
+            _grauEntrada = -1;
+            _grauSaida = -1;
+            _grau = -1;
             _cor = branco;
         }
 
@@ -147,6 +160,10 @@ class Vertice
             else 
                 return "-1";
         }
+
+        void MudarCor(int cor) { _cor = cor; }
+        int Cor() { return _cor; }
+        std::set<Presa> Adjacencias() { return _vetorPresa; }
 
         friend bool operator==(const Vertice v1, const Vertice v2) {return v1._nome == v2._nome;}
         friend bool operator<(const Vertice v1, const Vertice v2) {return v1._nome < v2._nome;}
