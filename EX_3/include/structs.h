@@ -7,10 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define branco 0
-#define cinza  1
-#define preto  2
-
 // ========================================================================
 // ========================= STRUCTS DOS REGISTROS ========================
 // ========================================================================
@@ -55,7 +51,7 @@ class Presa
         std::string _nome;
         int _populacaoPredador;
 
-        Presa(std::string nome = "", int populacao = 0)
+        Presa(std::string nome, int populacao)
         {
             _nome = nome;
             _populacaoPredador = populacao;
@@ -85,7 +81,6 @@ class Vertice
         int _grauEntrada; 
         int _grauSaida;
         int _grau;
-        int _cor;
         std::set<Presa> _vetorPresa;
         std::set<Presa>::iterator _it;
     public:
@@ -99,21 +94,9 @@ class Vertice
             _grauEntrada = 0;
             _grauSaida = 1;
             _grau = 1;
-            _cor = branco;
         }
 
-        Vertice(std::string nome)
-        {
-            _nome = nome;
-            _especie = "";
-            _habitat = "";
-            _dieta = "";
-            _tipo = "";
-            _grauEntrada = -1;
-            _grauSaida = -1;
-            _grau = -1;
-            _cor = branco;
-        }
+        Vertice(std::string nome) { _nome = nome; }
 
         void AumentarGrauEntrada()
         {
@@ -161,22 +144,22 @@ class Vertice
                 return "-1";
         }
 
-        void MudarCor(int cor) { _cor = cor; }
-        int Cor() { return _cor; }
-        std::set<Presa> Adjacencias() { return _vetorPresa; }
+        std::set<Presa> Adjacencias() { 
+            
+            auto it = _vetorPresa.begin();
+            Presa p = *it;
+            
+            return _vetorPresa; 
+        }
 
         friend bool operator==(const Vertice v1, const Vertice v2) {return v1._nome == v2._nome;}
         friend bool operator<(const Vertice v1, const Vertice v2) {return v1._nome < v2._nome;}
 
         friend std::ostream& operator<<(std::ostream &out, const std::set<Vertice> &vetorVertices) 
         {
-            out << "Tamanho: " << vetorVertices.size() << "\n";
             std::set<Vertice>::iterator itVertice;
             for(itVertice = vetorVertices.begin(); itVertice!=vetorVertices.end(); itVertice++)
-                out << (*itVertice).Nome() << ' ';
-
-            //for (Vertice const& vertice : verticeList)
-              //  out << vertice.Nome() << ' ';
+                out << "-> " << (*itVertice).Nome() << "\n";
 
             return out;
         }

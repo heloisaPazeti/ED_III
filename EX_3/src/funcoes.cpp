@@ -146,49 +146,50 @@ int BuscarGrafo(std::string nomeArq)
     Se atingiu final da recStack -> nao tem ciclo
 
 */
+
+
 int BuscarCiclo(std::string nomeArq) 
 {
     int i = 0;
+    std::set<Vertice>::iterator it;
     std::set<Vertice> recStack;
     std::set<Vertice> visitados;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
-
-
-    Vertice v = *vetorVertices.begin();
-    std::cout << "NOME: " << v.Nome();
+    it = vetorVertices.begin();
+    it++;
+    Vertice v = *it;
     recStack.insert(v);
-    std::cout << recStack << std::endl;
 
     while(!recStack.empty())
     {
-        Presa presa;
         std::set<Presa>::iterator p;
         std::set<Presa> presas = v.Adjacencias();  
 
+        visitados.insert(v);                                            // Coloca que visitou esse vertice
         for(p = presas.begin(); p != presas.end(); p++)                 // Para cada presa na lista de adjacencias
         {
-            presa = *p;                                                 // Pega-se referência
+            Presa presa = *p;                                           // Pega-se referência
             Vertice vTemp(presa.Nome());                                // Cria-se um vertice temporario
 
             if(visitados.find(vTemp) != visitados.end()) 
                 i++;                                                    // Se adjacencia já foi visitada -> tem ciclo
             else
-                recStack.insert(recStack.begin(), vTemp);                   // Adiciona no inicio da rec stack se não estiver
+                recStack.insert(vTemp);                                 // Adiciona no inicio da rec stack se não estiver
         }
 
-        auto pair = visitados.insert(v);                                            // Coloca que visitou esse vertice
         recStack.erase(v);                                              // Apaga esse vertice da reckStack
         if(!recStack.empty())
             v = *recStack.begin();                                      // O vertice eh o topo da pilha
 
-        std::cout << visitados << std::endl;
-        std::cout << recStack << std::endl;
+        //std::cout << "VISITADOS (1): " << visitados << std::endl;
+        //std::cout << "RECSTACK  (1): " << recStack << std::endl;
     }
 
     std::cout << "Quantidade de ciclos:" << i << std::endl;
     return i;
 }
+
 
 // ========================================================================
 // ==================== FUNCOES DE CONEXO GRAFO (13) ======================
