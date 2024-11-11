@@ -1,6 +1,7 @@
 #include "funcoes.h"
 #include "structs.h"
 #include "funcoesAuxiliares.h"
+#include <stack>
 
 // ========================================================================
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
@@ -130,6 +131,74 @@ int BuscarGrafo(std::string nomeArq)
 // ========================================================================
 // ==================== FUNCOES DE CICLO GRAFO (12) =======================
 // ========================================================================
+
+ /* == Procura se ha ciclos ou nao ==
+ 
+    Pegar um vertice x
+    Adicionar adjacentes de x na recStack
+
+    Se adjacente -> esta nos visitados (preto) -> tem ciclo
+    Se adjacente -> n esta na recStack (branco) -> adiciona na RecStack
+    Se adjacente -> esta na reckStack, mas n nos visitados (cinza) -> nao faz nada
+
+    Adicionar x nos visitados
+    Remove x da recStack
+    Assim que acabar -> topo da pilha -> refaz.
+    Se atingiu final da recStack -> nao tem ciclo
+
+*/
+
+
+int BuscarCiclo(std::string nomeArq) 
+{
+    int i = 0;
+    std::set<Vertice>::iterator it;
+    std::stack<Vertice> recStack;
+    std::set<Vertice> visitados;
+    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
+
+    for(it = vetorVertices.begin(); it != vetorVertices.end(); it++)
+    {
+        Vertice v = *it;
+        if(v.Nome() == "") continue;
+
+        if(visitados.find(v) == visitados.end())                                // Se esse vértice não foi visitado
+        {
+            recStack.push(v);
+            while(!recStack.empty())
+            {
+                recStack.pop();
+                std::set<Presa>::iterator p;
+                std::set<Presa> presas = v.Adjacencias();  
+
+                visitados.insert(v);                                            // Coloca que visitou esse vertice
+                for(p = presas.begin(); p != presas.end(); p++)                 // Para cada presa na lista de adjacencias
+                {
+                    Presa presa = *p;                                           // Pega-se referência
+                    Vertice vTemp(presa.Nome());                                // Cria-se um vertice temporario
+
+                    if(visitados.find(vTemp) != visitados.end()) 
+                        i++;                                                    // Se adjacencia já foi visitada -> tem ciclo
+                    else
+                        recStack.push(vTemp);                                   // Adiciona no inicio da rec stack se não estiver
+                }
+
+                if(!recStack.empty())
+                {
+                    v = recStack.top();                                         // O vertice eh o topo da pilha
+                    recStack.pop();                                             // Apaga esse vertice da reckStack
+                }
+
+                //std::cout << "VISITADOS (1): " << visitados << std::endl;
+                //std::cout << "RECSTACK  (1): " << recStack << std::endl;
+            }
+        }
+    }
+
+    std::cout << "Quantidade de ciclos:" << i << std::endl;
+    return i;
+}
+
 
 // ========================================================================
 // ==================== FUNCOES DE CONEXO GRAFO (13) ======================

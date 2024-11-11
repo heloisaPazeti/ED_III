@@ -29,6 +29,10 @@ int main()
             BuscarGrafo(nomeArq);
             break;
 
+        case 12:
+            BuscarCiclo(nomeArq);
+            break;
+
         default:
             std::cout << "Opcao invalida!" << std::endl;
     }

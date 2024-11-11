@@ -96,6 +96,8 @@ class Vertice
             _grau = 1;
         }
 
+        Vertice(std::string nome) { _nome = nome; }
+
         void AumentarGrauEntrada()
         {
             ++_grauEntrada;
@@ -108,6 +110,8 @@ class Vertice
             ++_grau;
         }
 
+        std::string Nome() const { return _nome; }
+        
         void InserirPresa(std::string nome, int populacao)
         {
             std::pair<std::set<Presa>::iterator, bool> par;
@@ -116,10 +120,6 @@ class Vertice
             _it = par.first;
         }
 
-        std::string Nome() const
-        {
-            return _nome;
-        }
 
         void MostrarVertice()
         {
@@ -144,9 +144,25 @@ class Vertice
                 return "-1";
         }
 
-        friend bool operator==(const Vertice v1, const Vertice v2) {return v1.Nome() == v2.Nome();}
+        std::set<Presa> Adjacencias() { 
+            
+            auto it = _vetorPresa.begin();
+            Presa p = *it;
+            
+            return _vetorPresa; 
+        }
 
+        friend bool operator==(const Vertice v1, const Vertice v2) {return v1._nome == v2._nome;}
         friend bool operator<(const Vertice v1, const Vertice v2) {return v1._nome < v2._nome;}
+
+        friend std::ostream& operator<<(std::ostream &out, const std::set<Vertice> &vetorVertices) 
+        {
+            std::set<Vertice>::iterator itVertice;
+            for(itVertice = vetorVertices.begin(); itVertice!=vetorVertices.end(); itVertice++)
+                out << "-> " << (*itVertice).Nome() << "\n";
+
+            return out;
+        }
 };
 
 
