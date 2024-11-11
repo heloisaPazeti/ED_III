@@ -1,6 +1,7 @@
 #include "funcoes.h"
 #include "structs.h"
 #include "funcoesAuxiliares.h"
+#include <unordered_set>
 #include <stack>
 
 // ========================================================================
@@ -152,47 +153,44 @@ int BuscarGrafo(std::string nomeArq)
 int BuscarCiclo(std::string nomeArq) 
 {
     int i = 0;
+    bool flag=true;
     std::set<Vertice>::iterator it;
-    std::stack<Vertice> recStack;
-    std::set<Vertice> visitados;
+    std::unordered_set<Vertice> cinzaSet;
+    std::stack<Vertice> cinzaStack;
+    std::set<Vertice> preto;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
     for(it = vetorVertices.begin(); it != vetorVertices.end(); it++)
     {
         Vertice v = *it;
-        if(v.Nome() == "") continue;
-
-        if(visitados.find(v) == visitados.end())                                // Se esse vértice não foi visitado
-        {
-            recStack.push(v);
-            while(!recStack.empty())
+        if(cinzaSet.find(v) != cinzaSet.end() || preto.find(v) != preto.end())
+            continue;
+        
+        while(flag)
+        {    
+            if(v.Nome() == "") continue;
+            std::set<Presa> adjacentes = v.Adjacencias();
+            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); it++)
             {
-                recStack.pop();
-                std::set<Presa>::iterator p;
-                std::set<Presa> presas = v.Adjacencias();  
+                Presa pTemp = *itPresa;
+                Vertice vTemp(pTemp.Nome());
 
-                visitados.insert(v);                                            // Coloca que visitou esse vertice
-                for(p = presas.begin(); p != presas.end(); p++)                 // Para cada presa na lista de adjacencias
+                if(cinzaSet.find(vTemp) == cinzaSet.end() && preto.find(vTemp) == preto.end())
                 {
-                    Presa presa = *p;                                           // Pega-se referência
-                    Vertice vTemp(presa.Nome());                                // Cria-se um vertice temporario
-
-                    if(visitados.find(vTemp) != visitados.end()) 
-                        i++;                                                    // Se adjacencia já foi visitada -> tem ciclo
-                    else
-                        recStack.push(vTemp);                                   // Adiciona no inicio da rec stack se não estiver
+                    cinzaSet.insert(vTemp);
+                    cinzaStack.push(vTemp);,
+                    v = cinzaStack.top();
+                    break;
                 }
-
-                if(!recStack.empty())
-                {
-                    v = recStack.top();                                         // O vertice eh o topo da pilha
-                    recStack.pop();                                             // Apaga esse vertice da reckStack
-                }
-
-                //std::cout << "VISITADOS (1): " << visitados << std::endl;
-                //std::cout << "RECSTACK  (1): " << recStack << std::endl;
+                else    flag = false;
             }
+            
         }
+
+        Vertice v = cinzaStack.top();
+        preto.insert(v);   
+
+
     }
 
     std::cout << "Quantidade de ciclos:" << i << std::endl;
