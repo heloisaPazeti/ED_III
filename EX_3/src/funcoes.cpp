@@ -178,7 +178,7 @@ int BuscarCiclo(std::string nomeArq)
                 if(cinzaSet.find(vTemp) == cinzaSet.end() && preto.find(vTemp) == preto.end())
                 {
                     cinzaSet.insert(vTemp);
-                    cinzaStack.push(vTemp);,
+                    cinzaStack.push(vTemp);
                     v = cinzaStack.top();
                     break;
                 }
