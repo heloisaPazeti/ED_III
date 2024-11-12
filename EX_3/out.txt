@@ -1,0 +1,2 @@
+./bin/programa;
+Quantidade de ciclos:39

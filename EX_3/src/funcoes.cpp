@@ -1,7 +1,9 @@
 #include "funcoes.h"
 #include "structs.h"
 #include "funcoesAuxiliares.h"
-#include <stack>
+#include <unordered_set>
+#include <list>
+#include <algorithm>
 
 // ========================================================================
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
@@ -132,71 +134,92 @@ int BuscarGrafo(std::string nomeArq)
 // ==================== FUNCOES DE CICLO GRAFO (12) =======================
 // ========================================================================
 
- /* == Procura se ha ciclos ou nao ==
+ /* == Descobrir quantidades de ciclos ==
  
-    Pegar um vertice x
-    Adicionar adjacentes de x na recStack
+    -> Enquanto vertice x possuir adjacentes
+        -> Pegar um vertice x
+        -> Procurar nos adjacentes de x um adjacente "branco"
+        -> Avançar para esse adjacente e torna-lo "cinza"
+        -> Coloca adjacente numa pilha
 
-    Se adjacente -> esta nos visitados (preto) -> tem ciclo
-    Se adjacente -> n esta na recStack (branco) -> adiciona na RecStack
-    Se adjacente -> esta na reckStack, mas n nos visitados (cinza) -> nao faz nada
+        -> Pilha montada
+        -> Topo da pilha -> preto
+        -> Remove topo
+        -> Vertice x = novo topo da pilha
+        -> Refazer 
+        
 
-    Adicionar x nos visitados
-    Remove x da recStack
-    Assim que acabar -> topo da pilha -> refaz.
-    Se atingiu final da recStack -> nao tem ciclo
 
 */
-
-
 int BuscarCiclo(std::string nomeArq) 
 {
-    int i = 0;
+    int ciclos = 0;
+    bool checarAdj = true;
+    Vertice v("");
     std::set<Vertice>::iterator it;
-    std::stack<Vertice> recStack;
-    std::set<Vertice> visitados;
+    std::list<Vertice> cinzas;
+    std::set<Vertice> pretos;
+    std::set<Presa> adjacentes;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
-    for(it = vetorVertices.begin(); it != vetorVertices.end(); it++)
+    for(it = vetorVertices.begin(); it != vetorVertices.end(); it++)                                            // Faz para todos os vertices
     {
-        Vertice v = *it;
-        if(v.Nome() == "") continue;
-
-        if(visitados.find(v) == visitados.end())                                // Se esse vértice não foi visitado
+        if(cinzas.empty())                                                                                      // Se pilha vazia -> prox caminho
         {
-            recStack.push(v);
-            while(!recStack.empty())
+            v = *it;                                                                                            // Vertice inicial
+            if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end() || pretos.find(v) != pretos.end() || v.Nome() == "")    // Se já fez pode pular
+                continue;
+        }
+        else                                                                                                    // Se ainda tiver caminho pra seguir
+        {
+            // *** Teoricamente n precisa dessa linha de baixo
+            //v = cinzas.front();                                                                                 // Certifica de pegar o topo
+            cinzas.pop_front();                                                                                 // Remove o topo
+        }
+        
+        checarAdj = true;
+        while(checarAdj)                                                                                        // Enquanto tiver adjacencias  
+        {    
+            bool alterouPilha = false;
+            adjacentes = v.Adjacencias();
+            if(adjacentes.empty()) checarAdj = false;
+            
+            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); itPresa++)      // Procura adjacente branco
             {
-                recStack.pop();
-                std::set<Presa>::iterator p;
-                std::set<Presa> presas = v.Adjacencias();  
+                Presa pTemp = *itPresa;
+                Vertice vTemp(pTemp.Nome());
 
-                visitados.insert(v);                                            // Coloca que visitou esse vertice
-                for(p = presas.begin(); p != presas.end(); p++)                 // Para cada presa na lista de adjacencias
+                if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end())
                 {
-                    Presa presa = *p;                                           // Pega-se referência
-                    Vertice vTemp(presa.Nome());                                // Cria-se um vertice temporario
-
-                    if(visitados.find(vTemp) != visitados.end()) 
-                        i++;                                                    // Se adjacencia já foi visitada -> tem ciclo
-                    else
-                        recStack.push(vTemp);                                   // Adiciona no inicio da rec stack se não estiver
+                    ciclos++;
+                    checarAdj = false;
+                    continue;
                 }
-
-                if(!recStack.empty())
+                else if(pTemp.Nome() == v.Nome())
                 {
-                    v = recStack.top();                                         // O vertice eh o topo da pilha
-                    recStack.pop();                                             // Apaga esse vertice da reckStack
+                    ciclos++;
+                    checarAdj = false;
+                    continue;
                 }
-
-                //std::cout << "VISITADOS (1): " << visitados << std::endl;
-                //std::cout << "RECSTACK  (1): " << recStack << std::endl;
+                else if(pretos.find(v) == pretos.end())                                                             // Se adjacente eh branco
+                {
+                    cinzas.push_front(vTemp);                                                                       // Adiciona adj na pilha
+                    v = cinzas.front();
+                    checarAdj = true;
+                    alterouPilha = true;                                                                             // v eh o novo topo da pilha
+                    break;
+                }
+                else
+                    checarAdj = false;
             }
         }
+
+        cinzas.remove(v);
+        pretos.insert(v);                                                                                   // coloca nas pretas
     }
 
-    std::cout << "Quantidade de ciclos:" << i << std::endl;
-    return i;
+    std::cout << "Quantidade de ciclos:" << ciclos << std::endl;
+    return ciclos;
 }
 
 
