@@ -167,20 +167,17 @@ int BuscarCiclo(std::string nomeArq)
         if(cinzas.empty())                                                                                      // Se pilha vazia -> prox caminho
         {
             v = *it;                                                                                            // Vertice inicial
-            if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end() || pretos.find(v) != pretos.end() || v.Nome() == "")    // Se já fez pode pular
+            if(!VerticeBranco(cinzas, pretos, v) || v.Nome() == "")    // Se já fez pode pular
                 continue;
         }
-        else                                                                                                    // Se ainda tiver caminho pra seguir
+        else                                                                                                    // Se ainda tiver caminho pra seguir                
         {
-            // *** Teoricamente n precisa dessa linha de baixo
-            //v = cinzas.front();                                                                                 // Certifica de pegar o topo
-            cinzas.pop_front();                                                                                 // Remove o topo
-        }
+            v = cinzas.front();                                                                                 // Certifica de pegar o topo
+        }                                                                
         
         checarAdj = true;
         while(checarAdj)                                                                                        // Enquanto tiver adjacencias  
         {    
-            bool alterouPilha = false;
             adjacentes = v.Adjacencias();
             if(adjacentes.empty()) checarAdj = false;
             
@@ -189,13 +186,7 @@ int BuscarCiclo(std::string nomeArq)
                 Presa pTemp = *itPresa;
                 Vertice vTemp(pTemp.Nome());
 
-                if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end())
-                {
-                    ciclos++;
-                    checarAdj = false;
-                    continue;
-                }
-                else if(pTemp.Nome() == v.Nome())
+                if((std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end()) || (pTemp.Nome() == v.Nome()))   // Se o vértice atual for cinza ou um ciclo com ele próprio
                 {
                     ciclos++;
                     checarAdj = false;
@@ -206,7 +197,6 @@ int BuscarCiclo(std::string nomeArq)
                     cinzas.push_front(vTemp);                                                                       // Adiciona adj na pilha
                     v = cinzas.front();
                     checarAdj = true;
-                    alterouPilha = true;                                                                             // v eh o novo topo da pilha
                     break;
                 }
                 else
@@ -214,14 +204,18 @@ int BuscarCiclo(std::string nomeArq)
             }
         }
 
-        cinzas.remove(v);
+        cinzas.remove(v);                                                                                   // Remove o topo
         pretos.insert(v);                                                                                   // coloca nas pretas
     }
 
-    std::cout << "Quantidade de ciclos:" << ciclos << std::endl;
+    std::cout << "Quantidade de ciclos: " << ciclos << std::endl;
     return ciclos;
 }
 
+bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v)
+{
+    return (std::find(cinzas.begin(), cinzas.end(), v) == cinzas.end()) && (pretos.find(v) == pretos.end());
+}
 
 // ========================================================================
 // ==================== FUNCOES DE CONEXO GRAFO (13) ======================
