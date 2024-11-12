@@ -134,11 +134,6 @@ int BuscarGrafo(std::string nomeArq)
 // ==================== FUNCOES DE CICLO GRAFO (12) =======================
 // ========================================================================
 
-bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v)
-{
-    return (std::find(cinzas.begin(), cinzas.end(), v) == cinzas.end()) && (pretos.find(v) == pretos.end());
-}
-
  /* == Descobrir quantidades de ciclos ==
  
     -> Enquanto vertice x possuir adjacentes
@@ -165,52 +160,49 @@ int BuscarCiclo(std::string nomeArq)
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
 
-    for(it = vetorVertices.begin(); it != vetorVertices.end(); it++)                                            // Faz para todos os vertices
+    for(it = vetorVertices.begin(); it != vetorVertices.end(); it++)            // Faz para todos os vertices
     {
-        if(cinzas.empty())                                                                                      // Se pilha vazia -> prox caminho
+        if(cinzas.empty())                                                      // Se pilha vazia -> prox caminho
         {
-            v = *it;                                                                                            // Vertice inicial
-            if(!VerticeBranco(cinzas, pretos, v) || v.Nome() == "")    // Se já fez pode pular
+            v = *it;                                                            // Vertice inicial
+            if(!VerticeBranco(cinzas, pretos, v) || v.Nome() == "")             // Se já fez pode pular
                 continue;
-
-            //cinzas.push_front(v);
         }
-        else                                                                                                    // Se ainda tiver caminho pra seguir                
+        else                                                                    // Se ainda tiver caminho pra seguir                
         {
-            v = cinzas.front();                                                                                 // Certifica de pegar o topo
+            v = cinzas.front();                                                 // Certifica de pegar o topo
         }                                                                
         
         checarAdj = true;
-        while(checarAdj)                                                                                        // Enquanto tiver adjacencias  
+        while(checarAdj)                                                        // Enquanto tiver adjacencias  
         {    
             adjacentes = v.Adjacencias();
-            if(adjacentes.empty()) checarAdj = false;
+            if(adjacentes.empty()) checarAdj = false;                           // Se nao tiver mais para onde ir
             
-            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); itPresa++)      // Procura adjacente branco
+            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); itPresa++)
             {
                 Presa pTemp = *itPresa;
                 Vertice vTemp(pTemp.Nome());
 
-                if((std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end()) || (pTemp.Nome() == v.Nome()))   // Se o vértice atual for cinza ou um ciclo com ele próprio
+                if((VerticeCinza(cinzas, vTemp)) || (vTemp.Nome() == v.Nome())) // Se o adjacente for cinza ou se apontar para ele mesmo
                 {
                     ciclos++;
                     checarAdj = false;
-                    //std::cout << "NOME ADJACENTE CINZA: " << vTemp.Nome() << std::endl;
                 }
-                else if(pretos.find(v) == pretos.end())                                                             // Se adjacente eh branco
+                else if(!VerticePreto(pretos, v))                               // Se adjacente eh branco
                 {
-                    cinzas.push_front(vTemp);                                                                       // Adiciona adj na pilha
-                    v = cinzas.front();
-                    checarAdj = true;
-                    break;
+                    cinzas.push_front(vTemp);                                   // Adiciona adj na pilha
+                    v = cinzas.front();                                         // Passa para o novo topo
+                    checarAdj = true;                                           // Permanece no while
+                    break;                                                      // Saida do for
                 }
-                else
-                    checarAdj = false;
+                else                                                            // Se for preto
+                    checarAdj = false;                                          // Nao faz nada
             }
         }
 
-        cinzas.remove(v);                                                                                   // Remove o topo
-        pretos.insert(v);                                                                                // coloca nas pretas
+        cinzas.remove(v);                                                       // Remove o topo
+        pretos.insert(v);                                                       // coloca nas pretas
     }
 
     std::cout << "Quantidade de ciclos: " << ciclos << std::endl;

@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 #include <set>
+#include <list>
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,6 +41,12 @@ typedef struct _cabecalho
     int qttCompacta;
 
 } RegCabecalho;
+
+// ========================================================================
+// ====================== FUNCOES DE INICIALIZACAO ========================
+// ========================================================================
+
+RegDados InicializarRegistro();
 
 // ========================================================================
 // =========================== CLASSES DO GRAFO ===========================
