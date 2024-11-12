@@ -27,7 +27,7 @@ std::set<Vertice> CriarGrafo(std::string nomeArq)
     while(dado.removido != '2')                     // Percorre o arquivo
     {
         dado = LerRegistro(arquivo);                // Lê um registro
-        
+
         Vertice novoVertice(dado.nome, dado.especie, dado.habitat, dado.dieta, dado.tipo);  // Inicializa um vértice
         it = vetorVertices.find(novoVertice);       // Verifica se o vértice já existe
 
@@ -134,6 +134,11 @@ int BuscarGrafo(std::string nomeArq)
 // ==================== FUNCOES DE CICLO GRAFO (12) =======================
 // ========================================================================
 
+bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v)
+{
+    return (std::find(cinzas.begin(), cinzas.end(), v) == cinzas.end()) && (pretos.find(v) == pretos.end());
+}
+
  /* == Descobrir quantidades de ciclos ==
  
     -> Enquanto vertice x possuir adjacentes
@@ -147,9 +152,6 @@ int BuscarGrafo(std::string nomeArq)
         -> Remove topo
         -> Vertice x = novo topo da pilha
         -> Refazer 
-        
-
-
 */
 int BuscarCiclo(std::string nomeArq) 
 {
@@ -162,6 +164,7 @@ int BuscarCiclo(std::string nomeArq)
     std::set<Presa> adjacentes;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
+
     for(it = vetorVertices.begin(); it != vetorVertices.end(); it++)                                            // Faz para todos os vertices
     {
         if(cinzas.empty())                                                                                      // Se pilha vazia -> prox caminho
@@ -169,6 +172,8 @@ int BuscarCiclo(std::string nomeArq)
             v = *it;                                                                                            // Vertice inicial
             if(!VerticeBranco(cinzas, pretos, v) || v.Nome() == "")    // Se já fez pode pular
                 continue;
+
+            //cinzas.push_front(v);
         }
         else                                                                                                    // Se ainda tiver caminho pra seguir                
         {
@@ -190,7 +195,7 @@ int BuscarCiclo(std::string nomeArq)
                 {
                     ciclos++;
                     checarAdj = false;
-                    continue;
+                    //std::cout << "NOME ADJACENTE CINZA: " << vTemp.Nome() << std::endl;
                 }
                 else if(pretos.find(v) == pretos.end())                                                             // Se adjacente eh branco
                 {
@@ -205,16 +210,11 @@ int BuscarCiclo(std::string nomeArq)
         }
 
         cinzas.remove(v);                                                                                   // Remove o topo
-        pretos.insert(v);                                                                                   // coloca nas pretas
+        pretos.insert(v);                                                                                // coloca nas pretas
     }
 
     std::cout << "Quantidade de ciclos: " << ciclos << std::endl;
     return ciclos;
-}
-
-bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v)
-{
-    return (std::find(cinzas.begin(), cinzas.end(), v) == cinzas.end()) && (pretos.find(v) == pretos.end());
 }
 
 // ========================================================================
