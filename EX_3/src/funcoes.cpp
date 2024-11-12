@@ -153,12 +153,10 @@ int BuscarGrafo(std::string nomeArq)
 */
 int BuscarCiclo(std::string nomeArq) 
 {
-    int i = 0;
+    int ciclos = 0;
     bool checarAdj = true;
     Vertice v("");
     std::set<Vertice>::iterator it;
-    //std::unordered_set<Vertice> cinzaSet;
-    //std::stack<Vertice> cinzaStack;
     std::list<Vertice> cinzas;
     std::set<Vertice> pretos;
     std::set<Presa> adjacentes;
@@ -169,42 +167,59 @@ int BuscarCiclo(std::string nomeArq)
         if(cinzas.empty())                                                                                      // Se pilha vazia -> prox caminho
         {
             v = *it;                                                                                            // Vertice inicial
-            if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end() || pretos.find(v) != pretos.end())    // Se já fez pode pular
+            if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end() || pretos.find(v) != pretos.end() || v.Nome() == "")    // Se já fez pode pular
                 continue;
         }
         else                                                                                                    // Se ainda tiver caminho pra seguir
         {
             // *** Teoricamente n precisa dessa linha de baixo
-            v = cinzas.front();                                                                                 // Certifica de pegar o topo
+            //v = cinzas.front();                                                                                 // Certifica de pegar o topo
             cinzas.pop_front();                                                                                 // Remove o topo
-            pretos.insert(v);                                                                                   // coloca nas pretas
         }
         
+        checarAdj = true;
         while(checarAdj)                                                                                        // Enquanto tiver adjacencias  
         {    
-            if(v.Nome() == "") continue;
+            bool alterouPilha = false;
             adjacentes = v.Adjacencias();
+            if(adjacentes.empty()) checarAdj = false;
             
-            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); it++)      // Procura adjacente branco
+            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); itPresa++)      // Procura adjacente branco
             {
                 Presa pTemp = *itPresa;
                 Vertice vTemp(pTemp.Nome());
 
-                if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end() || pretos.find(v) != pretos.end())    // Se adjacente eh bran
+                if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end())
+                {
+                    ciclos++;
+                    checarAdj = false;
+                    continue;
+                }
+                else if(pTemp.Nome() == v.Nome())
+                {
+                    ciclos++;
+                    checarAdj = false;
+                    continue;
+                }
+                else if(pretos.find(v) == pretos.end())                                                             // Se adjacente eh branco
                 {
                     cinzas.push_front(vTemp);                                                                       // Adiciona adj na pilha
-                    v = cinzas.front();                                                                             // v eh o novo topo da pilha
+                    v = cinzas.front();
+                    checarAdj = true;
+                    alterouPilha = true;                                                                             // v eh o novo topo da pilha
                     break;
                 }
-                else    
+                else
                     checarAdj = false;
             }
-            
         }
+
+        cinzas.remove(v);
+        pretos.insert(v);                                                                                   // coloca nas pretas
     }
 
-    std::cout << "Quantidade de ciclos:" << i << std::endl;
-    return i;
+    std::cout << "Quantidade de ciclos:" << ciclos << std::endl;
+    return ciclos;
 }
 
 

@@ -57,17 +57,27 @@ class Presa
             _populacaoPredador = populacao;
         }
 
-        std::string Nome()
-        {
-            return _nome;
-        }
-
-        int Populacao()
-        {
-            return _populacaoPredador;
-        }
+        std::string Nome() const { return _nome; }
+        int Populacao() { return _populacaoPredador; }
 
     friend bool operator<(const Presa p1, const Presa p2) {return p1._nome < p2._nome;}
+
+
+    friend std::ostream& operator<<(std::ostream &out, const std::set<Presa> &vetorPresas) 
+    {
+        std::set<Presa>::iterator itPresas;
+
+        if(vetorPresas.empty())
+            out << "VAZIA";
+        else
+        {
+            for(itPresas = vetorPresas.begin(); itPresas!=vetorPresas.end(); itPresas++)
+                out << "-> " << (*itPresas).Nome() << "\n";
+
+        }
+
+        return out;
+    }
 };
 
 class Vertice
