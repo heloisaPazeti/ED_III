@@ -73,37 +73,6 @@ RegCabecalho LerCabecalho(FILE *arquivo)
     return cabecalho;
 }
 
-RegDados InicializarRegistro()
-{
-    RegDados registro;
-
-    registro.removido = '0';
-    registro.encadeamento = -1;
-    registro.populacao = 0;
-    registro.tamanho = 0;
-    registro.unidadeMedida = ' ';
-    registro.alimento = (char*)calloc(160, sizeof(char));
-    registro.dieta = (char*)calloc(160, sizeof(char));
-    registro.especie = (char*)calloc(160, sizeof(char));
-    registro.habitat = (char*)calloc(160, sizeof(char));
-    registro.nome = (char*)calloc(160, sizeof(char));
-    registro.tipo = (char*)calloc(160, sizeof(char));
-
-    return registro;
-}
-
-void MostrarGrafo(std::set<Vertice> vetorVertices)
-{
-    std::set<Vertice>::iterator it;
-    
-    for(it = vetorVertices.begin(); it!=vetorVertices.end(); it++)
-    {
-        Vertice ans = *it;
-        if(ans.Nome() != "")
-            ans.MostrarVertice();
-    }
-}
-
 void scan_quote_string(char *str) {
 
 	/*
@@ -138,3 +107,27 @@ void scan_quote_string(char *str) {
 		strcpy(str, "");
 	}
 }
+
+// ========================================================================
+// ====================== FUNCOES DE IMPRESSAO ============================
+// ========================================================================
+
+void MostrarGrafo(std::set<Vertice> vetorVertices)
+{
+    std::set<Vertice>::iterator it;
+    
+    for(it = vetorVertices.begin(); it!=vetorVertices.end(); it++)
+    {
+        Vertice ans = *it;
+        if(ans.Nome() != "")
+            ans.MostrarVertice();
+    }
+}
+
+// ========================================================================
+// ====================== FUNCOES DE VERIFICACAO ==========================
+// ========================================================================
+
+bool VerticePreto(std::set<Vertice> pretos, Vertice v)  { return pretos.find(v) != pretos.end(); }
+bool VerticeCinza(std::list<Vertice> cinzas, Vertice v) { return std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end(); }
+bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v) { return ((!VerticeCinza(cinzas, v)) && (!VerticePreto(pretos, v))); }
