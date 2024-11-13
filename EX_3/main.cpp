@@ -33,6 +33,10 @@ int main()
             BuscarCiclo(nomeArq);
             break;
 
+        case 13:
+            BuscarComponentes(nomeArq);
+            break;
+
         default:
             std::cout << "Opcao invalida!" << std::endl;
     }

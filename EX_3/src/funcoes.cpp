@@ -1,7 +1,7 @@
 #include "funcoes.h"
 #include "structs.h"
 #include "funcoesAuxiliares.h"
-#include <unordered_set>
+#include <string.h>
 #include <list>
 #include <algorithm>
 
@@ -27,6 +27,8 @@ std::set<Vertice> CriarGrafo(std::string nomeArq)
     while(dado.removido != '2')                     // Percorre o arquivo
     {
         dado = LerRegistro(arquivo);                // Lê um registro
+
+        if(strcmp(dado.nome, "") == 0) continue;
 
         Vertice novoVertice(dado.nome, dado.especie, dado.habitat, dado.dieta, dado.tipo);  // Inicializa um vértice
         it = vetorVertices.find(novoVertice);       // Verifica se o vértice já existe
@@ -54,6 +56,7 @@ std::set<Vertice> CriarGrafo(std::string nomeArq)
     while(dado.removido != '2')                     // Percorre o arquivo
     {
         dado = LerRegistro(arquivo);                // Lê um registro
+        if(strcmp(dado.nome, "") == 0) continue;
         Vertice alimento(dado.alimento, dado.especie, dado.habitat, dado.dieta, dado.tipo); // Cria um vértice com o nome do alimento do predador (as demais informações são irrelevantes e incorretas)
         it = vetorVertices.find(alimento);          // Verifica se a presa do predador é também um predador       
 
@@ -151,8 +154,9 @@ int BuscarGrafo(std::string nomeArq)
 int BuscarCiclo(std::string nomeArq) 
 {
     int ciclos = 0;
-    bool checarAdj = true;
+    bool pilhaAlterada = true;
     Vertice v("");
+    Vertice vTemp("");
     std::set<Vertice>::iterator it;
     std::set<Vertice>::iterator itTemp;
     std::list<Vertice> cinzas;
@@ -168,41 +172,38 @@ int BuscarCiclo(std::string nomeArq)
             if(!VerticeBranco(cinzas, pretos, v) || v.Nome() == "")             // Se já fez pode pular
                 continue;
         }
-        else                                                                    // Se ainda tiver caminho pra seguir                
+        else                                                                    // Se ainda tiver caminho pra seguir
+        {
+            it--;
             v = cinzas.front();                                                 // Certifica de pegar o topo
+        }                
 
-        checarAdj = true;
-        while(checarAdj)                                                        // Enquanto tiver adjacencias  
+        pilhaAlterada = true;
+        while(pilhaAlterada)                                                        // Enquanto tiver adjacencias  
         {    
+            pilhaAlterada = false;
             adjacentes = v.Adjacencias();
-            if(adjacentes.empty()) checarAdj = false;
+            if(adjacentes.empty()) continue;
 
             for(Presa pTemp : adjacentes)
             {
                 itTemp = vetorVertices.find(pTemp.Nome());
-                if(itTemp == vetorVertices.end() || pTemp.Nome() == "") 
-                {
-                    checarAdj = false;
+                if(itTemp != vetorVertices.end() && pTemp.Nome() != "") 
+                    vTemp = *itTemp;
+                else
                     continue;
-                }
 
-                Vertice vTemp = *itTemp;
-
-                if((VerticeCinza(cinzas, vTemp)) || (vTemp.Nome() == v.Nome())) // Se o adjacente for cinza ou se apontar para ele mesmo
+                if(VerticeCinza(cinzas, vTemp) || vTemp.Nome() == v.Nome())
                 {
                     ciclos++;
-                    checarAdj = false;
+                    continue;
                 }
-                else if(!VerticePreto(pretos, vTemp))                           // Se adjacente eh branco
+                else if(VerticeBranco(cinzas, pretos, vTemp))                           // Se adjacente eh branco
                 {
                     cinzas.push_front(vTemp);                                   // Adiciona adj na pilha
                     v = cinzas.front();                                         // Passa para o novo topo
-                    checarAdj = true;                                           // Permanece no while
+                    pilhaAlterada = true;                                           // Permanece no while
                     break;                                                      // Saida do for
-                }
-                else                                                            // Se for preto
-                {
-                    checarAdj = false;                                          // Nao faz nada
                 }
             }
         }
@@ -218,6 +219,94 @@ int BuscarCiclo(std::string nomeArq)
 // ========================================================================
 // ==================== FUNCOES DE CONEXO GRAFO (13) ======================
 // ========================================================================
+
+/* == Se fortemente conexo ou nao e quantidade de componentes ==
+
+    -> Para todo vertice x 
+
+    -> Seguir os caminhos possiveis de forma a percorrer todo o grafo.
+    -> Se for possivel para x -> x é um componente conexo.
+    -> Se for possivel para todo vertice -> grafo fortemente conexo.
+
+    -> Metodo: Buscar por Profundidade
+*/
+int BuscarComponentes(std::string nomeArq) 
+{
+    int componentes = 0;
+    bool pilhaAlterada = true;
+    bool fortementeConexo = true;
+    Vertice v("");
+    Vertice vTemp("");
+    std::set<Vertice>::iterator it;
+    std::set<Vertice>::iterator itTemp;
+    std::list<Vertice> pilha;
+    std::set<Vertice> visitados;
+    std::set<Presa> adjacentes;
+    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
+
+    it = vetorVertices.begin();
+    while(it != vetorVertices.end() || !pilha.empty())
+    {
+        if(pilha.empty())                                                   // Se pilha vazia -> prox caminho
+        {
+            v = *it;                                                        // Vertice inicial
+            it++;
+            if(VerticePreto(visitados, v) || v.Nome() == "")               // Se já fez pode pular
+                continue;
+
+            pilha.push_front(v);
+        }
+        else                                                                // Se ainda tiver caminho pra seguir
+            v = pilha.front();                                              // Certifica de pegar o topo
+
+        pilhaAlterada = true;                                               // Saber se avançou ou nao
+        while(pilhaAlterada)                                                // Enquanto tiver adjacencias  
+        {    
+            pilhaAlterada = false;                                          // Assume-se que nao sera alterada
+            adjacentes = v.Adjacencias();
+            if(adjacentes.empty()) continue;                                // Se nao houver adjacentes acabou
+
+            for(Presa pTemp : adjacentes)                                   // Para todas as adjacencias
+            {
+                itTemp = vetorVertices.find(pTemp.Nome());                  // Pegamos como vertice
+                if(itTemp != vetorVertices.end())                           // Se o vertice existir
+                    vTemp = *itTemp;                                        // Pegamos sua referencia
+                else
+                    continue;
+
+                if(VerticeBranco(pilha, visitados, vTemp))                  // Se nao foi visitado
+                {
+                    v = vTemp;                                              // Alteramos destino 
+                    pilhaAlterada = true;                                   // Alteramos a pilha
+                    pilha.push_front(v);
+                    break;                                                  // Saida do for
+                }
+            }
+        }
+
+
+
+        pilha.remove(v);
+        visitados.insert(v);
+        
+        if(pilha.empty())
+        {
+            
+            if(visitados == vetorVertices)                                  // Se todos estao nos visitados
+                componentes++;                                              // O componente eh conexo
+            else
+                fortementeConexo = false;                                   // Se nao, sabe-se que nao sera fort. conexo
+
+            visitados.clear();                                              // Limpamos visitados   
+        }
+    }
+
+    if(fortementeConexo)
+        std::cout << "Sim, o grafo é fortemente conexo e possui 1 componente." << std::endl;
+    else
+        std::cout << "Não, o grafo não é fortemente conexo e possui " << componentes << " componentes." << std::endl;
+    return componentes;
+}
 
 // ========================================================================
 // =================== FUNCOES DE RELAÇÃO GRAFO (14) ======================
