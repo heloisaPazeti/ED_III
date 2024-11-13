@@ -162,13 +162,7 @@ class Vertice
                 return "-1";
         }
 
-        std::set<Presa> Adjacencias() { 
-            
-            auto it = _vetorPresa.begin();
-            Presa p = *it;
-            
-            return _vetorPresa; 
-        }
+        std::set<Presa> Adjacencias() { return _vetorPresa; }
 
         friend bool operator==(const Vertice v1, const Vertice v2) {return v1._nome == v2._nome;}
         friend bool operator<(const Vertice v1, const Vertice v2) {return v1._nome < v2._nome;}
@@ -178,6 +172,15 @@ class Vertice
             std::set<Vertice>::iterator itVertice;
             for(itVertice = vetorVertices.begin(); itVertice!=vetorVertices.end(); itVertice++)
                 out << "-> " << (*itVertice).Nome() << "\n";
+
+            return out;
+        }
+
+        friend std::ostream& operator<<(std::ostream &out, const std::list<Vertice> &vetorVertices) 
+        {
+            //std::list<Vertice>::iterator itVertice;
+            for(Vertice v : vetorVertices)
+                out << "-> " << v.Nome() << "\n";
 
             return out;
         }

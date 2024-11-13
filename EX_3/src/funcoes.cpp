@@ -154,11 +154,11 @@ int BuscarCiclo(std::string nomeArq)
     bool checarAdj = true;
     Vertice v("");
     std::set<Vertice>::iterator it;
+    std::set<Vertice>::iterator itTemp;
     std::list<Vertice> cinzas;
     std::set<Vertice> pretos;
     std::set<Presa> adjacentes;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
-
 
     for(it = vetorVertices.begin(); it != vetorVertices.end(); it++)            // Faz para todos os vertices
     {
@@ -169,27 +169,31 @@ int BuscarCiclo(std::string nomeArq)
                 continue;
         }
         else                                                                    // Se ainda tiver caminho pra seguir                
-        {
             v = cinzas.front();                                                 // Certifica de pegar o topo
-        }                                                                
-        
+
         checarAdj = true;
         while(checarAdj)                                                        // Enquanto tiver adjacencias  
         {    
             adjacentes = v.Adjacencias();
-            if(adjacentes.empty()) checarAdj = false;                           // Se nao tiver mais para onde ir
-            
-            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); itPresa++)
+            if(adjacentes.empty()) checarAdj = false;
+
+            for(Presa pTemp : adjacentes)
             {
-                Presa pTemp = *itPresa;
-                Vertice vTemp(pTemp.Nome());
+                itTemp = vetorVertices.find(pTemp.Nome());
+                if(itTemp == vetorVertices.end() || pTemp.Nome() == "") 
+                {
+                    checarAdj = false;
+                    continue;
+                }
+
+                Vertice vTemp = *itTemp;
 
                 if((VerticeCinza(cinzas, vTemp)) || (vTemp.Nome() == v.Nome())) // Se o adjacente for cinza ou se apontar para ele mesmo
                 {
                     ciclos++;
                     checarAdj = false;
                 }
-                else if(!VerticePreto(pretos, v))                               // Se adjacente eh branco
+                else if(!VerticePreto(pretos, vTemp))                           // Se adjacente eh branco
                 {
                     cinzas.push_front(vTemp);                                   // Adiciona adj na pilha
                     v = cinzas.front();                                         // Passa para o novo topo
@@ -197,7 +201,9 @@ int BuscarCiclo(std::string nomeArq)
                     break;                                                      // Saida do for
                 }
                 else                                                            // Se for preto
+                {
                     checarAdj = false;                                          // Nao faz nada
+                }
             }
         }
 
