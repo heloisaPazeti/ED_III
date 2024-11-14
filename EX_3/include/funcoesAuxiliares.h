@@ -22,5 +22,11 @@ bool VerticePreto(std::set<Vertice> pretos, Vertice v);
 bool VerticeCinza(std::list<Vertice> cinzas, Vertice v);
 bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v);
 
+// ========================================================================
+// ======================== FUNCOES DE BUSCA ==============================
+// ========================================================================
+
+bool DFS(Vertice vInicio, Vertice vFinal, std::set<Vertice> vetorVertice, std::set<Vertice> &visitados);
+
 
 #endif

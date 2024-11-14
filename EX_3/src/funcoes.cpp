@@ -220,92 +220,31 @@ int BuscarCiclo(std::string nomeArq)
 // ==================== FUNCOES DE CONEXO GRAFO (13) ======================
 // ========================================================================
 
-/* == Se fortemente conexo ou nao e quantidade de componentes ==
-
-    -> Para todo vertice x 
-
-    -> Seguir os caminhos possiveis de forma a percorrer todo o grafo.
-    -> Se for possivel para x -> x é um componente conexo.
-    -> Se for possivel para todo vertice -> grafo fortemente conexo.
-
-    -> Metodo: Buscar por Profundidade
-*/
+// Baseado em -> https://www.geeksforgeeks.org/strongly-connected-components/
 int BuscarComponentes(std::string nomeArq) 
 {
     int componentes = 0;
-    bool pilhaAlterada = true;
-    bool fortementeConexo = true;
-    Vertice v("");
-    Vertice vTemp("");
-    std::set<Vertice>::iterator it;
-    std::set<Vertice>::iterator itTemp;
-    std::list<Vertice> pilha;
-    std::set<Vertice> visitados;
-    std::set<Presa> adjacentes;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
+    std::set<Vertice> visitados;
 
-    it = vetorVertices.begin();
-    while(it != vetorVertices.end() || !pilha.empty())
+    for(Vertice vI : vetorVertices)
     {
-        if(pilha.empty())                                                   // Se pilha vazia -> prox caminho
+        if(visitados.find(vI) != visitados.end()) continue;
+        for(Vertice vJ : vetorVertices)
         {
-            v = *it;                                                        // Vertice inicial
-            it++;
-            if(VerticePreto(visitados, v) || v.Nome() == "")               // Se já fez pode pular
-                continue;
-
-            pilha.push_front(v);
-        }
-        else                                                                // Se ainda tiver caminho pra seguir
-            v = pilha.front();                                              // Certifica de pegar o topo
-
-        pilhaAlterada = true;                                               // Saber se avançou ou nao
-        while(pilhaAlterada)                                                // Enquanto tiver adjacencias  
-        {    
-            pilhaAlterada = false;                                          // Assume-se que nao sera alterada
-            adjacentes = v.Adjacencias();
-            if(adjacentes.empty()) continue;                                // Se nao houver adjacentes acabou
-
-            for(Presa pTemp : adjacentes)                                   // Para todas as adjacencias
-            {
-                itTemp = vetorVertices.find(pTemp.Nome());                  // Pegamos como vertice
-                if(itTemp != vetorVertices.end())                           // Se o vertice existir
-                    vTemp = *itTemp;                                        // Pegamos sua referencia
-                else
-                    continue;
-
-                if(VerticeBranco(pilha, visitados, vTemp))                  // Se nao foi visitado
-                {
-                    v = vTemp;                                              // Alteramos destino 
-                    pilhaAlterada = true;                                   // Alteramos a pilha
-                    pilha.push_front(v);
-                    break;                                                  // Saida do for
-                }
-            }
-        }
-
-
-
-        pilha.remove(v);
-        visitados.insert(v);
-        
-        if(pilha.empty())
-        {
-            
-            if(visitados == vetorVertices)                                  // Se todos estao nos visitados
-                componentes++;                                              // O componente eh conexo
-            else
-                fortementeConexo = false;                                   // Se nao, sabe-se que nao sera fort. conexo
-
-            visitados.clear();                                              // Limpamos visitados   
+            if(visitados.find(vJ) != visitados.end()) continue;
+            if(DFS(vI, vJ, vetorVertices, visitados) && DFS(vJ, vI, vetorVertices, visitados))
+                componentes++;
         }
     }
 
-    if(fortementeConexo)
-        std::cout << "Sim, o grafo é fortemente conexo e possui 1 componente." << std::endl;
+
+    if(componentes == 1)
+        std::cout << "Sim, o grafo é fortemente conexo e possui " << componentes << " componente." << std::endl;
     else
         std::cout << "Não, o grafo não é fortemente conexo e possui " << componentes << " componentes." << std::endl;
     return componentes;
+
 }
 
 // ========================================================================

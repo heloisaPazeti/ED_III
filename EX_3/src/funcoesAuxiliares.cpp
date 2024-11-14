@@ -131,3 +131,35 @@ void MostrarGrafo(std::set<Vertice> vetorVertices)
 bool VerticePreto(std::set<Vertice> pretos, Vertice v)  { return pretos.find(v) != pretos.end(); }
 bool VerticeCinza(std::list<Vertice> cinzas, Vertice v) { return std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end(); }
 bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v) { return ((!VerticeCinza(cinzas, v)) && (!VerticePreto(pretos, v))); }
+
+// ========================================================================
+// ======================== FUNCOES DE BUSCA ==============================
+// ========================================================================
+
+bool DFS(Vertice vInicio, Vertice vFinal, std::set<Vertice> vetorVertice, std::set<Vertice> &visitados)
+{
+    Vertice vTemp("");
+    std::set<Vertice>::iterator itTemp;
+    std::set<Presa> adjacencias = vInicio.Adjacencias();
+
+    if (vInicio == vFinal) return true;
+
+    visitados.insert(vInicio);
+    for (Presa presa : adjacencias) 
+    {
+        itTemp = vetorVertice.find(presa.Nome());
+
+        if(itTemp == vetorVertice.end())
+            return false;
+        else
+            vTemp = *itTemp;
+
+        if (!VerticePreto(visitados, vTemp)) 
+        {
+            if (DFS(vTemp, vFinal, vetorVertice, visitados)) 
+                return true;
+        }
+    }
+    
+    return false;
+}
