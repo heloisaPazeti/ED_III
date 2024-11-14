@@ -169,9 +169,13 @@ class Vertice
 
         friend std::ostream& operator<<(std::ostream &out, const std::set<Vertice> &vetorVertices) 
         {
-            std::set<Vertice>::iterator itVertice;
-            for(itVertice = vetorVertices.begin(); itVertice!=vetorVertices.end(); itVertice++)
-                out << "-> " << (*itVertice).Nome() << "\n";
+            if(vetorVertices.empty())
+                out << "vazia\n";
+            else
+            {
+                for(Vertice v : vetorVertices)
+                    out << "-> " << v.Nome() << "\n";
+            }
 
             return out;
         }
