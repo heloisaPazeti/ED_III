@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include <list>
 #include <algorithm>
+#include <queue>
 
 // ========================================================================
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
@@ -153,12 +154,10 @@ int BuscarGrafo(std::string nomeArq)
 */
 int BuscarCiclo(std::string nomeArq) 
 {
-    int i = 0;
+    int ciclos = 0;
     bool checarAdj = true;
     Vertice v("");
     std::set<Vertice>::iterator it;
-    //std::unordered_set<Vertice> cinzaSet;
-    //std::stack<Vertice> cinzaStack;
     std::list<Vertice> cinzas;
     std::set<Vertice> pretos;
     std::set<Presa> adjacentes;
@@ -169,42 +168,59 @@ int BuscarCiclo(std::string nomeArq)
         if(cinzas.empty())                                                                                      // Se pilha vazia -> prox caminho
         {
             v = *it;                                                                                            // Vertice inicial
-            if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end() || pretos.find(v) != pretos.end())    // Se já fez pode pular
+            if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end() || pretos.find(v) != pretos.end() || v.Nome() == "")    // Se já fez pode pular
                 continue;
         }
         else                                                                                                    // Se ainda tiver caminho pra seguir
         {
             // *** Teoricamente n precisa dessa linha de baixo
-            v = cinzas.front();                                                                                 // Certifica de pegar o topo
+            //v = cinzas.front();                                                                                 // Certifica de pegar o topo
             cinzas.pop_front();                                                                                 // Remove o topo
-            pretos.insert(v);                                                                                   // coloca nas pretas
         }
         
+        checarAdj = true;
         while(checarAdj)                                                                                        // Enquanto tiver adjacencias  
         {    
-            if(v.Nome() == "") continue;
+            bool alterouPilha = false;
             adjacentes = v.Adjacencias();
+            if(adjacentes.empty()) checarAdj = false;
             
-            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); it++)      // Procura adjacente branco
+            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); itPresa++)      // Procura adjacente branco
             {
                 Presa pTemp = *itPresa;
                 Vertice vTemp(pTemp.Nome());
 
-                if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end() || pretos.find(v) != pretos.end())    // Se adjacente eh bran
+                if(std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end())
+                {
+                    ciclos++;
+                    checarAdj = false;
+                    continue;
+                }
+                else if(pTemp.Nome() == v.Nome())
+                {
+                    ciclos++;
+                    checarAdj = false;
+                    continue;
+                }
+                else if(pretos.find(v) == pretos.end())                                                             // Se adjacente eh branco
                 {
                     cinzas.push_front(vTemp);                                                                       // Adiciona adj na pilha
-                    v = cinzas.front();                                                                             // v eh o novo topo da pilha
+                    v = cinzas.front();
+                    checarAdj = true;
+                    alterouPilha = true;                                                                             // v eh o novo topo da pilha
                     break;
                 }
-                else    
+                else
                     checarAdj = false;
             }
-            
         }
+
+        cinzas.remove(v);
+        pretos.insert(v);                                                                                   // coloca nas pretas
     }
 
-    std::cout << "Quantidade de ciclos:" << i << std::endl;
-    return i;
+    std::cout << "Quantidade de ciclos:" << ciclos << std::endl;
+    return ciclos;
 }
 
 
@@ -215,3 +231,58 @@ int BuscarCiclo(std::string nomeArq)
 // ========================================================================
 // =================== FUNCOES DE RELAÇÃO GRAFO (14) ======================
 // ========================================================================
+
+int RelacaoPresaPredador(std::string nomeArq)
+{
+    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq); // Cria o grafo a partir do arquivo binário
+    std::list<VerticePeso> percorridos;
+    std::list<VerticePeso> analisados;
+    std::set<Vertice>::iterator it;
+    
+    int n, pesoAcumulado;
+    bool flag = true;
+    char nomePredador[60], nomePresa[60];
+
+    std::cin >> n;
+
+    for(int i = 0; i<n; i++)
+    {
+        scan_quote_string(nomePredador);        // Obtém os nomes do predador e da presa
+        scan_quote_string(nomePresa);
+
+        Vertice predador(nomePredador);
+        it = vetorVertices.find(predador);
+        if(it!=vetorVertices.end())
+            predador = *it;
+        else
+            std::cout << "O predador não está no grafo" << std::endl;
+
+        while(flag)
+        {
+            std::set<Presa> adjacentes = predador.Adjacencias();
+            // Percorre os adjacentes de modo a encontrar o de menor peso
+            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); itPresa++)
+            {
+                Presa presa = *itPresa;
+
+                if(presa.Nome() == nomePresa)
+                {
+                    flag = false;
+                    pesoAcumulado = pesoAcumulado + presa.Populacao();
+                    break;
+                }
+                else
+                {
+                    VerticePeso verticePeso()
+                    analisados.push_front(presa);
+                }
+                
+
+            }
+        }
+        
+    }
+
+
+    return 0;
+}

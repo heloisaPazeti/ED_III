@@ -33,6 +33,10 @@ int main()
             BuscarCiclo(nomeArq);
             break;
 
+        case 14:
+            RelacaoPresaPredador(nomeArq);
+            break;
+
         default:
             std::cout << "Opcao invalida!" << std::endl;
     }

@@ -40,6 +40,7 @@ typedef struct _cabecalho
 
 } RegCabecalho;
 
+
 // ========================================================================
 // =========================== CLASSES DO GRAFO ===========================
 // ========================================================================
@@ -57,17 +58,28 @@ class Presa
             _populacaoPredador = populacao;
         }
 
-        std::string Nome()
-        {
-            return _nome;
-        }
-
-        int Populacao()
-        {
-            return _populacaoPredador;
-        }
+        std::string Nome() const { return _nome; }
+        int Populacao() { return _populacaoPredador; }
 
     friend bool operator<(const Presa p1, const Presa p2) {return p1._nome < p2._nome;}
+    friend bool operator==(const Presa p1, const Presa p2) {return p1._nome == p2._nome;}
+
+
+    friend std::ostream& operator<<(std::ostream &out, const std::set<Presa> &vetorPresas) 
+    {
+        std::set<Presa>::iterator itPresas;
+
+        if(vetorPresas.empty())
+            out << "VAZIA";
+        else
+        {
+            for(itPresas = vetorPresas.begin(); itPresas!=vetorPresas.end(); itPresas++)
+                out << "-> " << (*itPresas).Nome() << "\n";
+
+        }
+
+        return out;
+    }
 };
 
 class Vertice
@@ -96,7 +108,7 @@ class Vertice
             _grau = 1;
         }
 
-        Vertice(std::string nome) { _nome = nome; }
+        Vertice(std::string nome = "-1") { _nome = nome; }
 
         void AumentarGrauEntrada()
         {
@@ -111,6 +123,7 @@ class Vertice
         }
 
         std::string Nome() const { return _nome; }
+        
         
         void InserirPresa(std::string nome, int populacao)
         {
@@ -165,5 +178,19 @@ class Vertice
         }
 };
 
+class VerticePeso
+{
+    public:
+        int _peso;
+        Vertice _vertice;
+        VerticePeso(std::string nome, int peso)
+        {
+            Vertice _vertice(nome);
+            _peso = peso;
+        }
+
+        friend bool operator==(const VerticePeso v1, const VerticePeso v2) {return v1._vertice.Nome() == v1._vertice.Nome();}
+        friend bool operator<(const VerticePeso v1, const VerticePeso v2) {return v1._vertice.Nome() < v1._vertice.Nome();}
+};
 
 #endif
