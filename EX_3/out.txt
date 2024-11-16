@@ -1,0 +1,2 @@
+./bin/programa;
+Não, o grafo não é fortemente conexo e possui 1647196568 componentes.

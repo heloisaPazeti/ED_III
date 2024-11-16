@@ -137,22 +137,34 @@ bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice 
 // ======================== FUNCOES DE BUSCA ==============================
 // ========================================================================
 
-int DFS(Vertice v, std::map<std::string, std::string> &low, std::list<Vertice> &pilha, std::list<Vertice> &cinzas, std::set<Vertice> &visitados, std::set<Vertice> vetorVertices, int componentes)
+int DFS(Vertice v, std::map<std::string, std::string> &low, std::list<Vertice> &pilha, std::set<Vertice> &visitados, std::set<Vertice> vetorVertices, int &componentes)
 {
     Vertice vTemp("");
+    std::set<Vertice>::iterator itV;
     std::set<Presa> adjacencias = v.Adjacencias();
 
     low[v.Nome()] = v.Nome();
     pilha.push_front(v);
-    cinzas.push_front(v);
     visitados.insert(v);
+
+    //std::cout << "VISITANDO: " << v.Nome() << std::endl;
 
     for(Presa presa :  adjacencias)
     {
-        vTemp = *(vetorVertices.find(presa.Nome()));
+        itV = vetorVertices.find(presa.Nome());
+
+        if(itV != vetorVertices.end())
+            vTemp = *itV;
+        else
+        {
+            if(presa.Nome() != "") componentes++;
+            continue;
+        }
+
+        //std::cout << "  PROX: " << vTemp.Nome() << std::endl;
         if(visitados.find(vTemp) == visitados.end())
-            componentes = DFS(vTemp, low, pilha, cinzas, visitados, vetorVertices, componentes);
-        if(VerticeCinza(cinzas, vTemp))
+            DFS(vTemp, low, pilha, visitados, vetorVertices, componentes);
+        if(VerticeCinza(pilha, vTemp))
             low[v.Nome()] = min(low[v.Nome()], low[vTemp.Nome()]);
     }
 
@@ -160,11 +172,12 @@ int DFS(Vertice v, std::map<std::string, std::string> &low, std::list<Vertice> &
     {
         for(Vertice vI = pilha.front(); ; vI = pilha.front())
         {
-            cinzas.remove(vI);
-            //sccs[node] = sccCount; -> Não entendi 00
+            pilha.remove(vI);
             if(vI.Nome() == v.Nome()) break;
         }
+        
+        componentes++;
     }
 
-    return componentes++;
+    return componentes;
 }

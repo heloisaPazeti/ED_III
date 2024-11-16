@@ -226,7 +226,6 @@ int BuscarComponentes(std::string nomeArq)
 {
     int componentes;
     std::list<Vertice> pilha;
-    std::list<Vertice> cinzas;
     std::set<Vertice> visitados;
     std::map<std::string, std::string> low;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
@@ -234,7 +233,7 @@ int BuscarComponentes(std::string nomeArq)
     for(Vertice v : vetorVertices)
     {
         if(visitados.find(v) == visitados.end())
-            componentes  = DFS(v, low, pilha, cinzas, visitados, vetorVertices, componentes);
+            DFS(v, low, pilha, visitados, vetorVertices, componentes);
     }
 
      if(componentes == 1)
@@ -242,46 +241,6 @@ int BuscarComponentes(std::string nomeArq)
     else
         std::cout << "Não, o grafo não é fortemente conexo e possui " << componentes << " componentes." << std::endl;
     return componentes;
-
-    /* 
-    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
-    std::set<Vertice> visitados;
-    std::set<Vertice> comp;
-    std::set<std::set<Vertice>> componentes;
-
-    for(Vertice vI : vetorVertices)
-    {
-        if(visitados.find(vI) != visitados.end()) continue;
-
-        visitados.insert(vI);
-        comp.clear();
-        comp.insert(vI);
-
-        if(LacoOuVazio(vI))
-        {
-            componentes.insert(comp);
-            continue;
-        }
-        
-        for(Vertice vJ : vetorVertices)
-        {
-            if(vJ == vI) continue;
-            if(visitados.find(vJ) != visitados.end()) continue;
-            if(DFS(vI, vJ, vetorVertices, visitados) && DFS(vJ, vI, vetorVertices, visitados))
-                comp.insert(vJ);
-        }
-
-        componentes.insert(comp);
-        if(comp == vetorVertices) break;
-    }
-
-
-    if(componentes.size() == 1)
-        std::cout << "Sim, o grafo é fortemente conexo e possui " << componentes.size() << " componente." << std::endl;
-    else
-        std::cout << "Não, o grafo não é fortemente conexo e possui " << componentes.size() << " componentes." << std::endl;
-    return componentes.size(); */
-
 }
 
 // ========================================================================
