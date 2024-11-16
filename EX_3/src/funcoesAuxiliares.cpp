@@ -1,6 +1,7 @@
 #include "structs.h"
 #include "funcoesAuxiliares.h"
 #include <string.h>
+#include <map>
 
 // ========================================================================
 // ========================= FUNCOES DE LEITURA ===========================
@@ -136,30 +137,34 @@ bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice 
 // ======================== FUNCOES DE BUSCA ==============================
 // ========================================================================
 
-bool DFS(Vertice vInicio, Vertice vFinal, std::set<Vertice> vetorVertice, std::set<Vertice> &visitados)
+int DFS(Vertice v, std::map<std::string, std::string> &low, std::list<Vertice> &pilha, std::list<Vertice> &cinzas, std::set<Vertice> &visitados, std::set<Vertice> vetorVertices, int componentes)
 {
     Vertice vTemp("");
-    std::set<Vertice>::iterator itTemp;
-    std::set<Presa> adjacencias = vInicio.Adjacencias();
+    std::set<Presa> adjacencias = v.Adjacencias();
 
-    if (vInicio == vFinal) return true;
+    low[v.Nome()] = v.Nome();
+    pilha.push_front(v);
+    cinzas.push_front(v);
+    visitados.insert(v);
 
-    visitados.insert(vInicio);
-    for (Presa presa : adjacencias) 
+    for(Presa presa :  adjacencias)
     {
-        itTemp = vetorVertice.find(presa.Nome());
+        vTemp = *(vetorVertices.find(presa.Nome()));
+        if(visitados.find(vTemp) == visitados.end())
+            componentes = DFS(vTemp, low, pilha, cinzas, visitados, vetorVertices, componentes);
+        if(VerticeCinza(cinzas, vTemp))
+            low[v.Nome()] = min(low[v.Nome()], low[vTemp.Nome()]);
+    }
 
-        if(itTemp == vetorVertice.end())
-            return false;
-        else
-            vTemp = *itTemp;
-
-        if (!VerticePreto(visitados, vTemp)) 
+    if(v.Nome() == low[v.Nome()])
+    {
+        for(Vertice vI = pilha.front(); ; vI = pilha.front())
         {
-            if (DFS(vTemp, vFinal, vetorVertice, visitados)) 
-                return true;
+            cinzas.remove(vI);
+            //sccs[node] = sccCount; -> Não entendi 00
+            if(vI.Nome() == v.Nome()) break;
         }
     }
-    
-    return false;
+
+    return componentes++;
 }
