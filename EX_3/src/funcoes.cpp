@@ -2,6 +2,7 @@
 #include "structs.h"
 #include "funcoesAuxiliares.h"
 #include <string.h>
+#include <map>
 #include <list>
 #include <algorithm>
 
@@ -136,8 +137,7 @@ int BuscarGrafo(std::string nomeArq)
 // ========================================================================
 // ==================== FUNCOES DE CICLO GRAFO (12) =======================
 // ========================================================================
-
- /* == Descobrir quantidades de ciclos ==
+ /* == Funcionamento ==
  
     -> Enquanto vertice x possuir adjacentes
         -> Pegar um vertice x
@@ -151,6 +151,8 @@ int BuscarGrafo(std::string nomeArq)
         -> Vertice x = novo topo da pilha
         -> Refazer 
 */
+
+/* Calcula quantos ciclos existem dentro do grafo.*/
 int BuscarCiclo(std::string nomeArq) 
 {
     int ciclos = 0;
@@ -219,91 +221,41 @@ int BuscarCiclo(std::string nomeArq)
 // ========================================================================
 // ==================== FUNCOES DE CONEXO GRAFO (13) ======================
 // ========================================================================
+// Tarjan's Algorithm -> github.com/williamfiset/Algorithms/blob/master/src/main/java/com/williamfiset/algorithms/graphtheory/TarjanSccSolverAdjacencyList.java
+/* == Funcionamento ==
 
-/* == Se fortemente conexo ou nao e quantidade de componentes ==
+    -> Para todo vertice no grafo aplicar DFS
+    -> Mater um id para o vertice (nome) + low (menor vertice que ele alcança)
+    -> Manter pilha de cinzas -> analisando ainda
+    -> Manter lista de pretos -> ja visitados
+    -> Apos cada DFS recursivo -> vertice adjacente esta nos cinzas ?
+        -> Se sim -> verificar o menor valor entre os lows
+        -> Se nao -> nao faz nada
+    -> Ao encontrar o topo de uma subarvore (id == low)
+    -> Desempilhar vertices que fazem parte do componente
+    -> Somar um componente
 
-    -> Para todo vertice x 
-
-    -> Seguir os caminhos possiveis de forma a percorrer todo o grafo.
-    -> Se for possivel para x -> x é um componente conexo.
-    -> Se for possivel para todo vertice -> grafo fortemente conexo.
-
-    -> Metodo: Buscar por Profundidade
+    -> OBS: cuidar para vertices "fantasmas" -> que nao estao realmente no grafo 
 */
+
+/* Buscar por componentes conexos no grafo. Verificar se o grafo eh fortemente conexo ou nao.*/
 int BuscarComponentes(std::string nomeArq) 
 {
     int componentes = 0;
-    bool pilhaAlterada = true;
-    bool fortementeConexo = true;
-    Vertice v("");
-    Vertice vTemp("");
-    std::set<Vertice>::iterator it;
-    std::set<Vertice>::iterator itTemp;
     std::list<Vertice> pilha;
     std::set<Vertice> visitados;
-    std::set<Presa> adjacentes;
+    std::map<std::string, std::string> low;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
-    it = vetorVertices.begin();
-    while(it != vetorVertices.end() || !pilha.empty())
+    for(Vertice v : vetorVertices)                                              // Para todos os vertices do grafo
     {
-        if(pilha.empty())                                                   // Se pilha vazia -> prox caminho
-        {
-            v = *it;                                                        // Vertice inicial
-            it++;
-            if(VerticePreto(visitados, v) || v.Nome() == "")               // Se já fez pode pular
-                continue;
-
-            pilha.push_front(v);
-        }
-        else                                                                // Se ainda tiver caminho pra seguir
-            v = pilha.front();                                              // Certifica de pegar o topo
-
-        pilhaAlterada = true;                                               // Saber se avançou ou nao
-        while(pilhaAlterada)                                                // Enquanto tiver adjacencias  
-        {    
-            pilhaAlterada = false;                                          // Assume-se que nao sera alterada
-            adjacentes = v.Adjacencias();
-            if(adjacentes.empty()) continue;                                // Se nao houver adjacentes acabou
-
-            for(Presa pTemp : adjacentes)                                   // Para todas as adjacencias
-            {
-                itTemp = vetorVertices.find(pTemp.Nome());                  // Pegamos como vertice
-                if(itTemp != vetorVertices.end())                           // Se o vertice existir
-                    vTemp = *itTemp;                                        // Pegamos sua referencia
-                else
-                    continue;
-
-                if(VerticeBranco(pilha, visitados, vTemp))                  // Se nao foi visitado
-                {
-                    v = vTemp;                                              // Alteramos destino 
-                    pilhaAlterada = true;                                   // Alteramos a pilha
-                    pilha.push_front(v);
-                    break;                                                  // Saida do for
-                }
-            }
-        }
-
-
-
-        pilha.remove(v);
-        visitados.insert(v);
-        
-        if(pilha.empty())
-        {
-            
-            if(visitados == vetorVertices)                                  // Se todos estao nos visitados
-                componentes++;                                              // O componente eh conexo
-            else
-                fortementeConexo = false;                                   // Se nao, sabe-se que nao sera fort. conexo
-
-            visitados.clear();                                              // Limpamos visitados   
-        }
+        if(visitados.find(v) == visitados.end())                                // Se ainda nao foi visitado
+            DFS(v, low, pilha, visitados, vetorVertices, componentes);          // Fazer uma busca em profundidade
     }
 
-    if(fortementeConexo)
-        std::cout << "Sim, o grafo é fortemente conexo e possui 1 componente." << std::endl;
-    else
+     if(componentes == 1)                                                       // Grafo fortemente conexo
+        std::cout << "Sim, o grafo é fortemente conexo e possui " << componentes << " componente." << std::endl;
+    else                                                                        // Grafo nao conexo
         std::cout << "Não, o grafo não é fortemente conexo e possui " << componentes << " componentes." << std::endl;
     return componentes;
 }

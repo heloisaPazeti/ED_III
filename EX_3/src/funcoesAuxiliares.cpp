@@ -1,6 +1,7 @@
 #include "structs.h"
 #include "funcoesAuxiliares.h"
 #include <string.h>
+#include <map>
 
 // ========================================================================
 // ========================= FUNCOES DE LEITURA ===========================
@@ -131,3 +132,54 @@ void MostrarGrafo(std::set<Vertice> vetorVertices)
 bool VerticePreto(std::set<Vertice> pretos, Vertice v)  { return pretos.find(v) != pretos.end(); }
 bool VerticeCinza(std::list<Vertice> cinzas, Vertice v) { return std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end(); }
 bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v) { return ((!VerticeCinza(cinzas, v)) && (!VerticePreto(pretos, v))); }
+
+// ========================================================================
+// ======================== FUNCOES DE BUSCA ==============================
+// ========================================================================
+
+/* Dado um vertice v faz uma busca em profundidade por ele calculando os componentes e retorna esse valor (recursivo).*/
+int DFS(Vertice v, std::map<std::string, std::string> &low, std::list<Vertice> &pilha, std::set<Vertice> &visitados, std::set<Vertice> vetorVertices, int &componentes)
+{
+    Vertice vTemp("");
+    std::set<Vertice>::iterator itV;
+    std::set<Presa> adjacencias = v.Adjacencias();
+
+    low[v.Nome()] = v.Nome();                                                   // Coloca-se no id nome o seu valor inicialmente
+    pilha.push_front(v);                                                        // Adiciona-se vertice na pilha
+    visitados.insert(v);                                                        // Adiciona-se vertice nos visitados
+
+    for(Presa presa :  adjacencias)                                             // Para todas suas adjacencias
+    {
+        itV = vetorVertices.find(presa.Nome());                                 // Procura-se a presa
+
+        if(itV != vetorVertices.end())                                          // Se a busca encontrar algo
+            vTemp = *itV;                                                       // Vertice temporario assume seu valor
+        else                                                                    // Caso nao, pode ser final das adjacencias ou o vertice fantasma
+        {
+            Vertice vPresa(presa.Nome());                                       // Cria-se um vertice fantasma
+            if(presa.Nome() != "" && !VerticePreto(visitados, vPresa))          // Verifica-se se nao eh fim da lista e se ja nao foi visitado
+            {
+                visitados.insert(vPresa);                                       // Insere-se essa presa aos visitados
+                componentes++;                                                  // Soma-se mais um componente
+            }
+            continue;
+        }
+
+        if(visitados.find(vTemp) == visitados.end())                            // Se vertice nao foi visitado
+            DFS(vTemp, low, pilha, visitados, vetorVertices, componentes);      // Faz-se outra DFS
+        if(VerticeCinza(pilha, vTemp))                                          // Se vertice adjacente esta sendo analisado
+            low[v.Nome()] = min(low[v.Nome()], low[vTemp.Nome()]);              // Calculam-se um possivel novo low
+    }
+
+    if(v.Nome() == low[v.Nome()])                                               // Caso esteja-se no topo da subarvore
+    {
+        for(Vertice vI = pilha.front(); ; vI = pilha.front())                   // Desempilha-se todo o caminho ate esse topo
+        {
+            pilha.remove(vI);                                                   // Remove da pilha
+            if(vI.Nome() == v.Nome()) break;                                    // Se chega-se ate o topo, para
+        }
+        componentes++;                                                          // Soma-se um componente
+    }
+
+    return componentes;                                                         // Retorna-se o total de componentes
+}
