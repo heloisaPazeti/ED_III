@@ -137,8 +137,7 @@ int BuscarGrafo(std::string nomeArq)
 // ========================================================================
 // ==================== FUNCOES DE CICLO GRAFO (12) =======================
 // ========================================================================
-
- /* == Descobrir quantidades de ciclos ==
+ /* == Funcionamento ==
  
     -> Enquanto vertice x possuir adjacentes
         -> Pegar um vertice x
@@ -152,6 +151,8 @@ int BuscarGrafo(std::string nomeArq)
         -> Vertice x = novo topo da pilha
         -> Refazer 
 */
+
+/* Calcula quantos ciclos existem dentro do grafo.*/
 int BuscarCiclo(std::string nomeArq) 
 {
     int ciclos = 0;
@@ -220,25 +221,41 @@ int BuscarCiclo(std::string nomeArq)
 // ========================================================================
 // ==================== FUNCOES DE CONEXO GRAFO (13) ======================
 // ========================================================================
-
 // Tarjan's Algorithm -> github.com/williamfiset/Algorithms/blob/master/src/main/java/com/williamfiset/algorithms/graphtheory/TarjanSccSolverAdjacencyList.java
+/* == Funcionamento ==
+
+    -> Para todo vertice no grafo aplicar DFS
+    -> Mater um id para o vertice (nome) + low (menor vertice que ele alcança)
+    -> Manter pilha de cinzas -> analisando ainda
+    -> Manter lista de pretos -> ja visitados
+    -> Apos cada DFS recursivo -> vertice adjacente esta nos cinzas ?
+        -> Se sim -> verificar o menor valor entre os lows
+        -> Se nao -> nao faz nada
+    -> Ao encontrar o topo de uma subarvore (id == low)
+    -> Desempilhar vertices que fazem parte do componente
+    -> Somar um componente
+
+    -> OBS: cuidar para vertices "fantasmas" -> que nao estao realmente no grafo 
+*/
+
+/* Buscar por componentes conexos no grafo. Verificar se o grafo eh fortemente conexo ou nao.*/
 int BuscarComponentes(std::string nomeArq) 
 {
-    int componentes;
+    int componentes = 0;
     std::list<Vertice> pilha;
     std::set<Vertice> visitados;
     std::map<std::string, std::string> low;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
-    for(Vertice v : vetorVertices)
+    for(Vertice v : vetorVertices)                                              // Para todos os vertices do grafo
     {
-        if(visitados.find(v) == visitados.end())
-            DFS(v, low, pilha, visitados, vetorVertices, componentes);
+        if(visitados.find(v) == visitados.end())                                // Se ainda nao foi visitado
+            DFS(v, low, pilha, visitados, vetorVertices, componentes);          // Fazer uma busca em profundidade
     }
 
-     if(componentes == 1)
+     if(componentes == 1)                                                       // Grafo fortemente conexo
         std::cout << "Sim, o grafo é fortemente conexo e possui " << componentes << " componente." << std::endl;
-    else
+    else                                                                        // Grafo nao conexo
         std::cout << "Não, o grafo não é fortemente conexo e possui " << componentes << " componentes." << std::endl;
     return componentes;
 }

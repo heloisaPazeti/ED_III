@@ -137,47 +137,49 @@ bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice 
 // ======================== FUNCOES DE BUSCA ==============================
 // ========================================================================
 
+/* Dado um vertice v faz uma busca em profundidade por ele calculando os componentes e retorna esse valor (recursivo).*/
 int DFS(Vertice v, std::map<std::string, std::string> &low, std::list<Vertice> &pilha, std::set<Vertice> &visitados, std::set<Vertice> vetorVertices, int &componentes)
 {
     Vertice vTemp("");
     std::set<Vertice>::iterator itV;
     std::set<Presa> adjacencias = v.Adjacencias();
 
-    low[v.Nome()] = v.Nome();
-    pilha.push_front(v);
-    visitados.insert(v);
+    low[v.Nome()] = v.Nome();                                                   // Coloca-se no id nome o seu valor inicialmente
+    pilha.push_front(v);                                                        // Adiciona-se vertice na pilha
+    visitados.insert(v);                                                        // Adiciona-se vertice nos visitados
 
-    //std::cout << "VISITANDO: " << v.Nome() << std::endl;
-
-    for(Presa presa :  adjacencias)
+    for(Presa presa :  adjacencias)                                             // Para todas suas adjacencias
     {
-        itV = vetorVertices.find(presa.Nome());
+        itV = vetorVertices.find(presa.Nome());                                 // Procura-se a presa
 
-        if(itV != vetorVertices.end())
-            vTemp = *itV;
-        else
+        if(itV != vetorVertices.end())                                          // Se a busca encontrar algo
+            vTemp = *itV;                                                       // Vertice temporario assume seu valor
+        else                                                                    // Caso nao, pode ser final das adjacencias ou o vertice fantasma
         {
-            if(presa.Nome() != "") componentes++;
+            Vertice vPresa(presa.Nome());                                       // Cria-se um vertice fantasma
+            if(presa.Nome() != "" && !VerticePreto(visitados, vPresa))          // Verifica-se se nao eh fim da lista e se ja nao foi visitado
+            {
+                visitados.insert(vPresa);                                       // Insere-se essa presa aos visitados
+                componentes++;                                                  // Soma-se mais um componente
+            }
             continue;
         }
 
-        //std::cout << "  PROX: " << vTemp.Nome() << std::endl;
-        if(visitados.find(vTemp) == visitados.end())
-            DFS(vTemp, low, pilha, visitados, vetorVertices, componentes);
-        if(VerticeCinza(pilha, vTemp))
-            low[v.Nome()] = min(low[v.Nome()], low[vTemp.Nome()]);
+        if(visitados.find(vTemp) == visitados.end())                            // Se vertice nao foi visitado
+            DFS(vTemp, low, pilha, visitados, vetorVertices, componentes);      // Faz-se outra DFS
+        if(VerticeCinza(pilha, vTemp))                                          // Se vertice adjacente esta sendo analisado
+            low[v.Nome()] = min(low[v.Nome()], low[vTemp.Nome()]);              // Calculam-se um possivel novo low
     }
 
-    if(v.Nome() == low[v.Nome()])
+    if(v.Nome() == low[v.Nome()])                                               // Caso esteja-se no topo da subarvore
     {
-        for(Vertice vI = pilha.front(); ; vI = pilha.front())
+        for(Vertice vI = pilha.front(); ; vI = pilha.front())                   // Desempilha-se todo o caminho ate esse topo
         {
-            pilha.remove(vI);
-            if(vI.Nome() == v.Nome()) break;
+            pilha.remove(vI);                                                   // Remove da pilha
+            if(vI.Nome() == v.Nome()) break;                                    // Se chega-se ate o topo, para
         }
-        
-        componentes++;
+        componentes++;                                                          // Soma-se um componente
     }
 
-    return componentes;
+    return componentes;                                                         // Retorna-se o total de componentes
 }
