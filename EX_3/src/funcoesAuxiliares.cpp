@@ -3,6 +3,10 @@
 #include <string.h>
 #include <set>
 #include <list>
+#include <iostream>
+#include "funcoes.h"
+#include <map>
+#include <algorithm>
 
 // ========================================================================
 // ========================= FUNCOES DE LEITURA ===========================

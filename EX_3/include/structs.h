@@ -157,7 +157,8 @@ class Vertice
                 return "-1";
         }
 
-        std::set<Presa> Adjacencias() { 
+        std::set<Presa> Adjacencias() 
+        { 
             
             auto it = _vetorPresa.begin();
             Presa p = *it;

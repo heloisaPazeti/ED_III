@@ -253,25 +253,28 @@ int RelacaoPresaPredador(std::string nomeArq)
         scan_quote_string(nomePredador);
         scan_quote_string(nomePresa);
         
-        std::set<Vertice> inicio(nomePredador);
+        Vertice inicio(nomePredador);
         std::set<Vertice>::iterator itV = vetorVertices.find(inicio);
 
         if(itV != vetorVertices.end())
-        inicio = *itV;
+            inicio = *itV;
+        else
+        {
+            std::cout << "Predador não existe" << std::endl;
+            continue;;
+        }
 
         VerticePeso v(nomePredador, 0);
 
-        while(flag)           // Faz para todos os vertices
+        while(flag)           
         {
             if(analisados.empty())                                                      // Se pilha vazia -> prox caminho
             {
-                                                                                // Vertice inicial
                 if(!VerticeBrancoP(analisados, percorridos, v) || v._vertice.Nome() == "")             // Se já fez pode pular
                     continue;
             }
             else                                                                    // Se ainda tiver caminho pra seguir
             {
-                it--;
                 v = analisados.front();                                                 // Certifica de pegar o topo
             }                
 
@@ -285,23 +288,24 @@ int RelacaoPresaPredador(std::string nomeArq)
                 for(Presa pTemp : adjacentes)
                 {
                     itTemp = vetorVertices.find(pTemp.Nome());
+                    Vertice aux = *itTemp;
+                    if(aux.Nome()==nomePresa)
+                    {
+                        flag = false;
+                    }
                     if(itTemp != vetorVertices.end() && pTemp.Nome() != "") 
                     {
-                        Vertice aux = *itTemp;
                         vTemp._vertice.Nome() = aux.Nome();
                         vTemp._peso = pTemp.Populacao();
                     }
                     else
                         continue;
 
-                    
-
                     if(VerticeCinzaP(analisados, vTemp) || vTemp._vertice.Nome() == v._vertice.Nome())
                     {
                         if(vTemp._peso>v._peso)
                         {
                             vTemp._peso = v._peso;
-        
                         }
 
                         pesoAcumulado += vTemp._peso;
@@ -323,5 +327,7 @@ int RelacaoPresaPredador(std::string nomeArq)
             percorridos.insert(v);                                                       // coloca nas pretas
         }
     }
+
+    std::cout << nomePredador << " " << nomePresa << ": " << pesoAcumulado << std::endl;
     return 0;
 }
