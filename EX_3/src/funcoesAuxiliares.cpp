@@ -1,6 +1,8 @@
 #include "structs.h"
 #include "funcoesAuxiliares.h"
 #include <string.h>
+#include <set>
+#include <list>
 
 // ========================================================================
 // ========================= FUNCOES DE LEITURA ===========================
@@ -138,3 +140,11 @@ void scan_quote_string(char *str) {
 		strcpy(str, "");
 	}
 }
+
+bool VerticePreto(std::set<Vertice> pretos, Vertice v)  { return pretos.find(v) != pretos.end(); }
+bool VerticeCinza(std::list<Vertice> cinzas, Vertice v) { return std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end(); }
+bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v) { return ((!VerticeCinza(cinzas, v)) && (!VerticePreto(pretos, v))); }
+
+bool VerticePretoP(std::set<VerticePeso> pretos, VerticePeso v)  { return pretos.find(v) != pretos.end(); }
+bool VerticeCinzaP(std::list<VerticePeso> cinzas, VerticePeso v) { return std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end(); }
+bool VerticeBrancoP(std::list<VerticePeso> cinzas, std::set<VerticePeso> pretos, VerticePeso v) { return ((!VerticeCinzaP(cinzas, v)) && (!VerticePretoP(pretos, v))); }

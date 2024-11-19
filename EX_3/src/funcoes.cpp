@@ -234,55 +234,94 @@ int BuscarCiclo(std::string nomeArq)
 
 int RelacaoPresaPredador(std::string nomeArq)
 {
-    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq); // Cria o grafo a partir do arquivo binário
-    std::list<VerticePeso> percorridos;
+    bool pilhaAlterada = true;
+    VerticePeso vTemp("", 0);
+    std::set<VerticePeso>::iterator it;
+    std::set<Vertice>::iterator itTemp;
     std::list<VerticePeso> analisados;
-    std::set<Vertice>::iterator it;
+    std::set<VerticePeso> percorridos;
+    std::set<Presa> adjacentes;
+    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
     
     int n, pesoAcumulado;
     bool flag = true;
     char nomePredador[60], nomePresa[60];
 
     std::cin >> n;
-
-    for(int i = 0; i<n; i++)
+    for(int i=0; i<n; i++)
     {
-        scan_quote_string(nomePredador);        // Obtém os nomes do predador e da presa
+        scan_quote_string(nomePredador);
         scan_quote_string(nomePresa);
-
-        Vertice predador(nomePredador);
-        it = vetorVertices.find(predador);
-        if(it!=vetorVertices.end())
-            predador = *it;
-        else
-            std::cout << "O predador não está no grafo" << std::endl;
-
-        while(flag)
-        {
-            std::set<Presa> adjacentes = predador.Adjacencias();
-            // Percorre os adjacentes de modo a encontrar o de menor peso
-            for(std::set<Presa>::iterator itPresa = adjacentes.begin(); itPresa != adjacentes.end(); itPresa++)
-            {
-                Presa presa = *itPresa;
-
-                if(presa.Nome() == nomePresa)
-                {
-                    flag = false;
-                    pesoAcumulado = pesoAcumulado + presa.Populacao();
-                    break;
-                }
-                else
-                {
-                    VerticePeso verticePeso()
-                    analisados.push_front(presa);
-                }
-                
-
-            }
-        }
         
+        std::set<Vertice> inicio(nomePredador);
+        std::set<Vertice>::iterator itV = vetorVertices.find(inicio);
+
+        if(itV != vetorVertices.end())
+        inicio = *itV;
+
+        VerticePeso v(nomePredador, 0);
+
+        while(flag)           // Faz para todos os vertices
+        {
+            if(analisados.empty())                                                      // Se pilha vazia -> prox caminho
+            {
+                                                                                // Vertice inicial
+                if(!VerticeBrancoP(analisados, percorridos, v) || v._vertice.Nome() == "")             // Se já fez pode pular
+                    continue;
+            }
+            else                                                                    // Se ainda tiver caminho pra seguir
+            {
+                it--;
+                v = analisados.front();                                                 // Certifica de pegar o topo
+            }                
+
+            pilhaAlterada = true;
+            while(pilhaAlterada)                                                        // Enquanto tiver adjacencias  
+            {    
+                pilhaAlterada = false;
+                adjacentes = inicio.Adjacencias();
+                if(adjacentes.empty()) continue;
+
+                for(Presa pTemp : adjacentes)
+                {
+                    itTemp = vetorVertices.find(pTemp.Nome());
+                    if(itTemp != vetorVertices.end() && pTemp.Nome() != "") 
+                    {
+                        Vertice aux = *itTemp;
+                        vTemp._vertice.Nome() = aux.Nome();
+                        vTemp._peso = pTemp.Populacao();
+                    }
+                    else
+                        continue;
+
+                    
+
+                    if(VerticeCinzaP(analisados, vTemp) || vTemp._vertice.Nome() == v._vertice.Nome())
+                    {
+                        if(vTemp._peso>v._peso)
+                        {
+                            vTemp._peso = v._peso;
+        
+                        }
+
+                        pesoAcumulado += vTemp._peso;
+                        analisados.remove(vTemp);
+                        analisados.push_front(vTemp);
+                        continue;
+                    }
+                    else if(VerticeBrancoP(analisados, percorridos, vTemp))                           // Se adjacente eh branco
+                    {
+                        analisados.push_front(vTemp);                                   // Adiciona adj na pilha
+                        v = analisados.front();                                         // Passa para o novo topo
+                        pilhaAlterada = true;                                           // Permanece no while
+                        break;                                                      // Saida do for
+                    }
+                }
+            }
+
+            analisados.remove(v);                                                       // Remove o topo
+            percorridos.insert(v);                                                       // coloca nas pretas
+        }
     }
-
-
     return 0;
 }

@@ -191,6 +191,8 @@ class VerticePeso
 
         friend bool operator==(const VerticePeso v1, const VerticePeso v2) {return v1._vertice.Nome() == v1._vertice.Nome();}
         friend bool operator<(const VerticePeso v1, const VerticePeso v2) {return v1._vertice.Nome() < v1._vertice.Nome();}
+
+    
 };
 
 #endif
