@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <list>
 #include <algorithm>
-#include <queue>
+#include <map>
 
 // ========================================================================
 // ===================== FUNCOES CRIAÇÃO GRAFO (10) =======================
@@ -234,21 +234,61 @@ int BuscarCiclo(std::string nomeArq)
 
 int RelacaoPresaPredador(std::string nomeArq)
 {
-    bool pilhaAlterada = true;
+    Vertice v("");
+    std::set<VerticePeso> pilha;
+    std::list<VerticePeso> visitados;
+    std::map<std::string, int> dists;
+    std::set<Vertice>::iterator itPredador;
+    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
+
+    int i, j, k, n;
+    int size = vetorVertices.size();
+    
+    std::string nomePredador, nomePresa;
+
+    std::cin >> n;
+    for(i = 0; i < n; i++)
+    {
+        scan_quote_string(nomePredador);
+        scan_quote_string(nomePresa);
+
+        itPredador = vetorVertices.find(nomePredador);
+
+        if(itPredador == vetorVertices.end()) return -1;
+
+        v = *itPredador;
+
+
+        for(Vertice vI : vetorVertices)
+            dists[vI.Nome()] = __INT_MAX__;
+        
+        dists[v.Nome()] = 0;
+
+        for(j = 0; j < size-1; j++)
+        {
+
+            int min = INT_MAX, min_index;
+
+            for (k = 0; k < size; v++)
+                if (sptSet[v] == false && dist[v] <= min)
+                    min = dist[v], min_index = v;
+
+            return min_index;
+
+            int min = min_index
+        }
+    }
+
+    /* bool pilhaAlterada = true;
     VerticePeso vTemp("", 0);
     std::set<VerticePeso>::iterator it;
     std::set<Vertice>::iterator itTemp;
-    std::list<VerticePeso> analisados;
-    std::set<VerticePeso> percorridos;
     std::set<Presa> adjacentes;
-    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
     
     int n, pesoAcumulado;
     bool flag = true;
     char nomePredador[60], nomePresa[60];
 
-    std::cin >> n;
-    for(int i=0; i<n; i++)
     {
         scan_quote_string(nomePredador);
         scan_quote_string(nomePresa);
@@ -329,5 +369,5 @@ int RelacaoPresaPredador(std::string nomeArq)
     }
 
     std::cout << nomePredador << " " << nomePresa << ": " << pesoAcumulado << std::endl;
-    return 0;
+    return 0; */
 }
