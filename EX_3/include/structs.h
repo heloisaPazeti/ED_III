@@ -69,23 +69,6 @@ class Presa
         int Populacao() { return _populacaoPredador; }
 
     friend bool operator<(const Presa p1, const Presa p2) {return p1._nome < p2._nome;}
-
-
-    friend std::ostream& operator<<(std::ostream &out, const std::set<Presa> &vetorPresas) 
-    {
-        std::set<Presa>::iterator itPresas;
-
-        if(vetorPresas.empty())
-            out << "VAZIA";
-        else
-        {
-            for(itPresas = vetorPresas.begin(); itPresas!=vetorPresas.end(); itPresas++)
-                out << "-> " << (*itPresas).Nome() << "\n";
-
-        }
-
-        return out;
-    }
 };
 
 class Vertice
@@ -166,50 +149,6 @@ class Vertice
 
         friend bool operator==(const Vertice v1, const Vertice v2) {return v1._nome == v2._nome;}
         friend bool operator<(const Vertice v1, const Vertice v2) {return v1._nome < v2._nome;}
-
-        friend std::ostream& operator<<(std::ostream &out, const std::set<Vertice> &vetorVertices) 
-        {
-            if(vetorVertices.empty())
-                out << "vazia\n";
-            else
-            {
-                for(Vertice v : vetorVertices)
-                    out << "-> " << v.Nome() << "\n";
-            }
-
-            return out;
-        }
-
-        friend std::ostream& operator<<(std::ostream &out, const std::list<Vertice> &vetorVertices) 
-        {
-            //std::list<Vertice>::iterator itVertice;
-            for(Vertice v : vetorVertices)
-                out << "-> " << v.Nome() << "\n";
-
-            return out;
-        }
-};
-
-class VerticePeso
-{
-    private:
-        Vertice _id;
-        int _peso;
-
-    public:
-
-        VerticePeso(Vertice id, int peso = 0)
-        {
-            _id = id;
-            _peso = peso;
-        }
-
-        Vertice Id() { return _id; }
-        //int Peso() { return _peso; }
-        int Peso() const { return _peso; }
-
-        friend bool operator==(const VerticePeso p1, const VerticePeso p2) {return p1._id == p2._id;}
-        friend bool operator<(const VerticePeso p1, const VerticePeso p2) {return p1._peso < p2._peso;}
 };
 
 #endif

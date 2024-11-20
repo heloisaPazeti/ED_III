@@ -19,8 +19,21 @@ std::set<Vertice> CriarGrafo(std::string nomeArq)
     std::set<Vertice> vetorVertices;
     std::set<Vertice>::iterator it;
     int tam;
+    char status;
 
     arquivo = fopen(nomeArq.c_str(), "rb");         // Abre o arquivo
+
+    if(arquivo == NULL)
+    {
+        std::cout << "Falha no processamento do arquivo." << std::endl;
+        return vetorVertices;
+    }
+
+    if(fread(&status, sizeof(char),1,arquivo) == '0')
+    {
+        std::cout << "Falha no processamento do arquivo." << std::endl;
+        return vetorVertices;
+    }
 
     dado = InicializarRegistro();                   // Inicializa o registro com valores padrão
 
@@ -92,9 +105,9 @@ int BuscarGrafo(std::string nomeArq)
     std::set<Presa>::iterator itPresa;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
-    std::cin >> n;
-    
+    if(vetorVertices.empty()) return -1;
 
+    std::cin >> n;
     for(i=0; i<n; i++)
     {
         scan_quote_string(nomePresa);           // Lê o nome a ser buscado
@@ -166,6 +179,8 @@ int BuscarCiclo(std::string nomeArq)
     std::set<Vertice> pretos;
     std::set<Presa> adjacentes;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
+
+    if(vetorVertices.empty()) return -1;
 
     for(it = vetorVertices.begin(); it != vetorVertices.end(); it++)            // Faz para todos os vertices
     {
@@ -248,6 +263,8 @@ int BuscarComponentes(std::string nomeArq)
     std::map<std::string, std::string> low;
     std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);
 
+    if(vetorVertices.empty()) return -1;
+
     for(Vertice v : vetorVertices)                                              // Para todos os vertices do grafo
     {
         if(visitados.find(v) == visitados.end())                                // Se ainda nao foi visitado
@@ -287,6 +304,7 @@ int RelacaoPresaPredador(std::string nomeArq)
     std::priority_queue <std::pair<int, Vertice>, std::vector<std::pair<int, Vertice>>, std::greater<std::pair<int, Vertice> >> pq;
     // ^ Fila de prioridade <distancia, vertice> -> ordena pelo menor vertice
 
+    if(vetorVertices.empty()) return -1;
 
     std::cin >> n;
     for(i = 0; i < n; i++)
