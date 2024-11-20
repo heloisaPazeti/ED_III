@@ -114,7 +114,7 @@ class Vertice
             _grau = 1;
         }
 
-        Vertice(std::string nome) { _nome = nome; }
+        Vertice(std::string nome = "") { _nome = nome; }
 
         void AumentarGrauEntrada()
         {
@@ -190,5 +190,26 @@ class Vertice
         }
 };
 
+class VerticePeso
+{
+    private:
+        Vertice _id;
+        int _peso;
+
+    public:
+
+        VerticePeso(Vertice id, int peso = 0)
+        {
+            _id = id;
+            _peso = peso;
+        }
+
+        Vertice Id() { return _id; }
+        //int Peso() { return _peso; }
+        int Peso() const { return _peso; }
+
+        friend bool operator==(const VerticePeso p1, const VerticePeso p2) {return p1._id == p2._id;}
+        friend bool operator<(const VerticePeso p1, const VerticePeso p2) {return p1._peso < p2._peso;}
+};
 
 #endif

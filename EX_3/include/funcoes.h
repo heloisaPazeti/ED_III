@@ -31,4 +31,6 @@ int BuscarComponentes(std::string nomeArq);
 // =================== FUNCOES DE RELAÇÃO GRAFO (14) ======================
 // ========================================================================
 
+int RelacaoPresaPredador(std::string nomeArq);
+
 #endif

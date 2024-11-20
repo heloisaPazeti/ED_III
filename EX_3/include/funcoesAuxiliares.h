@@ -26,6 +26,7 @@ bool VerticePreto(std::set<Vertice> pretos, Vertice v);
 bool VerticeCinza(std::list<Vertice> cinzas, Vertice v);
 bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v);
 
+Vertice distMin(std::map<Vertice, int> dists, std::list<Vertice> visitados);
 // ========================================================================
 // ======================== FUNCOES DE BUSCA ==============================
 // ========================================================================

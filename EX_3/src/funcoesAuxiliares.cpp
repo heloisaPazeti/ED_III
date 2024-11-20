@@ -133,6 +133,27 @@ bool VerticePreto(std::set<Vertice> pretos, Vertice v)  { return pretos.find(v) 
 bool VerticeCinza(std::list<Vertice> cinzas, Vertice v) { return std::find(cinzas.begin(), cinzas.end(), v) != cinzas.end(); }
 bool VerticeBranco(std::list<Vertice> cinzas, std::set<Vertice> pretos, Vertice v) { return ((!VerticeCinza(cinzas, v)) && (!VerticePreto(pretos, v))); }
 
+Vertice distMin(std::map<Vertice, int> dists, std::list<Vertice> visitados)
+{
+    int min = __INT_MAX__;
+    Vertice minVertice("");
+    Vertice vTemp("");
+    std::map<Vertice, int>::iterator it;
+
+    for (it = dists.begin(); it != dists.end(); it++) 
+    {
+        vTemp = (*it).first;
+        if (min > dists[vTemp] && (!VerticeCinza(visitados, vTemp))) 
+        {
+            min = dists[vTemp];
+            minVertice = vTemp;
+        }
+    }
+
+    return minVertice;
+}
+
+
 // ========================================================================
 // ======================== FUNCOES DE BUSCA ==============================
 // ========================================================================

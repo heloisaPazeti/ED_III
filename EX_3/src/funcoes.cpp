@@ -4,6 +4,7 @@
 #include <string.h>
 #include <map>
 #include <list>
+#include <queue>
 #include <algorithm>
 
 // ========================================================================
@@ -263,3 +264,89 @@ int BuscarComponentes(std::string nomeArq)
 // ========================================================================
 // =================== FUNCOES DE RELAÇÃO GRAFO (14) ======================
 // ========================================================================
+// Algoritmo de Dijkstra -> https://gist.github.com/marcoscastro/d4e0df5b134c2cd63cf2 s2
+
+/* == Funcionamento ==
+
+    -> Inicialmente tem-se todas as distancias como infinito.
+    -> Sabe-se que a distancia do vertice origem para ele mesmo eh zero.
+    -> Enquanto a fila de prioridade, ordenada pelo menor custo, conter possibilidades.
+    -> Pega-se o proximo com menor custo e recalcula-se o novo custo desse vertice.
+    -> Se esse valor for menor do que o anteriormente salvo, atualiza-se para o novo.
+    -> Coloca-se o vertice na fila com o novo valor.
+    -> Se a fila ficar vazia, quer dizer que todos os possiveis caminhos foram percorridos, logo tem-se o menor caminho.
+*/
+int RelacaoPresaPredador(std::string nomeArq)
+{
+    int i, n;
+    char nomePredador[200];                                                     // Nomes predadores
+    char nomePresa[200];                                                        // Nomes Presas
+    std::map<Vertice, int> dist;                                                // Guarda as distancias finais
+    std::set<Vertice>::iterator itPredador;                                     // Iterador
+    std::set<Vertice> vetorVertices = CriarGrafo(nomeArq);                      // Grafo
+    std::priority_queue <std::pair<int, Vertice>, std::vector<std::pair<int, Vertice>>, std::greater<std::pair<int, Vertice> >> pq;
+    // ^ Fila de prioridade <distancia, vertice> -> ordena pelo menor vertice
+
+
+    std::cin >> n;
+    for(i = 0; i < n; i++)
+    {
+        scan_quote_string(nomePredador);                                        // Pega os nomes
+        scan_quote_string(nomePresa);                                           // Pega os nomes
+        std::string predador(nomePredador);
+        std::string presa(nomePresa);
+
+        itPredador = vetorVertices.find(predador);
+        if(itPredador == vetorVertices.end())                                   // Caso não encontre o predador -> caminho nao existe
+        {
+            std::cout << predador << " " << presa << ": " << "CAMINHO INEXISTENTE" << std::endl;
+            continue;
+        }
+
+        dist.clear();                                                           // Limpamos as distancias
+        Vertice vOrigem = *itPredador;                                          // Vertice de origem
+        Vertice vDestino(presa);                                                // Vertice de destino
+
+        for (Vertice vI : vetorVertices) dist[vI] = __INT_MAX__;                // Distancias inicialmente infinitas
+        if(dist.find(presa) == dist.end()) dist[presa] = __INT_MAX__;           // Caso a presa nao esteja no grafo em si
+
+        dist[vOrigem] = 0;                                                      // Da origem para origem eh zero
+        pq.push(std::make_pair(dist[vOrigem], vOrigem));                        // Colocamos na fila de prioridade
+
+        while(!pq.empty())                                                      // Enquanto tiver caminhos para testar
+        {
+            std::pair<int, Vertice> p = pq.top();                               // Pegamos o proximo com menor distancia
+            Vertice vTemp = p.second;                                           // Vertice de menor distancia
+            std::set<Presa> adjacencias = vTemp.Adjacencias();                  // Seus adjacentes
+            pq.pop();                                                           // Removemos esse vertice da fila
+
+            for(Presa p : adjacencias)                                          // Percorre-se as adjacencias
+            {
+                auto it = vetorVertices.find(p.Nome());                         // Encontra-se o proximo vertice
+                int novoCusto = dist[vTemp] + p.Populacao();                    // Calcula-se o novo custo
+                Vertice vAtual("");
+
+                if(it == vetorVertices.end())                                   // Se o vertice atual n estiver no grafo
+                    vAtual = Vertice(p.Nome());                                 // Cria-se um vertice fantasma
+                else
+                    vAtual = (*it);                                             // Se nao, utiliza-se o encontrado
+
+                if(dist[vAtual] > novoCusto)                                    // Se o novo custo for menor
+                {
+                    dist[vAtual] = novoCusto;                                   // Altera-se para novo custo
+                    pq.push(std::make_pair(dist[vAtual], vAtual));              // Coloca-se na fila de prioridade
+                }
+                    
+            }
+        }
+        
+        std::cout << vOrigem.Nome() << " " << vDestino.Nome() << ": ";          // Print de resposta
+
+        if(dist[vDestino] == __INT_MAX__)                                       // Se distancia eh infinita -> nao tem caminho
+            std::cout << "CAMINHO INEXISTENTE" << std::endl;
+        else                                                                    // Se nao -> printar caminho
+            std::cout << dist[vDestino] << std::endl;
+    }
+
+    return 0;
+}
